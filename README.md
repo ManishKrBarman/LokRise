@@ -1,29 +1,35 @@
+# <span style="color: orange">**LokRise**
+---
 ### ROUTES
-- **Register/Login**
-- **Dashboard** [*Seller* **&** *Buyer*]
-- **About**
+- 🔐 **Register/Login**
+- 📊 **Dashboard** [*Seller* **&** *Buyer*]
+- ℹ️ **About**
 
 ---
 ---
 
 ### SCHEMAS
-- **User**
+- 🧑‍💼 **User**
 ```javascript
 {
   _id: ObjectId,
-  buyerId: ObjectId,
-  sellerId: ObjectId,
-  productId: ObjectId,
-  quantity: Number,
-  totalAmount: Number,
-  paymentStatus: "pending" | "success" | "failed",
-  deliveryStatus: "placed" | "confirmed" | "shipped" | "delivered",
-  transactionId: String, // from Monad or Base
+  name: String,
+  email: String,
+  passwordHash: String,
+  role: "farmer" | "buyer" | "admin",
+  phone: String,
+  address: {
+    village: String,
+    district: String,
+    state: String,
+    pinCode: String
+  },
+  language: "hi" | "bn" | "en",
   createdAt: Date,
   updatedAt: Date
 }
 ```
-- **Product**
+- 📦 **Product**
 ```javascript
 {
   _id: ObjectId,
@@ -33,15 +39,12 @@
   imageUrl: String,
   category: String, // e.g., handicraft, foodgrain, textile
   price: Number,
-  stock: Number,
   unit: String,  // e.g., "kg", "piece"
   location: String,  // auto-fill from seller address
-  isActive: Boolean,
-  createdAt: Date,
   updatedAt: Date
 }
 ```
-- **Order**
+- 📄 **Order**
 ```javascript
 {
   _id: ObjectId,
@@ -54,9 +57,7 @@
   deliveryStatus: "placed" | "confirmed" | "shipped" | "delivered",
   transactionId: String, // from Monad or Base
   createdAt: Date,
-  updatedAt: Date
 }
 ```
-
 ---
 ---

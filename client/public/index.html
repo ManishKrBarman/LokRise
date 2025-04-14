@@ -1,24 +1,62 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LokRise</title>
-    <link rel="stylesheet" href="/styles/styles.css" />
+    <link rel="stylesheet" href="/styles/styles.css">
+
 </head>
 
 <body>
-    <div class="container">
-        <h2>Login with OTP</h2>
-        <input type="text" id="phoneNumber" placeholder="Enter phone number" />
-        <div id="recaptcha-container"></div>
-        <button onclick="sendOTP()">Send OTP</button>
+    <header>
+        <nav>
+            <div class="logo">LokRise</div>
+            <div class="nav-links">
+                <a href="/">Home</a>
+                <a href="/about">About</a>
+            </div>
+            <div class="auth-buttons">
+                <a href="/login" class="btn btn-secondary">Login</a>
+                <a href="/register" class="btn btn-primary">Register</a>
+            </div>
+        </nav>
+    </header>
 
-        <input type="text" id="otp" placeholder="Enter OTP" style="margin-top: 10px;" />
-        <button onclick="verifyOTP()">Verify OTP</button>
-    </div>
+    <main>
+        <section class="hero">
+            <h1>Welcome to MarketPlace</h1>
+            <p>The ultimate platform connecting buyers and sellers for seamless transactions.</p>
+            <div class="hero-buttons">
+                <a href="/register?type=seller" class="btn btn-primary">Start Selling</a>
+                <a href="/register?type=buyer" class="btn btn-secondary">Start Shopping</a>
+            </div>
+        </section>
+
+        <section class="features">
+            <h2>Why Choose MarketPlace?</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>Secure Transactions</h3>
+                    <p>Our platform ensures all your transactions are safe and protected.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Wide Selection</h3>
+                    <p>Thousands of products from verified sellers across multiple categories.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Easy to Use</h3>
+                    <p>Intuitive interface makes buying and selling a breeze for everyone.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 LokRise. All rights reserved.</p>
+    </footer>
+
     <script src="/scripts/script.js"></script>
 </body>
 
