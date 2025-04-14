@@ -13,9 +13,6 @@ app.use(express.urlencoded({ extended: true }));
 
 // Serve static files from client/public
 app.use(express.static(path.join(__dirname, '../client/public')));
-app.use('/styles', express.static(path.join(__dirname, '../client/src/styles')));
-app.use('/scripts', express.static(path.join(__dirname, '../client/src/scripts')));
-
 
 // Routes
 // Send index.html for root route
