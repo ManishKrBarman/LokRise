@@ -1,6 +1,13 @@
-const express = require('express');
-const path = require('path');
-const dotenv = require('dotenv');
+import express from 'express';
+import path from 'path';
+import dotenv from 'dotenv';
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
+import connectDB from './libs/db.js';
+import AuthRoutes from './routes/auth.routes.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 dotenv.config();
 
@@ -11,35 +18,34 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve static files from client/public
+// Static files
 app.use(express.static(path.join(__dirname, '../client/public')));
 
 // Routes
-// Send index.html for root route
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '../client/public/index.html'));
 });
-
-// Registration route
 app.get('/register', (req, res) => {
     res.sendFile(path.join(__dirname, '../client/public/register.html'));
 });
-
-// Login route
 app.get('/login', (req, res) => {
     res.sendFile(path.join(__dirname, '../client/public/login.html'));
 });
-
-// About page route
 app.get('/about', (req, res) => {
     res.sendFile(path.join(__dirname, '../client/public/about.html'));
 });
+app.use('/auth', AuthRoutes);
 
-// Error handler for undefined routes
+
+
+
+// 404
 app.use((req, res) => {
     res.status(404).sendFile(path.join(__dirname, '../client/public/404.html'));
 });
 
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+connectDB().then(() => {
+    app.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+    });
 });
