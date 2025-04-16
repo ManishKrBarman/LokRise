@@ -1,3 +1,5 @@
+const backendURL = 'https://lokrise.netlify.app'; // use correct URL
+
 document.getElementById('loginForm').addEventListener('submit', async (e) => {
     e.preventDefault();
 
@@ -5,7 +7,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
     const password = document.getElementById('password').value;
 
     try {
-        const res = await fetch('/auth/login', {
+        const res = await fetch(`${backendURL}/auth/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password }),
@@ -15,8 +17,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
 
         if (res.ok) {
             alert(result.message || 'Login successful!');
-            // Redirect user after login
-            window.location.href = '/dashboard'; // or wherever your app takes them
+            window.location.href = '/dashboard';
         } else {
             alert(result.message || 'Login failed');
         }

@@ -1,36 +1,21 @@
-document.getElementById('role').addEventListener('change', () => {
-    const role = document.getElementById('role').value;
-    const upiField = document.getElementById('upiId');
-    upiField.style.display = role === 'seller' ? 'block' : 'none';
-});
+const backendURL = 'https://lokrise.netlify.app'; // replace with actual backend domain (e.g., Render or Railway)
 
 document.getElementById('registerForm').addEventListener('submit', async (e) => {
     e.preventDefault();
-
-    const name = document.getElementById('name').value;
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    const phone = document.getElementById('phone').value;
-    const role = document.getElementById('role').value;
-    const upiId = role === 'seller' ? document.getElementById('upiId').value : undefined;
+    const formData = new FormData(e.target);
+    const data = Object.fromEntries(formData.entries());
 
     try {
-        const res = await fetch('/auth/register', {
+        const res = await fetch(`${backendURL}/auth/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name, email, password, phone, role, upiId }),
+            body: JSON.stringify(data),
         });
 
         const result = await res.json().catch(() => ({}));
-
-        if (res.ok) {
-            alert(result.message || 'Registration successful!');
-            window.location.href = '/login';
-        } else {
-            alert(result.message || 'Registration failed');
-        }
-    } catch (error) {
-        console.error(error);
-        alert('An error occurred while registering.');
+        alert(result.message || 'Registered!');
+    } catch (err) {
+        console.error(err);
+        alert('Something went wrong!');
     }
 });
