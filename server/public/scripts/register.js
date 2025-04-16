@@ -1,4 +1,9 @@
-// client/public/scripts/register.js
+document.getElementById('role').addEventListener('change', () => {
+    const role = document.getElementById('role').value;
+    const upiField = document.getElementById('upiId');
+    upiField.style.display = role === 'seller' ? 'block' : 'none';
+});
+
 document.getElementById('registerForm').addEventListener('submit', async (e) => {
     e.preventDefault();
 
@@ -10,24 +15,22 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
     const upiId = role === 'seller' ? document.getElementById('upiId').value : undefined;
 
     try {
-        const response = await fetch('/auth/register', {
+        const res = await fetch('/auth/register', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name, email, password, phone, role, upiId }),
         });
 
-        const data = await response.json();
+        const result = await res.json().catch(() => ({}));
 
-        if (response.ok) {
-            alert('Registration successful! Please check your email for verification code.');
-            // Redirect to verification page or show verification form
+        if (res.ok) {
+            alert(result.message || 'Registration successful!');
+            window.location.href = '/login';
         } else {
-            alert(data.message || 'Registration failed');
+            alert(result.message || 'Registration failed');
         }
     } catch (error) {
-        console.error('Error:', error);
-        alert('An error occurred during registration');
+        console.error(error);
+        alert('An error occurred while registering.');
     }
 });

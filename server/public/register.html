@@ -11,42 +11,25 @@
 <body>
     <div class="form-container">
         <form id="registerForm">
-            <h2>Register</h2>
-            <input type="text" name="name" placeholder="Full Name" required />
-            <input type="email" name="email" placeholder="Email" required />
-            <input type="password" name="password" placeholder="Password" required />
-            <input type="text" name="phone" placeholder="Phone Number" />
-            <select name="role" id="roleSelect" required>
+            <h2>Create Account</h2>
+            <input type="text" id="name" name="name" placeholder="Full Name" required />
+            <input type="email" id="email" name="email" placeholder="Email Address" required />
+            <input type="password" id="password" name="password" placeholder="Password" required />
+            <input type="text" id="phone" name="phone" placeholder="Phone Number" />
+
+            <select name="role" id="role" required>
                 <option value="buyer">Buyer</option>
                 <option value="seller">Seller</option>
             </select>
-            <input type="text" name="upiLink" id="upiField" placeholder="UPI ID (Only for sellers)"
-                style="display:none;" />
+
+            <input type="text" id="upiId" name="upiId" placeholder="UPI ID (for sellers only)" style="display: none;" />
+
             <button type="submit">Register</button>
         </form>
         <p>Already have an account? <a href="/login">Login here</a></p>
     </div>
 
-    <script>
-        const roleSelect = document.getElementById('roleSelect');
-        const upiField = document.getElementById('upiField');
-        roleSelect.addEventListener('change', () => {
-            upiField.style.display = roleSelect.value === 'seller' ? 'block' : 'none';
-        });
-
-        document.getElementById('registerForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            const data = Object.fromEntries(formData.entries());
-            const res = await fetch('/auth/register', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data),
-            });
-            const result = await res.json();
-            alert(result.message || 'Registered!');
-        });
-    </script>
+    <script src="/scripts/register.js"></script>
 </body>
 
 </html>
