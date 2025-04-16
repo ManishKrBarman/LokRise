@@ -1,3 +1,4 @@
+// models/user.js
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
@@ -15,11 +16,15 @@ const userSchema = new mongoose.Schema(
             type: String,
             required: true
         },
-        // role: {
-        //     type: String,
-        //     default: "buyer",
-        //     Options: ["buyer", "seller"]
-        // },
+        role: {
+            type: String,
+            default: "buyer",
+            enum: ["buyer", "seller"]
+        },
+        upiId: {
+            type: String,
+            required: function () { return this.role === 'seller'; }
+        },
         phone: String,
         address: {
             village: String,
@@ -37,7 +42,6 @@ const userSchema = new mongoose.Schema(
     },
     {
         timestamps: true
-
     });
 
 const UserModel = mongoose.model("User", userSchema);

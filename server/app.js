@@ -1,3 +1,4 @@
+// app.js
 import express from 'express';
 import path from 'path';
 import dotenv from 'dotenv';
@@ -5,6 +6,7 @@ import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import connectDB from './libs/db.js';
 import AuthRoutes from './routes/auth.routes.js';
+import PayRoutes from './routes/Pay.routes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -19,29 +21,27 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Static files
-app.use(express.static(path.join(__dirname, '../client/public')));
+app.use(express.static(path.join(__dirname, './public')));
 
 // Routes
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '../client/public/index.html'));
+    res.sendFile(path.join(__dirname, './public/index.html'));
 });
 app.get('/register', (req, res) => {
-    res.sendFile(path.join(__dirname, '../client/public/register.html'));
+    res.sendFile(path.join(__dirname, './public/register.html'));
 });
 app.get('/login', (req, res) => {
-    res.sendFile(path.join(__dirname, '../client/public/login.html'));
+    res.sendFile(path.join(__dirname, './public/login.html'));
 });
 app.get('/about', (req, res) => {
-    res.sendFile(path.join(__dirname, '../client/public/about.html'));
+    res.sendFile(path.join(__dirname, './public/about.html'));
 });
 app.use('/auth', AuthRoutes);
-
-
-
+app.use('/payment', PayRoutes);
 
 // 404
 app.use((req, res) => {
-    res.status(404).sendFile(path.join(__dirname, '../client/public/404.html'));
+    res.status(404).sendFile(path.join(__dirname, 'temp/404.html'));
 });
 
 connectDB().then(() => {

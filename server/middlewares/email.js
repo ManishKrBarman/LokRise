@@ -6,7 +6,7 @@ export const SendVerificationCode = async (email, verificationCode) => {
 
     try {
         const response = await transporter.sendMail({
-            from: '"LokRise" <artitechmotion@gmail.com>', // sender address
+            from: '"LokRise" <thecreons@gmail.com>', // sender address
             to: email, // list of receivers
             subject: "Verify Your Email - LokRise",
             text: `Your LokRise verification code is: ${verificationCode}`,
@@ -23,7 +23,7 @@ export const SendVerificationCode = async (email, verificationCode) => {
 export const sendWelcomeEmail = async (email, name) => {
     try {
         const response = await transporter.sendMail({
-            from: '"LokRise" <artitechmotion@gmail.com>',
+            from: '"LokRise" <thecreons@gmail.com>',
             to: email,
             subject: "Welcome to LokRise!",
             text: `Hello, ${name}! Thank you for joining LokRise! Your email has been successfully verified, and your account is now active.`,
