@@ -30,6 +30,7 @@ const register = async (req, res) => {
             password: hashedPassword,
             phone,
             role: role || 'buyer',
+            upiLink: role === "seller" ? upiLink : undefined,
             upiId,
             verificationCode,
             createdAt: new Date(),
