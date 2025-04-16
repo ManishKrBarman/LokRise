@@ -1,13 +1,11 @@
-import './tailwind.css'
-import Footer from './components/footer'
+import React from 'react'
+import HomePage from './pages/home'
+import './App.css'
 
-function App() {
-
-  return (
-    <>
-      <Footer />
-    </>
-  )
+const App = () => {
+    return (
+        <HomePage />
+    )
 }
 
 export default App

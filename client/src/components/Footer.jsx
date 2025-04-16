@@ -1,38 +1,60 @@
 import React from 'react';
-import FooterLogo from '../assets/lokrise-logo.svg';
+import FooterLogo from '../assets/logo.svg';
 import { AiFillInstagram } from "react-icons/ai";
-import { FaDiscord } from "react-icons/fa";
-import { FaYoutube } from "react-icons/fa";
-import { FaTwitter } from "react-icons/fa";
+import { FaDiscord, FaYoutube, FaTwitter } from "react-icons/fa";
 
 const Footer = () => {
     return (
-        <footer className='absolute w-full h-auto py-2 bottom-0 flex flex-col gap-y-3 md:flex-row-reverse justify-between items-center px-4 bg-[#9B7653] text-white'>
-            <div className="social-icons flex flex-row md:flex-col space-x-4 md:space-x-0 text-4xl">
-                <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer"><AiFillInstagram color='white' /></a>
-                <a href="https://discord.com/" target="_blank" rel="noopener noreferrer"><FaDiscord color='white' /></a>
-                <a href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer"><FaYoutube color='white' /></a>
-                <a href="https://twitter.com/" target="_blank" rel="noopener noreferrer"><FaTwitter color='white' /></a>
+        <footer className="relative bottom-0 w-full py-6 px-4 bg-[var(--primary-color)] text-white flex flex-col gap-y-8 md:flex-row md:justify-between md:items-start">
+            {/* Logo Section */}
+            <div className="bg-white p-2 rounded-t-3xl rounded-br-3xl h-auto w-auto flex justify-center items-center self-center md:self-start">
+                <img className="w-40" src={FooterLogo} alt="Lokrise Logo" />
             </div>
-            <div className='footer-text flex flex-col text-base gap-y-5 items-center font-light md:flex-row md:items-start md:gap-x-12 md:text-xl'>
-                <div className="footer-text flex flex-col items-center text-center">
-                    <p className='font-medium'>LOKRISE</p>
+
+            {/* Middle Info Section */}
+            <div className="flex flex-col md:flex-row gap-8 justify-center items-center text-center md:text-left md:items-start md:gap-16 text-base md:text-lg font-light">
+                <div>
+                    <p className="font-medium text-lg mb-2">LOKRISE</p>
                     <p>© 2025 All rights reserved</p>
-                    <p>Made with love by Lokrise Team</p>
+                    <p>Made with ❤️ by the Creon Team</p>
                 </div>
-                <div className="footer-text flex flex-col items-center md:items-start text-left">
-                    <p className='font-medium'>Get to Know Us:</p>
-                    <ul className='list-disc list-inside'>
-                        <li>About Lokrise</li>
-                        <li>Lokrise Learning</li>
+                <div>
+                    <p className="font-semibold mb-2">Get to Know Us:</p>
+                    <ul className="space-y-1">
+                        <li><a href="/about" className="hover:underline">About Lokrise</a></li>
+                        <li><a href="/terms" className="hover:underline">Terms & Conditions</a></li>
+                        <li><a href="/privacy" className="hover:underline">Privacy Policy</a></li>
+                        <li><a href="/contact" className="hover:underline">Contact Us</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <p className="font-semibold mb-2">Helpful Links:</p>
+                    <ul className="space-y-1">
+                        <li><a href="/help-center" className="hover:underline">Help Center</a></li>
+                        <li><a href="/learning" className="hover:underline">Learning</a></li>
+                        <li><a href="/community" className="hover:underline">Community</a></li>
+                        <li><a href="/dashboard" className="hover:underline">Seller Dashboard</a></li>
                     </ul>
                 </div>
             </div>
-            <div className="bg-white rounded-t-4xl rounded-br-4xl footer-logo h-55 w-55 flex justify-center items-center">
-                <img className='w-50 h-50' src={FooterLogo} alt="Logo" />
+
+            {/* Social Icons */}
+            <div className="flex justify-center md:flex-col gap-4 text-3xl md:text-4xl items-center md:items-end">
+                <a href="https://www.instagram.com/" aria-label="Instagram" target="_blank" rel="noopener noreferrer">
+                    <AiFillInstagram />
+                </a>
+                <a href="https://discord.com/" aria-label="Discord" target="_blank" rel="noopener noreferrer">
+                    <FaDiscord />
+                </a>
+                <a href="https://www.youtube.com/" aria-label="YouTube" target="_blank" rel="noopener noreferrer">
+                    <FaYoutube />
+                </a>
+                <a href="https://twitter.com/" aria-label="Twitter" target="_blank" rel="noopener noreferrer">
+                    <FaTwitter />
+                </a>
             </div>
         </footer>
-    )
-}
+    );
+};
 
-export default Footer
+export default Footer;
