@@ -4,7 +4,7 @@ import SellerProfile from './SellerProfile';
 
 const ProductCard = ({ product }) => {
     return (
-        <div className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col h-full border border-gray-100 hover:shadow-lg transition duration-300">
+        <div className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col h-full border border-gray-100 hover:shadow-lg transition duration-300 max-h-80">
             {/* Product Image */}
             <div className="relative h-48">
                 <img

@@ -47,7 +47,7 @@ const CategoryBar = () => {
     return (
         <div className="bg-white border-b border-gray-200 fixed top-[72px] left-0 right-0 z-40 shadow-sm">
             <div className="max-w-7xl mx-auto px-4">
-                <div className="flex items-center h-12 gap-6 overflow-x-auto overflow-y-visible no-scrollbar">
+                <div className="flex items-center h-12 gap-6 overflow-visible">
                     <a href="/"
                         className="flex-none text-[var(--primary-color)] font-medium hover:text-[var(--primary-color)]/80 text-sm whitespace-nowrap">
                         Home
