@@ -1,10 +1,11 @@
-import './App.css'
+import './tailwind.css'
+import Footer from './components/footer'
 
 function App() {
 
   return (
     <>
-      <h1 className="text-3xl font-bold underline">Hello World</h1>
+      <Footer />
     </>
   )
 }
