@@ -64,13 +64,16 @@ const AboutPage = () => {
                     >
                         <h2 className="text-2xl md:text-3xl font-semibold mb-6 text-center">Meet the Team</h2>
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                            {["Manish", "Devesh", "Raghav", "Himanshi"].map((name, i) => (
-                                <div key={i} className="bg-gray-100 p-4 rounded-xl shadow hover:shadow-lg transition w-64">
-                                    <img src={`/team/${name.toLowerCase()}.jpg`} alt={name} className="h-32 w-full object-cover rounded mb-3" />
-                                    <h3 className="text-lg font-bold">{name}</h3>
-                                    <p className="text-sm text-gray-600">Team Member</p>
-                                </div>
-                            ))}
+                        {[{"Manish":"Developer"}, {"Devesh":"Developer"}, {"Raghav":"UI/UX Designer & Cousellor"}, {"Himanshi":"UI/UX Designer"}].map((member, i) => {
+                            const [name, role] = Object.entries(member)[0];
+                            return (
+                            <div key={i} className="bg-gray-100 p-4 rounded-xl shadow hover:shadow-lg transition w-64">
+                                <img src={`/team/${name.toLowerCase()}.jpg`} alt={name} className="h-32 w-full object-cover rounded mb-3" />
+                                <h3 className="text-lg font-bold">{name}</h3>
+                                <p className="text-sm text-gray-600">{role}</p>
+                            </div>
+                            );
+                        })}
                         </div>
                     </motion.section>
                 </section>
