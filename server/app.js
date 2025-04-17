@@ -33,8 +33,8 @@ app.get('/register', (req, res) => {
 app.get('/login', (req, res) => {
     res.sendFile(path.join(__dirname, './public/login.html'));
 });
-app.get('/about', (req, res) => {
-    res.sendFile(path.join(__dirname, './public/about.html'));
+app.get("/about", (req, res) => {
+    res.json({ message: "This is the about route from backend!" });
 });
 app.use('/auth', AuthRoutes);
 app.use('/payment', PayRoutes);
