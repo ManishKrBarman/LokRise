@@ -13,7 +13,7 @@ const HomePage = () => {
             <Navbar />
             <CategoryBar />
             <main className="flex-grow pt-[128px]">
-                {/* <HeroSection /> */}
+                <HeroSection />
                 <ProductsSection />
                 <CoursesSection />
             </main>

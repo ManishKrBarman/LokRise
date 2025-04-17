@@ -5,7 +5,10 @@ const HeroSection = () => {
     const [isScrolling, setIsScrolling] = useState(true);
     const scrollRef = useRef(null);
     const scrollAmountRef = useRef(0);
-    const lastTimeRef = useRef(0);
+    const lastTimeRef = useRef(performance.now());
+    const animationIdRef = useRef(null);
+    const clonedRef = useRef(false); // Prevent re-cloning
+
     const banners = [
         {
             id: 1,
@@ -32,49 +35,46 @@ const HeroSection = () => {
 
     useEffect(() => {
         const scrollContainer = scrollRef.current;
-        if (!scrollContainer) return;
+        if (!scrollContainer || clonedRef.current) return;
 
-        // Clone the banner items for infinite scroll effect
+        // Clone banners only once
         const scrollContent = Array.from(scrollContainer.children);
         scrollContent.forEach(item => {
             const clone = item.cloneNode(true);
             scrollContainer.appendChild(clone);
         });
+        clonedRef.current = true;
+    }, []);
 
-        // Automatic scroll animation
-        const distance = 1; // pixels per frame (reduced from 1)
-        let animationId;
+    useEffect(() => {
+        const scrollContainer = scrollRef.current;
+        if (!scrollContainer) return;
+
+        const distance = 0.5; // smoother scroll
+        let lastTime = performance.now();
 
         const scroll = (timestamp) => {
-            if (!scrollContainer || !isScrolling) {
-                lastTimeRef.current = timestamp;
-                return;
-            }
+            if (!isScrolling) return;
 
-            // Calculate time elapsed
-            const deltaTime = timestamp - lastTimeRef.current;
-            lastTimeRef.current = timestamp;
+            const deltaTime = timestamp - lastTime;
+            lastTime = timestamp;
 
-            // Update scroll position
-            scrollAmountRef.current += distance * (deltaTime / 16); // normalize to 60fps
+            scrollAmountRef.current += distance * (deltaTime / 16); // normalize
             scrollContainer.scrollLeft = scrollAmountRef.current;
 
-            // Reset scroll position when we've scrolled through the original items
             if (scrollAmountRef.current >= scrollContainer.scrollWidth / 2) {
                 scrollAmountRef.current = 0;
                 scrollContainer.scrollLeft = 0;
             }
 
-            animationId = requestAnimationFrame(scroll);
+            animationIdRef.current = requestAnimationFrame(scroll);
         };
 
-        if (isScrolling) {
-            animationId = requestAnimationFrame(scroll);
-        }
+        animationIdRef.current = requestAnimationFrame(scroll);
 
         return () => {
-            if (animationId) {
-                cancelAnimationFrame(animationId);
+            if (animationIdRef.current) {
+                cancelAnimationFrame(animationIdRef.current);
             }
         };
     }, [isScrolling]);
