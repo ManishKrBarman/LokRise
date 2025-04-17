@@ -5,7 +5,7 @@ const HeroSection = () => {
     const [isScrolling, setIsScrolling] = useState(true);
     const scrollRef = useRef(null);
     const scrollAmountRef = useRef(0);
-    const lastTimeRef = useRef(performance.now());
+    // const lastTimeRef = useRef(performance.now());
     const animationIdRef = useRef(null);
     const clonedRef = useRef(false); // Prevent re-cloning
 
@@ -93,7 +93,7 @@ const HeroSection = () => {
                     </button> */}
                 </div>
 
-                <div className="overflow-hidden"  style={{ borderRadius: '10px'}}>
+                <div className="overflow-hidden" style={{ borderRadius: '10px' }}>
                     <div
                         ref={scrollRef}
                         className="flex gap-4 overflow-x-auto scrollbar-hide"

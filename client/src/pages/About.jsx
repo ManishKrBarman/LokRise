@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import Navbar from '../components/Navbar';
+import Navbar from '../components/NavBar';
 import Footer from '../components/Footer';
 import '../index.css';
 
@@ -18,7 +18,7 @@ const AboutPage = () => {
         <div className="min-h-screen flex flex-col bg-white text-gray-800">
             <Navbar />
             <main className="flex-grow pt-[128px] px-4 md:px-16 lg:px-32 space-y-16">
-                
+
                 {/* Hero Section */}
                 <section className="text-center">
                     <motion.section
@@ -43,14 +43,14 @@ const AboutPage = () => {
                         transition={{ duration: 0.5 }}
                         viewport={{ once: true }}
                     >
-                    <h2 className="text-2xl md:text-3xl font-semibold mb-4">Why Lokrise?</h2>
-                    <ul className="space-y-4 text-gray-700 list-disc list-inside">
-                        <li>🔗 Connects artisans and farmers directly to consumers</li>
-                        <li>📱 Provides a simple and powerful mobile-first platform</li>
-                        <li>💬 Offers support in local languages for inclusivity</li>
-                        <li>💰 Ensures fair trade by eliminating middlemen</li>
-                        <li>⚡ Uses cutting-edge tech like OTP auth and QR payments</li>
-                    </ul>
+                        <h2 className="text-2xl md:text-3xl font-semibold mb-4">Why Lokrise?</h2>
+                        <ul className="space-y-4 text-gray-700 list-disc list-inside">
+                            <li>🔗 Connects artisans and farmers directly to consumers</li>
+                            <li>📱 Provides a simple and powerful mobile-first platform</li>
+                            <li>💬 Offers support in local languages for inclusivity</li>
+                            <li>💰 Ensures fair trade by eliminating middlemen</li>
+                            <li>⚡ Uses cutting-edge tech like OTP auth and QR payments</li>
+                        </ul>
                     </motion.section>
                 </section>
 
@@ -62,16 +62,16 @@ const AboutPage = () => {
                         transition={{ duration: 0.7 }}
                         viewport={{ once: true }}
                     >
-                    <h2 className="text-2xl md:text-3xl font-semibold mb-6 text-center">Meet the Team</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                        {["Manish", "Devesh", "Raghav","Himanshi"].map((name, i) => (
-                            <div key={i} className="bg-gray-100 p-4 rounded-xl shadow hover:shadow-lg transition w-64">
-                                <img src={`/team/${name.toLowerCase()}.jpg`} alt={name} className="h-32 w-full object-cover rounded mb-3" />
-                                <h3 className="text-lg font-bold">{name}</h3>
-                                <p className="text-sm text-gray-600">Team Member</p>
-                            </div>
-                        ))}
-                    </div>
+                        <h2 className="text-2xl md:text-3xl font-semibold mb-6 text-center">Meet the Team</h2>
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                            {["Manish", "Devesh", "Raghav", "Himanshi"].map((name, i) => (
+                                <div key={i} className="bg-gray-100 p-4 rounded-xl shadow hover:shadow-lg transition w-64">
+                                    <img src={`/team/${name.toLowerCase()}.jpg`} alt={name} className="h-32 w-full object-cover rounded mb-3" />
+                                    <h3 className="text-lg font-bold">{name}</h3>
+                                    <p className="text-sm text-gray-600">Team Member</p>
+                                </div>
+                            ))}
+                        </div>
                     </motion.section>
                 </section>
 
