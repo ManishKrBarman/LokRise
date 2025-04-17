@@ -1,7 +1,6 @@
 import React from 'react';
 import NavBar from '../components/NavBar';
 import Footer from '../components/Footer';
-import CategoryBar from '../components/CategoryBar';
 import SellerHero from '../components/SellerHero';
 import SellerBenefits from '../components/SellerBenefits';
 import SellerSteps from '../components/SellerSteps';
@@ -13,9 +12,8 @@ import SellerCTA from '../components/SellerCTA';
 const SellerLanding = () => {
     return (
         <div className="seller-landing">
-            <NavBar />
+            <NavBar buttonText="Start Selling" />
             <div className="mt-[72px]">
-                <CategoryBar />
                 <div className="pt-12">
                     <SellerHero />
                     <SellerStats />

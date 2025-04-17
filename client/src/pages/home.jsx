@@ -10,7 +10,7 @@ import '../index.css';
 const HomePage = () => {
     return (
         <div className="min-h-screen flex flex-col">
-            <Navbar />
+            <Navbar fixed={true} cartBtn={true} />
             <CategoryBar />
             <main className="flex-grow pt-[128px]">
                 <HeroSection />

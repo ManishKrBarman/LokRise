@@ -7,13 +7,13 @@ const Footer = () => {
     return (
         <footer className="relative bottom-0 w-full py-6 px-4 bg-[var(--primary-color)] text-white flex flex-col gap-y-8 md:flex-row md:justify-between md:items-start">
             {/* Logo Section */}
-            <div className="bg-white p-2 rounded-t-3xl rounded-br-3xl h-auto w-auto flex justify-center items-center self-center md:self-start">
+            <div className="bg-white p-2 rounded-t-3xl rounded-br-3xl h-auto w-auto flex justify-center items-center self-center md:self-start md:ml-6">
                 <img className="w-40" src={FooterLogo} alt="Lokrise Logo" />
             </div>
 
             {/* Middle Info Section */}
-            <div className="flex flex-col md:flex-row gap-8 justify-center items-center text-center md:text-left md:items-start md:gap-16 text-base md:text-lg font-light">
-                <div>
+            <div className="flex flex-col md:flex-row gap-8 justify-center items-center text-center md:text-left md:items-start  text-base md:text-lg font-light">
+                <div className='flex flex-col items-center md:items-start p-2'>
                     <p className="font-medium text-lg mb-2">LOKRISE</p>
                     <p>© 2025 All rights reserved</p>
                     <p>Made with ❤️ by the Creon Team</p>
@@ -39,7 +39,7 @@ const Footer = () => {
             </div>
 
             {/* Social Icons */}
-            <div className="flex justify-center md:flex-col gap-4 text-3xl md:text-4xl items-center md:items-end">
+            <div className="flex justify-center md:mr-6 md:flex-col gap-4 text-3xl md:text-4xl items-center md:items-end">
                 <a href="https://www.instagram.com/" aria-label="Instagram" target="_blank" rel="noopener noreferrer">
                     <AiFillInstagram />
                 </a>

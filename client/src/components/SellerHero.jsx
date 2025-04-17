@@ -32,7 +32,7 @@ const SellerHero = () => {
                             className="w-full h-auto rounded-lg shadow-2xl"
                             onError={(e) => {
                                 e.target.onerror = null;
-                                e.target.src = "https://placehold.co/600x400/7D23E0/ffffff?text=Sell+on+Lokrise";
+                                e.target.src = "https://placehold.co/600x400/6A9B4B/ffffff?text=Sell+on+Lokrise";
                             }}
                         />
                     </div>
