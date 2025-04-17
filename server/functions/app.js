@@ -4,9 +4,9 @@ import path from 'path';
 import dotenv from 'dotenv';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
-import connectDB from './libs/db.js';
-import AuthRoutes from './routes/auth.routes.js';
-import PayRoutes from './routes/Pay.routes.js';
+import connectDB from '../libs/db.js';
+import AuthRoutes from '../routes/Auth.routes.js';
+import PayRoutes from '../routes/Pay.routes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);

@@ -12,7 +12,8 @@
   "main": "app.js",
   "scripts": {
     "start": "node server/app.js",
-    "dev": "nodemon server/app.js"
+    "dev": "nodemon /functions/app.js",
+    "build": "netlify deploy --prod"
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",
