@@ -13,7 +13,7 @@ const SellerLanding = () => {
     return (
         <div className="seller-landing">
             <NavBar buttonText="Start Selling" />
-            <div className="mt-[72px]">
+            <div>
                 <div className="pt-12">
                     <SellerHero />
                     <SellerStats />

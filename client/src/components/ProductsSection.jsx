@@ -52,7 +52,7 @@ const ProductsSection = () => {
         {
             id: 1,
             name: "TechSmart",
-            avatar: "/api/placeholder/80/80",
+            avatar: "https://placehold.co/10?text=T",
             followers: 12500,
             rating: 4.9,
             category: "Electronics"
@@ -60,7 +60,7 @@ const ProductsSection = () => {
         {
             id: 2,
             name: "FashionHub",
-            avatar: "/api/placeholder/80/80",
+            avatar: "https://placehold.co/10?text=F",
             followers: 9800,
             rating: 4.7,
             category: "Fashion"
@@ -68,7 +68,7 @@ const ProductsSection = () => {
         {
             id: 3,
             name: "HomeDecorPlus",
-            avatar: "/api/placeholder/80/80",
+            avatar: "https://placehold.co/10?text=H",
             followers: 7300,
             rating: 4.8,
             category: "Home & Living"

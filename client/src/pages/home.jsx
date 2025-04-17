@@ -12,7 +12,7 @@ const HomePage = () => {
         <div className="min-h-screen flex flex-col">
             <Navbar fixed={true} cartBtn={true} />
             <CategoryBar />
-            <main className="flex-grow pt-[128px]">
+            <main className="flex-grow">
                 <HeroSection />
                 <ProductsSection />
                 <CoursesSection />

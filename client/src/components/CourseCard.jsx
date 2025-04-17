@@ -8,7 +8,8 @@ const CourseCard = ({ course }) => {
             {/* Course Image */}
             <div className="relative h-40">
                 <img
-                    src={course.imageUrl}
+                    // src={course.imageUrl}
+                    src="https://placehold.co/300x200?text=Course+Image"
                     alt={course.title}
                     className="w-full h-full object-cover"
                 />

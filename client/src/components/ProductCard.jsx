@@ -8,7 +8,8 @@ const ProductCard = ({ product }) => {
             {/* Product Image */}
             <div className="relative h-48">
                 <img
-                    src={product.imageUrl}
+                    // src={product.imageUrl}
+                    src="https://placehold.co/300x200?text=Product+Image"
                     alt={product.name}
                     className="w-full h-full object-cover"
                 />

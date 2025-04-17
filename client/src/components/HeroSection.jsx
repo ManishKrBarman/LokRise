@@ -15,21 +15,21 @@ const HeroSection = () => {
             title: "Summer Collection 2025",
             description: "Discover the latest trends for the season",
             bgColor: "bg-gradient-to-r from-[var(--tertiary-color)] to-blue-400",
-            imageUrl: "/api/placeholder/600/300"
+            imageUrl: "https://placehold.co/600x300?text=Summer+Collection+2025"
         },
         {
             id: 2,
             title: "Tech Gadgets Sale",
             description: "Up to 40% off on premium electronics",
             bgColor: "bg-gradient-to-r from-[var(--primary-color)] to-amber-400",
-            imageUrl: "/api/placeholder/600/300"
+            imageUrl: "https://placehold.co/600x300?text=Tech+Gadgets+Sale"
         },
         {
             id: 3,
             title: "Home Decor Collection",
             description: "Transform your space with our exclusive items",
             bgColor: "bg-gradient-to-r from-[var(--secondary-color)] to-green-300",
-            imageUrl: "/api/placeholder/600/300"
+            imageUrl: "https://placehold.co/600x300?text=Home+Decor+Collection"
         }
     ];
 
@@ -115,7 +115,7 @@ const HeroSection = () => {
                                         <img
                                             src={banner.imageUrl}
                                             alt={banner.title}
-                                            className="w-full h-40 object-cover rounded"
+                                            className="w-full h-40 opacity-50 object-cover rounded"
                                         />
                                         <button className="mt-4 bg-white text-[var(--primary-color)] py-2 px-6 rounded-full font-medium hover:bg-gray-100 transition duration-300">
                                             Shop Now
