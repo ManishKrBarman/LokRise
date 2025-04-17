@@ -7,6 +7,9 @@ import { fileURLToPath } from 'url';
 import connectDB from './libs/db.js';
 import AuthRoutes from './routes/Auth.routes.js';
 import PayRoutes from './routes/Pay.routes.js';
+import ProductRoutes from './routes/Product.routes.js';
+import OrderRoutes from './routes/Order.routes.js';
+import { errorHandler } from './middlewares/errorHandler.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -38,6 +41,10 @@ app.get("/about", (req, res) => {
 });
 app.use('/auth', AuthRoutes);
 app.use('/payment', PayRoutes);
+app.use('/products', ProductRoutes);
+app.use('/orders', OrderRoutes);
+
+app.use(errorHandler);
 
 // 404
 app.use((req, res) => {

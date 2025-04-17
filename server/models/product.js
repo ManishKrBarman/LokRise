@@ -1,5 +1,5 @@
 // models/Product.js
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const productSchema = new mongoose.Schema({
     name: { type: String, required: true },
@@ -8,9 +8,10 @@ const productSchema = new mongoose.Schema({
     quantityAvailable: { type: Number, required: true },
     category: { type: String },
     images: [{ type: String }],
-    seller: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    seller: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },  // No need for `new` here
     location: { type: String },
     createdAt: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model('Product', productSchema);
+const ProductModel = mongoose.model('Product', productSchema);
+export default ProductModel;
