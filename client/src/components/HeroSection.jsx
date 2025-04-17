@@ -84,16 +84,16 @@ const HeroSection = () => {
             <div className="max-w-7xl mx-auto px-4">
                 <div className="flex justify-between items-center mb-6">
                     <h2 className="text-2xl font-bold text-gray-800">Trending Now</h2>
-                    <button
+                    {/* <button
                         onClick={() => setIsScrolling(!isScrolling)}
                         className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-full transition-colors"
                     >
                         {isScrolling ? <FiPause size={16} /> : <FiPlay size={16} />}
                         {isScrolling ? 'Pause' : 'Play'} Scroll
-                    </button>
+                    </button> */}
                 </div>
 
-                <div className="overflow-hidden">
+                <div className="overflow-hidden"  style={{ borderRadius: '10px'}}>
                     <div
                         ref={scrollRef}
                         className="flex gap-4 overflow-x-auto scrollbar-hide"

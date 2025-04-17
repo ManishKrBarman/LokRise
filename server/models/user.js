@@ -16,6 +16,12 @@ const userSchema = new mongoose.Schema(
             type: String,
             required: true
         },
+        profileImage: { type: String },
+        phone: {
+            type: String,
+            unique: true,
+            required: true
+        },
         role: {
             type: String,
             default: "buyer",
@@ -25,7 +31,6 @@ const userSchema = new mongoose.Schema(
             type: String,
             required: function () { return this.role === 'seller'; }
         },
-        phone: String,
         address: {
             village: String,
             district: String,

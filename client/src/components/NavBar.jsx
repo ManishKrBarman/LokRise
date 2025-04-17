@@ -53,6 +53,11 @@ const Navbar = () => {
                     <button className="bg-[var(--primary-color)] hover:bg-[#8b6b4b] text-white py-2 px-4 rounded-lg transition duration-300">
                         Login
                     </button>
+
+                    {/* Register Button */}
+                    <button className="bg-[var(--primary-color)] hover:bg-[#8b6b4b] text-white py-2 px-4 rounded-lg transition duration-300">
+                        Register
+                    </button>
                 </div>
             </div>
         </nav>
