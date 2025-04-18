@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { FiShoppingCart, FiBell, FiSearch } from 'react-icons/fi';
+import { FiShoppingCart, FiBell, FiSearch, FiHeart, FiPackage } from 'react-icons/fi';
 import logo from '../assets/logo.svg';
 import { Link } from 'react-router-dom';
 
@@ -77,6 +77,18 @@ const Navbar = (props) => {
                         <FiSearch size={24} />
                     </button>
 
+                    {/* Wishlist */}
+                    <Link to="/wishlist" className="text-gray-700 hover:text-[var(--primary-color)]">
+                        <FiHeart size={24} />
+                    </Link>
+
+                    {/* Orders - Only show if logged in */}
+                    {isLogged && (
+                        <Link to="/orders" className="text-gray-700 hover:text-[var(--primary-color)]">
+                            <FiPackage size={24} />
+                        </Link>
+                    )}
+
                     {/* Notifications */}
                     <div className="relative" ref={notificationRef}>
                         <button
@@ -137,10 +149,12 @@ const Navbar = (props) => {
                     </div>
 
                     {/* Cart */}
-                    {props.cartBtn && <button className="text-gray-700 hover:text-[var(--primary-color)] relative">
-                        <FiShoppingCart size={24} />
-                        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-4 h-4 flex items-center justify-center rounded-full">2</span>
-                    </button>}
+                    {props.cartBtn && (
+                        <Link to="/cart" className="text-gray-700 hover:text-[var(--primary-color)] relative">
+                            <FiShoppingCart size={24} />
+                            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-4 h-4 flex items-center justify-center rounded-full">2</span>
+                        </Link>
+                    )}
 
                     {/* Login/Action Button */}
                     {isLogged ? (
