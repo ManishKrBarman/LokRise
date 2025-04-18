@@ -1,0 +1,11 @@
+code,type,value,minimumPurchase,maximumDiscount,startDate,endDate,maxUses,maxUsesPerUser,applicableTo,isFirstOrderOnly,isActive,description,createdByEmail
+WELCOME20,percentage,20,1000,500,2025-01-01,2025-12-31,1000,1,all,true,true,20% off on your first order (up to ₹500),neha.gupta@example.com
+SUMMER25,percentage,25,2000,1000,2025-04-01,2025-06-30,500,1,all,false,true,Summer sale! 25% off on all products (min order ₹2000),neha.gupta@example.com
+FREESHIP,free_shipping,0,1500,,2025-01-01,2025-12-31,,,all,false,true,Free shipping on orders above ₹1500,neha.gupta@example.com
+FLASH500,fixed,500,2500,,2025-04-15,2025-04-20,100,1,all,false,true,Flash sale! Flat ₹500 off on orders above ₹2500,neha.gupta@example.com
+NEWUSER,percentage,15,500,300,2025-01-01,2025-12-31,,,all,true,true,15% off for new users (up to ₹300),neha.gupta@example.com
+BOOKS10,percentage,10,500,200,2025-01-01,2025-12-31,,,products,false,true,10% off on all books,neha.gupta@example.com
+GADGET15,percentage,15,5000,2000,2025-01-01,2025-12-31,,,products,false,true,15% off on electronics (up to ₹2000),neha.gupta@example.com
+COURSE30,percentage,30,1000,1500,2025-01-01,2025-12-31,200,1,courses,false,true,30% off on all courses (up to ₹1500),neha.gupta@example.com
+FASHION20,percentage,20,1000,500,2025-01-01,2025-12-31,,,products,false,true,20% off on fashion items,neha.gupta@example.com
+WEEKEND15,percentage,15,1500,750,2025-01-01,2025-12-31,,,all,false,true,Weekend special! 15% off on everything,neha.gupta@example.com

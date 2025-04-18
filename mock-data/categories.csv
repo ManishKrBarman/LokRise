@@ -1,0 +1,22 @@
+name,slug,description,parent,icon,image,isActive,productType
+Electronics,electronics,All electronic devices and accessories,,fas fa-tv,electronics_banner.jpg,true,physical
+Mobile Phones,mobile-phones,Smartphones and feature phones,Electronics,fas fa-mobile-alt,mobile_banner.jpg,true,physical
+Laptops,laptops,Portable computers for work and play,Electronics,fas fa-laptop,laptop_banner.jpg,true,physical
+Home Appliances,home-appliances,Essential appliances for your home,Electronics,fas fa-home,appliances_banner.jpg,true,physical
+Fashion,fashion,Clothing and accessories for all ages,,fas fa-tshirt,fashion_banner.jpg,true,physical
+Men's Clothing,mens-clothing,Clothing for men,Fashion,fas fa-male,men_banner.jpg,true,physical
+Women's Clothing,womens-clothing,Clothing for women,Fashion,fas fa-female,women_banner.jpg,true,physical
+Kids' Wear,kids-wear,Clothing for children,Fashion,fas fa-child,kids_banner.jpg,true,physical
+Books,books,Books across various genres and subjects,,fas fa-book,books_banner.jpg,true,physical
+Fiction,fiction,Novels and story books,Books,fas fa-book-open,fiction_banner.jpg,true,physical
+Non-Fiction,non-fiction,Educational and informative books,Books,fas fa-graduation-cap,non_fiction_banner.jpg,true,physical
+Programming Courses,programming-courses,Learn various programming languages and frameworks,,fas fa-code,programming_banner.jpg,true,course
+Web Development,web-development,Frontend and backend web development courses,Programming Courses,fas fa-globe,web_dev_banner.jpg,true,course
+Mobile App Development,mobile-app-development,Android and iOS app development courses,Programming Courses,fas fa-mobile-alt,app_dev_banner.jpg,true,course
+Data Science,data-science,Data analysis and machine learning courses,Programming Courses,fas fa-chart-bar,data_science_banner.jpg,true,course
+Business & Management,business-management,Courses related to business skills and management,,fas fa-briefcase,business_banner.jpg,true,course
+Finance,finance,Financial management and investment courses,Business & Management,fas fa-rupee-sign,finance_banner.jpg,true,course
+Marketing,marketing,Digital and traditional marketing courses,Business & Management,fas fa-ad,marketing_banner.jpg,true,course
+Personal Development,personal-development,Self-improvement and soft skills courses,,fas fa-user-graduate,personal_dev_banner.jpg,true,course
+Communication Skills,communication-skills,Public speaking and effective communication courses,Personal Development,fas fa-comments,communication_banner.jpg,true,course
+Leadership,leadership,Leadership and team management courses,Personal Development,fas fa-users,leadership_banner.jpg,true,course
