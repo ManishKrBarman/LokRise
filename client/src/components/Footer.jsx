@@ -3,9 +3,10 @@ import FooterLogo from '../assets/logo.svg';
 import { AiFillInstagram } from "react-icons/ai";
 import { FaDiscord, FaYoutube, FaTwitter } from "react-icons/fa";
 
-const Footer = () => {
+const Footer = (props) => {
+    console.log(props.bgcolor)
     return (
-        <footer className="relative bottom-0 w-full py-6 px-4 bg-[var(--primary-color)] text-white flex flex-col gap-y-8 md:flex-row md:justify-between md:items-start">
+        <footer className={`relative bottom-0 w-full py-6 px-4 ${props.bgcolor ? props.bgcolor : "bg-[var(--primary-color)]"} text-white flex flex-col gap-y-8 md:flex-row md:justify-between md:items-start`}>
             {/* Logo Section */}
             <div className="bg-white p-2 rounded-t-3xl rounded-br-3xl h-auto w-auto flex justify-center items-center self-center md:self-start md:ml-6">
                 <img className="w-40" src={FooterLogo} alt="Lokrise Logo" />

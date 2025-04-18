@@ -45,7 +45,7 @@ const CategoryBar = () => {
     };
 
     return (
-        <div className="bg-white border-b border-gray-200 sticky top-[72px] left-0 right-0 z-40 shadow-sm">
+        <div className="bg-white border-b border-gray-200 sticky top-[0px] left-0 right-0 z-40 shadow-sm">
             <div className="max-w-7xl mx-auto px-4">
                 <div className="flex items-center h-12 gap-6 overflow-visible">
                     <a href="/"
