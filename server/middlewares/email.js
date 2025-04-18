@@ -9,29 +9,45 @@ export const SendVerificationCode = async (email, verificationCode, tempPassword
             ? "Seller Account Verification - LokRise"
             : "Verify Your Email - LokRise";
 
-        const textContent = isSellerRegistration
-            ? `Your LokRise verification code is: ${verificationCode}. Your temporary password is: ${tempPassword}`
-            : `Your LokRise verification code is: ${verificationCode}`;
+        // The simple HTML content that will work more reliably (similar to test email)
+        const simpleHtmlContent = `
+            <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: 0 auto;">
+                <h2 style="color: #3b82f6;">Verify Your Email - LokRise</h2>
+                <p>Thanks for signing up! Please use the verification code below to complete your registration:</p>
+                <div style="background-color: #f0f4ff; padding: 15px; border-radius: 8px; font-size: 28px; 
+                    text-align: center; letter-spacing: 5px; font-weight: bold; color: #3b82f6; margin: 20px 0;">
+                    ${verificationCode}
+                </div>
+                <p>This code will expire in <strong>30 minutes</strong>.</p>
+                ${isSellerRegistration ?
+                `<p>Your temporary password is: <strong>${tempPassword}</strong></p>` :
+                ''}
+                <p>If you didn't request this verification, you can safely ignore this email.</p>
+                <p style="margin-top: 20px;">– The LokRise Team</p>
+            </div>
+        `;
 
-        const htmlContent = isSellerRegistration
-            ? verificationEmailTemplate(verificationCode, tempPassword)
-            : verificationEmailTemplate(verificationCode);
+        console.log(`[EMAIL] Attempting to send verification email to: ${email} with code: ${verificationCode}`);
 
-        console.log(`Attempting to send verification email to: ${email}`);
-
+        // Use the same structure as the test email which works
         const response = await transporter.sendMail({
-            from: process.env.EMAIL_FROM || '"LokRise" <thecreons@gmail.com>',
+            from: {
+                name: 'LokRise Team',
+                address: process.env.EMAIL_FROM || 'thecreons@gmail.com'
+            },
             to: email,
             subject: subject,
-            text: textContent,
-            html: htmlContent
+            text: isSellerRegistration
+                ? `Your LokRise verification code is: ${verificationCode}. Your temporary password is: ${tempPassword}`
+                : `Your LokRise verification code is: ${verificationCode}`,
+            html: simpleHtmlContent
         });
 
-        console.log(`Email successfully sent to ${email}. Message ID: ${response.messageId}`);
+        console.log(`[EMAIL] Successfully sent to ${email}. Message ID: ${response.messageId}`);
         return { success: true, messageId: response.messageId };
     } catch (error) {
-        console.error("Error sending verification email:", error);
-        console.error("Email configuration:", {
+        console.error("[EMAIL] Error sending verification email:", error);
+        console.error("[EMAIL] Email configuration:", {
             host: transporter.options.host,
             port: transporter.options.port,
             secure: transporter.options.secure,
@@ -43,20 +59,54 @@ export const SendVerificationCode = async (email, verificationCode, tempPassword
 
 export const sendWelcomeEmail = async (email, name) => {
     try {
-        console.log(`Sending welcome email to: ${email}`);
+        console.log(`[EMAIL] Sending welcome email to: ${email}`);
 
         const response = await transporter.sendMail({
-            from: process.env.EMAIL_FROM || '"LokRise" <thecreons@gmail.com>',
+            from: {
+                name: 'LokRise Team',
+                address: process.env.EMAIL_FROM || 'thecreons@gmail.com'
+            },
             to: email,
             subject: "Welcome to LokRise!",
             text: `Hello, ${name}! Thank you for joining LokRise! Your email has been successfully verified, and your account is now active.`,
             html: welcomeEmailTemplate(name)
         });
 
-        console.log(`Welcome email sent to ${email}. Message ID: ${response.messageId}`);
+        console.log(`[EMAIL] Welcome email sent to ${email}. Message ID: ${response.messageId}`);
         return { success: true, messageId: response.messageId };
     } catch (error) {
-        console.error("Error sending welcome email:", error);
+        console.error("[EMAIL] Error sending welcome email:", error);
+        return { success: false, error: error.message };
+    }
+};
+
+// Function to directly test email sending
+export const sendTestEmail = async (email) => {
+    try {
+        console.log(`[EMAIL] Sending test email to: ${email}`);
+
+        const response = await transporter.sendMail({
+            from: {
+                name: 'LokRise Test',
+                address: process.env.EMAIL_FROM || 'thecreons@gmail.com'
+            },
+            to: email,
+            subject: "Test Email from LokRise",
+            text: "This is a test email to verify that the email sending functionality is working correctly.",
+            html: `
+                <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: 0 auto;">
+                    <h2 style="color: #9B7653;">Email System Test</h2>
+                    <p>This is a test email to verify that the LokRise email system is working correctly.</p>
+                    <p>If you're receiving this, it means our email configuration is functioning properly!</p>
+                    <p>Time sent: ${new Date().toLocaleString()}</p>
+                </div>
+            `
+        });
+
+        console.log(`[EMAIL] Test email sent to ${email}. Message ID: ${response.messageId}`);
+        return { success: true, messageId: response.messageId };
+    } catch (error) {
+        console.error("[EMAIL] Error sending test email:", error);
         return { success: false, error: error.message };
     }
 };

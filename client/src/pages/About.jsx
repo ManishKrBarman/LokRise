@@ -23,7 +23,7 @@ const AboutPage = () => {
     }, [isTeamInView, teamControls]);
 
     useEffect(() => {
-        fetch('http://localhost:3001/about')
+        fetch('http://localhost:3000/about')
             .then((res) => res.json())
             .then((data) => setMessage(data.message))
             .catch((err) => console.error('Error fetching about data:', err));

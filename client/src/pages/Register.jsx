@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import logo from '../assets/logo.svg';
 import FormInput from '../components/FormInput';
+import { useAuth } from '../context/AuthContext';
 
 const Register = () => {
+    const navigate = useNavigate();
+    const { register, verifyEmail } = useAuth();
+
     const [formData, setFormData] = useState({
         firstName: '',
         middleName: '',
@@ -16,6 +20,7 @@ const Register = () => {
     const [error, setError] = useState('');
     const [step, setStep] = useState(1); // Step 1: Basic info, Step 2: OTP verification
     const [otp, setOtp] = useState('');
+    const [registrationData, setRegistrationData] = useState(null);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -48,7 +53,7 @@ const Register = () => {
         return true;
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
 
@@ -58,14 +63,43 @@ const Register = () => {
 
         setLoading(true);
 
-        // Simulate API call to register user and send OTP
-        setTimeout(() => {
+        try {
+            // Create the full name from the form data
+            const fullName = [
+                formData.firstName,
+                formData.middleName,
+                formData.lastName
+            ].filter(Boolean).join(' ');
+
+            // Prepare the registration data
+            const userData = {
+                name: fullName,
+                email: formData.email,
+                phone: formData.phone,
+                // A temporary password that will be changed after verification
+                password: Math.random().toString(36).substring(2, 10)
+            };
+
+            // Call the actual register function from AuthContext
+            const result = await register(userData);
+
+            if (result.success) {
+                // Store the registration data for OTP verification
+                setRegistrationData(result.data);
+                // Move to OTP verification step
+                setStep(2);
+            } else {
+                setError(result.error || 'Registration failed. Please try again.');
+            }
+        } catch (err) {
+            console.error('Registration error:', err);
+            setError('An unexpected error occurred. Please try again.');
+        } finally {
             setLoading(false);
-            setStep(2);
-        }, 1500);
+        }
     };
 
-    const handleVerifyOtp = (e) => {
+    const handleVerifyOtp = async (e) => {
         e.preventDefault();
         setError('');
 
@@ -76,13 +110,24 @@ const Register = () => {
 
         setLoading(true);
 
-        // Simulate API call to verify OTP and complete registration
-        setTimeout(() => {
+        try {
+            // Call the actual email verification function from AuthContext
+            const result = await verifyEmail(formData.email, otp);
+
+            if (result.success) {
+                // Show success message
+                alert('Registration successful! You can now login.');
+                // Navigate to login page
+                navigate('/login');
+            } else {
+                setError(result.error || 'Verification failed. Please try again.');
+            }
+        } catch (err) {
+            console.error('Verification error:', err);
+            setError('An unexpected error occurred during verification. Please try again.');
+        } finally {
             setLoading(false);
-            // Redirect to dashboard or login page after successful registration
-            alert('Registration successful! You can now login.');
-            // history.push('/login');
-        }, 1500);
+        }
     };
 
     return (
@@ -108,6 +153,15 @@ const Register = () => {
                     {error && (
                         <div className="mb-4 bg-red-50 border-l-4 border-red-400 p-4">
                             <p className="text-sm text-red-700">{error}</p>
+                        </div>
+                    )}
+
+                    {registrationData?.verificationCode && !registrationData.emailSent && (
+                        <div className="mb-4 bg-blue-50 border-l-4 border-blue-400 p-4">
+                            <p className="text-sm text-blue-700">
+                                <strong>Note:</strong> The email service couldn't send the verification code.
+                                Use this code instead: <strong>{registrationData.verificationCode}</strong>
+                            </p>
                         </div>
                     )}
 

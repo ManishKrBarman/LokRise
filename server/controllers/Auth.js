@@ -26,6 +26,8 @@ const register = async (req, res) => {
         const hashedPassword = await bcryptjs.hashSync(password, 10);
         const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
 
+        console.log(`Generated verification code for ${email}: ${verificationCode}`);
+
         const user = new UserModel({
             name,
             email,
@@ -38,41 +40,61 @@ const register = async (req, res) => {
             updatedAt: new Date()
         });
 
-        // Send verification email before saving the user
-        const emailResult = await SendVerificationCode(user.email, verificationCode);
+        // Try to send verification email before saving the user
+        try {
+            console.log(`Sending verification email to ${email}`);
+            const emailResult = await SendVerificationCode(email, verificationCode);
 
-        if (!emailResult.success) {
-            // Log the error but still create the account
-            console.error(`Failed to send verification email to ${email}: ${emailResult.error}`);
-
-            // Save the user but inform them about the email issue
+            // Save the user regardless of email success
             await user.save();
+
+            if (!emailResult.success) {
+                console.warn(`Email sending failed for ${email}: ${emailResult.error}`);
+                // Return verification code for testing/development environments
+                return res.status(201).json({
+                    success: true,
+                    message: 'User registered successfully but email could not be sent. Use the verification code below.',
+                    emailSent: false,
+                    verificationCode: verificationCode,
+                    user: {
+                        id: user._id,
+                        name: user.name,
+                        email: user.email
+                    }
+                });
+            }
+
+            // Email sent successfully
             return res.status(201).json({
                 success: true,
-                message: 'User registered successfully, but there was an issue sending the verification email. Please contact support for assistance.',
-                emailSent: false,
+                message: 'User registered successfully. Please check your email for verification code.',
+                emailSent: true,
                 user: {
                     id: user._id,
                     name: user.name,
-                    email: user.email,
-                    // For testing purposes only - REMOVE IN PRODUCTION
-                    verificationCode: verificationCode
+                    email: user.email
+                }
+            });
+        } catch (emailError) {
+            // Email sending failed, but still create the account
+            console.error(`Error sending verification email to ${email}:`, emailError);
+
+            // Save user anyway
+            await user.save();
+
+            // Return verification code for testing/development environments
+            return res.status(201).json({
+                success: true,
+                message: 'User registered, but email sending failed. Use the verification code below.',
+                emailSent: false,
+                verificationCode: verificationCode,
+                user: {
+                    id: user._id,
+                    name: user.name,
+                    email: user.email
                 }
             });
         }
-
-        // Email sent successfully, save user and return success response
-        await user.save();
-        res.status(201).json({
-            success: true,
-            message: 'User registered successfully. Please check your email for verification code.',
-            emailSent: true,
-            user: {
-                id: user._id,
-                name: user.name,
-                email: user.email
-            }
-        });
     } catch (error) {
         console.error("Registration error:", error);
         res.status(500).json({ message: 'Internal server error: ' + error.message });
@@ -391,6 +413,7 @@ const registerSeller = async (req, res, next) => {
 
         // Generate verification code
         const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+        console.log(`Generated seller verification code for ${email}: ${verificationCode}`);
 
         // Create seller user
         const newSeller = new UserModel({
@@ -411,22 +434,66 @@ const registerSeller = async (req, res, next) => {
             updatedAt: new Date(),
         });
 
+        // Save the seller first to ensure they're in the system
         await newSeller.save();
 
-        // Send verification email with temporary password
-        await SendVerificationCode(email, verificationCode, tempPassword);
+        // Try to send verification email with temporary password
+        try {
+            console.log(`Sending seller verification email to ${email}`);
+            const emailResult = await SendVerificationCode(email, verificationCode, tempPassword);
 
-        // Return success response without sensitive information
-        res.status(201).json({
-            message: "Seller registration successful! Please check your email to verify your account.",
-            user: {
-                id: newSeller._id,
-                name: newSeller.name,
-                email: newSeller.email,
-                role: newSeller.role,
-                sellerStatus: newSeller.sellerStatus
+            if (!emailResult.success) {
+                console.warn(`Seller email sending failed for ${email}: ${emailResult.error}`);
+                // Return verification code and temp password for testing environments
+                return res.status(201).json({
+                    success: true,
+                    message: 'Seller registered successfully but email could not be sent. Use the verification code and temporary password below.',
+                    emailSent: false,
+                    verificationCode: verificationCode,
+                    tempPassword: tempPassword,
+                    user: {
+                        id: newSeller._id,
+                        name: newSeller.name,
+                        email: newSeller.email,
+                        role: newSeller.role,
+                        sellerStatus: newSeller.sellerStatus
+                    }
+                });
             }
-        });
+
+            // Email sent successfully
+            return res.status(201).json({
+                success: true,
+                message: "Seller registration successful! Please check your email to verify your account.",
+                emailSent: true,
+                user: {
+                    id: newSeller._id,
+                    name: newSeller.name,
+                    email: newSeller.email,
+                    role: newSeller.role,
+                    sellerStatus: newSeller.sellerStatus
+                }
+            });
+        } catch (emailError) {
+            // Email sending failed but seller account is created
+            console.error(`Error sending verification email to seller ${email}:`, emailError);
+
+            // Return verification info for testing environments
+            return res.status(201).json({
+                success: true,
+                message: 'Seller registered, but email sending failed. Use the verification code and temporary password below.',
+                emailSent: false,
+                verificationCode: verificationCode,
+                tempPassword: tempPassword,
+                user: {
+                    id: newSeller._id,
+                    name: newSeller.name,
+                    email: newSeller.email,
+                    role: newSeller.role,
+                    sellerStatus: newSeller.sellerStatus
+                }
+            });
+        }
     } catch (err) {
         next(err);
     }
