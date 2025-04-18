@@ -1,6 +1,7 @@
 // app.js
 import express from 'express';
 import path from 'path';
+import cors from 'cors';
 import dotenv from 'dotenv';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
@@ -10,6 +11,7 @@ import PayRoutes from './routes/Pay.routes.js';
 import ProductRoutes from './routes/Product.routes.js';
 import OrderRoutes from './routes/Order.routes.js';
 import { errorHandler } from './middlewares/errorHandler.js';
+import ChatRoutes from './routes/Chat.routes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -25,12 +27,13 @@ app.use(express.urlencoded({ extended: true }));
 
 // Static files
 app.use(express.static(path.join(__dirname, './public')));
-
+app.use(cors());
 // Routes
 app.use('/auth', AuthRoutes);
 app.use('/payment', PayRoutes);
 app.use('/products', ProductRoutes);
 app.use('/orders', OrderRoutes);
+app.use('/chat', ChatRoutes);
 
 app.use(errorHandler);
 
