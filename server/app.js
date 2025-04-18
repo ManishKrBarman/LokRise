@@ -48,7 +48,7 @@ app.use(errorHandler);
 
 // 404
 app.use((req, res) => {
-    res.status(404).sendFile(path.join(__dirname, 'temp/404.html'));
+    res.status(404).sendFile(path.join(__dirname, '../temp/404.html'));
 });
 
 connectDB().then(() => {
