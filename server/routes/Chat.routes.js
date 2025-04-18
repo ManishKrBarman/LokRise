@@ -24,10 +24,11 @@ router.post('/', async (req, res) => {
             messages: [
                 {
                     role: 'system',
-                    content: 'You are a concise and helpful AI chatbot for a tech website.',
+                    content: 'You are a helpful AI chatbot for a tech website. Respond concisely in one or two complete sentences only.',
                 },
                 { role: 'user', content: message },
             ],
+            stop: ['\n'],
             max_tokens: 20,
             temperature: 0.7,
         });
