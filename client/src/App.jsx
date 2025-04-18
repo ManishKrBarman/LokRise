@@ -1,6 +1,6 @@
-import React from 'react'
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import HomePage from './pages/home'
+import HomePage from './pages/home';
 import About from "./pages/About";
 import SellerLanding from './pages/SellerLanding';
 import Edu from './pages/Edu';
@@ -15,7 +15,7 @@ import QandA from './pages/QandA';
 import BecomeSeller from './pages/BecomeSeller';
 import SellerPending from './pages/SellerPending';
 import ChatbotButton from './components/ChatbotButton';
-import './App.css'
+import './App.css';
 
 function App() {
     return (
@@ -40,4 +40,5 @@ function App() {
         </Router>
     );
 }
-export default App
+
+export default App;

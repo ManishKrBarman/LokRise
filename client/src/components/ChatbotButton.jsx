@@ -7,47 +7,63 @@ const ChatbotButton = () => {
     const [isDragging, setIsDragging] = useState(false);
     const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
     const [dragStarted, setDragStarted] = useState(false);
+    const [messages, setMessages] = useState([
+        { role: 'bot', content: 'Hello! How can I help you today?' }
+    ]);
+    const [input, setInput] = useState('');
     const buttonRef = useRef(null);
-    const dragStartTime = useRef(0);
-    const dragDistance = useRef(0);
+    const messagesEndRef = useRef(null);
 
-    // Handle click on the chatbot button
-    const toggleChat = (e) => {
-        // Only toggle if it was a simple click, not a drag
-        if (!dragStarted) {
-            setIsOpen(!isOpen);
-        }
-        // Reset drag tracking
-        setDragStarted(false);
-        dragDistance.current = 0;
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
 
-    // Start dragging
-    const handleMouseDown = (e) => {
-        if (buttonRef.current && !isOpen) {
-            const rect = buttonRef.current.getBoundingClientRect();
-            setDragOffset({
-                x: e.clientX - rect.left,
-                y: e.clientY - rect.top,
+    useEffect(() => {
+        scrollToBottom();
+    }, [messages]);
+
+    const sendMessage = async () => {
+        if (!input.trim()) return;
+
+        const newMessages = [...messages, { role: 'user', content: input }];
+        setMessages(newMessages);
+        setInput('');
+
+        try {
+            const response = await fetch('http://localhost:3005/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: input }),
             });
-            setIsDragging(true);
-            dragStartTime.current = Date.now();
-            dragDistance.current = 0;
+
+            const data = await response.json();
+            const botReply = data.reply || 'Sorry, I didn’t understand that.';
+            setMessages(prev => [...prev, { role: 'bot', content: botReply }]);
+        } catch (err) {
+            setMessages(prev => [...prev, { role: 'bot', content: 'Error connecting to server.' }]);
         }
     };
 
-    // Handle dragging
+    const handleKeyPress = (e) => {
+        if (e.key === 'Enter') sendMessage();
+    };
+
+    const toggleChat = () => {
+        if (!dragStarted) setIsOpen(!isOpen);
+        setDragStarted(false);
+    };
+
+    const handleMouseDown = (e) => {
+        setIsDragging(true);
+        setDragOffset({
+            x: e.clientX - position.x,
+            y: e.clientY - position.y,
+        });
+    };
+
     const handleMouseMove = (e) => {
         if (isDragging) {
-            // Calculate drag distance
-            if (!dragStarted) {
-                dragDistance.current += 1;
-                // If moved more than a few pixels, consider it a drag
-                if (dragDistance.current > 5) {
-                    setDragStarted(true);
-                }
-            }
-
+            setDragStarted(true);
             setPosition({
                 x: e.clientX - dragOffset.x,
                 y: e.clientY - dragOffset.y,
@@ -55,45 +71,39 @@ const ChatbotButton = () => {
         }
     };
 
-    // End dragging and snap to nearest edge
     const handleMouseUp = () => {
+        setIsDragging(false);
+    };
+
+    const handleTouchStart = (e) => {
+        const touch = e.touches[0];
+        setIsDragging(true);
+        setDragOffset({
+            x: touch.clientX - position.x,
+            y: touch.clientY - position.y,
+        });
+    };
+
+    const handleTouchMove = (e) => {
         if (isDragging) {
-            // Only snap if we've genuinely dragged (not just clicked)
-            if (dragStarted) {
-                const snapToEdge = () => {
-                    const screenWidth = window.innerWidth;
-                    const screenHeight = window.innerHeight;
-
-                    // Ensure button stays within vertical bounds
-                    const boundedY = Math.min(
-                        Math.max(position.y, 20),
-                        screenHeight - 80
-                    );
-
-                    // Determine whether to snap to left or right edge
-                    if (position.x < screenWidth / 2) {
-                        // Snap to left edge
-                        return { x: 20, y: boundedY };
-                    } else {
-                        // Snap to right edge
-                        return { x: screenWidth - 80, y: boundedY };
-                    }
-                };
-
-                setPosition(snapToEdge());
-            }
-
-            setIsDragging(false);
+            e.preventDefault();
+            setDragStarted(true);
+            const touch = e.touches[0];
+            setPosition({
+                x: touch.clientX - dragOffset.x,
+                y: touch.clientY - dragOffset.y,
+            });
         }
     };
 
-    // Set up event listeners for dragging
+    const handleTouchEnd = () => {
+        setIsDragging(false);
+    };
+
     useEffect(() => {
         if (isDragging) {
             window.addEventListener('mousemove', handleMouseMove);
             window.addEventListener('mouseup', handleMouseUp);
-
-            // Also add touch events for mobile
             window.addEventListener('touchmove', handleTouchMove, { passive: false });
             window.addEventListener('touchend', handleTouchEnd);
         }
@@ -104,59 +114,16 @@ const ChatbotButton = () => {
             window.removeEventListener('touchmove', handleTouchMove);
             window.removeEventListener('touchend', handleTouchEnd);
         };
-    }, [isDragging, position]);
+    }, [isDragging]);
 
-    // Touch event handlers
-    const handleTouchStart = (e) => {
-        if (buttonRef.current && !isOpen) {
-            const touch = e.touches[0];
-            const rect = buttonRef.current.getBoundingClientRect();
-            setDragOffset({
-                x: touch.clientX - rect.left,
-                y: touch.clientY - rect.top,
-            });
-            setIsDragging(true);
-            dragStartTime.current = Date.now();
-            dragDistance.current = 0;
-            e.preventDefault();
-        }
-    };
-
-    const handleTouchMove = (e) => {
-        if (isDragging) {
-            const touch = e.touches[0];
-            if (!dragStarted) {
-                dragDistance.current += 1;
-                if (dragDistance.current > 5) {
-                    setDragStarted(true);
-                }
-            }
-
-            setPosition({
-                x: touch.clientX - dragOffset.x,
-                y: touch.clientY - dragOffset.y,
-            });
-            e.preventDefault();
-        }
-    };
-
-    const handleTouchEnd = () => {
-        handleMouseUp(); // Reuse the same logic
-    };
-
-    // Reposition button on window resize
     useEffect(() => {
         const handleResize = () => {
             setPosition(prevPos => {
                 const screenWidth = window.innerWidth;
-
-                // If on right side, keep on right side
-                if (prevPos.x > screenWidth / 2) {
-                    return { ...prevPos, x: screenWidth - 80 };
-                } else {
-                    // Keep on left side
-                    return { ...prevPos, x: 20 };
-                }
+                return {
+                    ...prevPos,
+                    x: prevPos.x > screenWidth / 2 ? screenWidth - 80 : 20,
+                };
             });
         };
 
@@ -173,17 +140,22 @@ const ChatbotButton = () => {
                         <button className="close-button" onClick={() => setIsOpen(false)}>✕</button>
                     </div>
                     <div className="chatbot-messages">
-                        <div className="message bot">
-                            Hello! How can I help you today?
-                        </div>
-                        {/* Message history will go here */}
+                        {messages.map((msg, index) => (
+                            <div key={index} className={`message ${msg.role}`}>
+                                {msg.content}
+                            </div>
+                        ))}
+                        <div ref={messagesEndRef} />
                     </div>
                     <div className="chatbot-input">
                         <input
                             type="text"
                             placeholder="Type your message..."
+                            value={input}
+                            onChange={(e) => setInput(e.target.value)}
+                            onKeyDown={handleKeyPress}
                         />
-                        <button>Send</button>
+                        <button onClick={sendMessage}>Send</button>
                     </div>
                 </div>
             )}
