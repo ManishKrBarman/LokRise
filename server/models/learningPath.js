@@ -1,4 +1,3 @@
-// models/learningPath.js
 import mongoose from 'mongoose';
 
 const learningPathSchema = new mongoose.Schema({

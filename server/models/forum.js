@@ -1,4 +1,3 @@
-// models/forum.js
 import mongoose from 'mongoose';
 
 // Schema for forum categories

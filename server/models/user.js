@@ -1,4 +1,3 @@
-// models/user.js
 import mongoose from "mongoose";
 
 // Notification schema for user notifications
@@ -38,7 +37,7 @@ const userSchema = new mongoose.Schema(
         role: {
             type: String,
             default: "buyer",
-            enum: ["buyer", "seller", "instructor", "admin"]
+            enum: ["buyer", "seller", "admin"]
         },
         upiId: {
             type: String,
