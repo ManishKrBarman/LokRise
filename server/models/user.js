@@ -32,10 +32,37 @@ const userSchema = new mongoose.Schema(
             required: function () { return this.role === 'seller'; }
         },
         address: {
-            village: String,
+            addressLine1: String,
+            addressLine2: String,
+            city: String,
             district: String,
             state: String,
             pinCode: String
+        },
+        // Additional seller-specific fields
+        sellerStatus: {
+            type: String,
+            enum: ["pending", "approved", "rejected"],
+            default: function () { return this.role === 'seller' ? 'pending' : undefined; }
+        },
+        businessDetails: {
+            businessName: String,
+            gstin: String,
+            businessType: String,
+            businessCategory: String,
+            businessDescription: String,
+            establishedYear: Number
+        },
+        bankDetails: {
+            accountHolderName: String,
+            accountNumber: String,
+            ifscCode: String,
+            bankName: String,
+            branchName: String
+        },
+        identityDetails: {
+            panNumber: String,
+            aadharNumber: String
         },
         createdAt: Date,
         updatedAt: Date,

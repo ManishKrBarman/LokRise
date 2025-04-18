@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const SellerHero = () => {
     return (
@@ -13,9 +14,9 @@ const SellerHero = () => {
                             Become a Lokrise seller and grow your business across the country
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4 mb-8">
-                            <button className="bg-white text-[var(--primary-color)] py-3 px-8 rounded-full font-bold hover:bg-gray-100 transition duration-300 text-lg">
+                            <Link to="/become-seller" className="bg-white text-[var(--primary-color)] py-3 px-8 rounded-full font-bold hover:bg-gray-100 transition duration-300 text-lg text-center">
                                 Start Selling
-                            </button>
+                            </Link>
                             <button className="bg-transparent border-2 border-white text-white py-3 px-8 rounded-full font-bold hover:bg-white/10 transition duration-300 text-lg">
                                 Learn More
                             </button>

@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const SellerSteps = () => {
     const steps = [
@@ -58,9 +59,9 @@ const SellerSteps = () => {
                 </div>
 
                 <div className="mt-10 text-center">
-                    <button className="bg-[var(--primary-color)] text-white py-3 px-8 rounded-full font-bold hover:bg-[var(--primary-color)]/90 transition duration-300 text-lg">
+                    <Link to="/become-seller" className="bg-[var(--primary-color)] text-white py-3 px-8 rounded-full font-bold hover:bg-[var(--primary-color)]/90 transition duration-300 text-lg inline-block">
                         Start Selling Now
-                    </button>
+                    </Link>
                 </div>
             </div>
         </section>

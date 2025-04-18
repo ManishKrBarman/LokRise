@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const SellerCTA = () => {
     return (
@@ -12,9 +13,9 @@ const SellerCTA = () => {
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                    <button className="bg-white text-[var(--primary-color)] py-4 px-8 rounded-full font-bold hover:bg-gray-100 transition duration-300 text-lg">
+                    <Link to="/become-seller" className="bg-white text-[var(--primary-color)] py-4 px-8 rounded-full font-bold hover:bg-gray-100 transition duration-300 text-lg text-center">
                         Start Selling Now
-                    </button>
+                    </Link>
                     <button className="bg-transparent border-2 border-white text-white py-4 px-8 rounded-full font-bold hover:bg-white/10 transition duration-300 text-lg">
                         Contact Support
                     </button>

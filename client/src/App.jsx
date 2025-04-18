@@ -12,6 +12,8 @@ import Wishlist from './pages/Wishlist';
 import Orders from './pages/Orders';
 import Forum from './pages/Forum';
 import QandA from './pages/QandA';
+import BecomeSeller from './pages/BecomeSeller';
+import SellerPending from './pages/SellerPending';
 import ChatbotButton from './components/ChatbotButton';
 import './App.css'
 
@@ -22,6 +24,8 @@ function App() {
                 <Route path="/" element={<HomePage />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/sell" element={<SellerLanding />} />
+                <Route path="/become-seller" element={<BecomeSeller />} />
+                <Route path="/seller/pending" element={<SellerPending />} />
                 <Route path="/courses" element={<Edu />} />
                 <Route path="/customer-service" element={<CustomerService />} />
                 <Route path="/login" element={<Login />} />

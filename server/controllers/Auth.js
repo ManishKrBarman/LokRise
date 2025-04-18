@@ -67,4 +67,130 @@ const verifyEmail = async (req, res) => {
     }
 }
 
+// Register a new seller
+export const registerSeller = async (req, res, next) => {
+    try {
+        const {
+            // Personal Information
+            fullName,
+            email,
+            phone,
+
+            // Business Information
+            businessName,
+            gstin,
+            businessType,
+            businessCategory,
+            businessDescription,
+            establishedYear,
+
+            // Address Information
+            addressLine1,
+            addressLine2,
+            city,
+            district,
+            state,
+            pinCode,
+
+            // Payment Information
+            accountHolderName,
+            accountNumber,
+            ifscCode,
+            bankName,
+            branchName,
+            upiId,
+
+            // Identity Verification
+            panNumber,
+            aadharNumber,
+        } = req.body;
+
+        // Check if user with the email already exists
+        const existingUser = await UserModel.findOne({ email });
+        if (existingUser) {
+            return res.status(409).json({ message: "User with this email already exists" });
+        }
+
+        // Create a temporary password for the seller (can be changed later)
+        const tempPassword = Math.random().toString(36).slice(-8);
+        const hashedPassword = await bcrypt.hash(tempPassword, 10);
+
+        // Create address object
+        const address = {
+            addressLine1,
+            addressLine2,
+            city,
+            district,
+            state,
+            pinCode
+        };
+
+        // Create bank details object
+        const bankDetails = {
+            accountHolderName,
+            accountNumber,
+            ifscCode,
+            bankName,
+            branchName,
+        };
+
+        // Create business details object
+        const businessDetails = {
+            businessName,
+            gstin,
+            businessType,
+            businessCategory,
+            businessDescription,
+            establishedYear,
+        };
+
+        // Create identity details object
+        const identityDetails = {
+            panNumber,
+            aadharNumber,
+        };
+
+        // Generate verification code
+        const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+
+        // Create seller user
+        const newSeller = new UserModel({
+            name: fullName,
+            email,
+            password: hashedPassword,
+            phone,
+            role: "seller",
+            upiId,
+            address,
+            bankDetails,
+            businessDetails,
+            identityDetails,
+            verificationCode,
+            sellerStatus: "pending", // pending, approved, rejected
+            isVerified: false,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        });
+
+        await newSeller.save();
+
+        // Send verification email with temporary password
+        await sendVerificationEmail(email, verificationCode, tempPassword);
+
+        // Return success response without sensitive information
+        res.status(201).json({
+            message: "Seller registration successful! Please check your email to verify your account.",
+            user: {
+                id: newSeller._id,
+                name: newSeller.name,
+                email: newSeller.email,
+                role: newSeller.role,
+                sellerStatus: newSeller.sellerStatus
+            }
+        });
+    } catch (err) {
+        next(err);
+    }
+};
+
 export { register, verifyEmail };
