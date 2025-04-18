@@ -40,7 +40,7 @@ const SellerTestimonials = () => {
         <section className="py-16 px-4 bg-white">
             <div className="max-w-7xl mx-auto">
                 <div className="text-center mb-12">
-                    <h2 className="text-3xl font-bold text-gray-800 mb-4">Experiences Sellers Love to Talk About</h2>
+                    <h2 className="text-3xl font-bold text-gray-800 mb-4">Experienced Sellers Love to Talk About</h2>
                     <p className="text-gray-600 max-w-3xl mx-auto">
                         Hear from businesses that have grown with Lokrise
                     </p>

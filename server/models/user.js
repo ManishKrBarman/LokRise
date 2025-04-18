@@ -1,6 +1,19 @@
 // models/user.js
 import mongoose from "mongoose";
 
+// Notification schema for user notifications
+const notificationSchema = new mongoose.Schema({
+    message: { type: String, required: true },
+    type: {
+        type: String,
+        enum: ['order', 'payment', 'system', 'product', 'course', 'forum'],
+        required: true
+    },
+    read: { type: Boolean, default: false },
+    link: { type: String },  // Optional link to redirect when clicked
+    createdAt: { type: Date, default: Date.now }
+});
+
 const userSchema = new mongoose.Schema(
     {
         name: {
@@ -25,7 +38,7 @@ const userSchema = new mongoose.Schema(
         role: {
             type: String,
             default: "buyer",
-            enum: ["buyer", "seller"]
+            enum: ["buyer", "seller", "instructor", "admin"]
         },
         upiId: {
             type: String,
@@ -39,6 +52,17 @@ const userSchema = new mongoose.Schema(
             state: String,
             pinCode: String
         },
+        // Additional addresses (for shipping options)
+        additionalAddresses: [{
+            name: String,
+            addressLine1: String,
+            addressLine2: String,
+            city: String,
+            district: String,
+            state: String,
+            pinCode: String,
+            isDefault: Boolean
+        }],
         // Additional seller-specific fields
         sellerStatus: {
             type: String,
@@ -64,6 +88,47 @@ const userSchema = new mongoose.Schema(
             panNumber: String,
             aadharNumber: String
         },
+        // Instructor fields
+        instructorProfile: {
+            bio: String,
+            specialty: String,
+            quote: String,
+            experience: String,
+            education: String,
+            certifications: [String],
+            coursesCreated: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
+            studentsCount: { type: Number, default: 0 },
+            rating: { type: Number, default: 0 }
+        },
+        // Social profiles
+        socialProfiles: {
+            website: String,
+            github: String,
+            twitter: String,
+            linkedin: String,
+            instagram: String,
+            facebook: String
+        },
+        // User preferences
+        preferences: {
+            language: { type: String, default: 'en' },
+            currency: { type: String, default: 'INR' },
+            emailNotifications: { type: Boolean, default: true },
+            pushNotifications: { type: Boolean, default: true },
+            newsletter: { type: Boolean, default: false }
+        },
+        // User metrics and activity
+        metrics: {
+            productsListed: { type: Number, default: 0 },
+            totalSales: { type: Number, default: 0 },
+            totalRevenue: { type: Number, default: 0 },
+            totalPurchases: { type: Number, default: 0 },
+            totalSpent: { type: Number, default: 0 },
+            lastActive: { type: Date },
+            joinDate: { type: Date, default: Date.now }
+        },
+        notifications: [notificationSchema],
+        // Security and verification
         createdAt: Date,
         updatedAt: Date,
         isVerified: {
@@ -71,10 +136,14 @@ const userSchema = new mongoose.Schema(
             default: false
         },
         verificationCode: String,
+        passwordResetToken: String,
+        passwordResetExpires: Date,
+        lastLogin: Date
     },
     {
         timestamps: true
-    });
+    }
+);
 
 const UserModel = mongoose.model("User", userSchema);
 
