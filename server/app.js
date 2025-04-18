@@ -27,18 +27,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, './public')));
 
 // Routes
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, './public/index.html'));
-});
-app.get('/register', (req, res) => {
-    res.sendFile(path.join(__dirname, './public/register.html'));
-});
-app.get('/login', (req, res) => {
-    res.sendFile(path.join(__dirname, './public/login.html'));
-});
-app.get("/about", (req, res) => {
-    res.json({ message: "This is the about route from backend!" });
-});
 app.use('/auth', AuthRoutes);
 app.use('/payment', PayRoutes);
 app.use('/products', ProductRoutes);
