@@ -31,9 +31,9 @@ const Footer = (props) => {
                 <div>
                     <p className="font-semibold mb-2">Helpful Links:</p>
                     <ul className="space-y-1">
-                        <li><a href="/help-center" className="hover:underline">Help Center</a></li>
+                        <li><a href="/customer-service" className="hover:underline">Help Center</a></li>
                         <li><a href="/learning" className="hover:underline">Learning</a></li>
-                        <li><a href="/community" className="hover:underline">Community</a></li>
+                        <li><a href="/forum" className="hover:underline">Forum</a></li>
                         <li><a href="/dashboard" className="hover:underline">Seller Dashboard</a></li>
                     </ul>
                 </div>

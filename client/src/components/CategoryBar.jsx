@@ -93,6 +93,18 @@ const CategoryBar = () => {
                         className="flex-none text-gray-700 hover:text-[var(--primary-color)] text-sm whitespace-nowrap">
                         Courses
                     </a>
+                    <a href="/about"
+                        className="flex-none text-gray-700 hover:text-[var(--primary-color)] text-sm whitespace-nowrap">
+                        About
+                    </a>
+                    <a href="/forum"
+                        className="flex-none text-gray-700 hover:text-[var(--primary-color)] text-sm whitespace-nowrap">
+                        Forum
+                    </a>
+                    <a href="/qna"
+                        className="flex-none text-gray-700 hover:text-[var(--primary-color)] text-sm whitespace-nowrap">
+                        Q&A
+                    </a>
                     <a href="/sell"
                         className="flex-none text-gray-700 hover:text-[var(--primary-color)] text-sm whitespace-nowrap">
                         Sell on Lokrise

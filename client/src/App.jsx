@@ -10,6 +10,8 @@ import Register from './pages/Register';
 import Cart from './pages/Cart';
 import Wishlist from './pages/Wishlist';
 import Orders from './pages/Orders';
+import Forum from './pages/Forum';
+import QandA from './pages/QandA';
 import ChatbotButton from './components/ChatbotButton';
 import './App.css'
 
@@ -27,6 +29,8 @@ function App() {
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/wishlist" element={<Wishlist />} />
                 <Route path="/orders" element={<Orders />} />
+                <Route path="/forum" element={<Forum />} />
+                <Route path="/qna" element={<QandA />} />
             </Routes>
             <ChatbotButton />
         </Router>
