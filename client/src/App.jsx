@@ -5,6 +5,7 @@ import About from "./pages/About";
 import SellerLanding from './pages/SellerLanding';
 import Edu from './pages/Edu';
 import CustomerService from './pages/CustomerService';
+import ChatbotButton from './components/ChatbotButton';
 import './App.css'
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
                 <Route path="/courses" element={<Edu />} />
                 <Route path="/customer-service" element={<CustomerService />} />
             </Routes>
+            <ChatbotButton />
         </Router>
     );
 }

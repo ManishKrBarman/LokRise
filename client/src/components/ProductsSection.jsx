@@ -64,14 +64,6 @@ const ProductsSection = () => {
             followers: 9800,
             rating: 4.7,
             category: "Fashion"
-        },
-        {
-            id: 3,
-            name: "HomeDecorPlus",
-            avatar: "https://placehold.co/10?text=H",
-            followers: 7300,
-            rating: 4.8,
-            category: "Home & Living"
         }
     ];
 
