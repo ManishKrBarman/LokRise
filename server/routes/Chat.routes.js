@@ -19,17 +19,22 @@ router.post('/', async (req, res) => {
     }
 
     try {
+        const websiteKnowledge = `
+            MiDiORA offers services in:
+            - Web Development (custom websites, frontend/backend)
+            - App Development (Android, iOS, PWAs)
+            - UI/UX Design (Figma, prototyping, testing)`;
         const response = await groq.chat.completions.create({
             model: 'mistral-saba-24b',
             messages: [
                 {
                     role: 'system',
-                    content: 'You are a helpful AI chatbot for a tech website. Respond concisely in one or two complete sentences only.',
+                    content: `You are a helpful AI chatbot for a tech website. Respond concisely in one or two complete sentences only and Use the following site context for answering user queries:\n${websiteKnowledge}`,
                 },
                 { role: 'user', content: message },
             ],
             stop: ['\n'],
-            max_tokens: 20,
+            max_tokens: 50,
             temperature: 0.7,
         });
 
