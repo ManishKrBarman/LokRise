@@ -3,6 +3,8 @@ import { welcomeEmailTemplate } from '../libs/emailTemplate.js';
 import { SendVerificationCode, sendWelcomeEmail } from '../middlewares/email.js';
 import UserModel from '../models/user.js';
 import bcryptjs from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 
 const register = async (req, res) => {
     try {
@@ -30,19 +32,50 @@ const register = async (req, res) => {
             password: hashedPassword,
             phone,
             role: role || 'buyer',
-            upiLink: role === "seller" ? upiLink : undefined,
-            upiId,
+            upiId: role === "seller" ? upiId : undefined,
             verificationCode,
             createdAt: new Date(),
             updatedAt: new Date()
         });
 
-        SendVerificationCode(user.email, verificationCode);
+        // Send verification email before saving the user
+        const emailResult = await SendVerificationCode(user.email, verificationCode);
+
+        if (!emailResult.success) {
+            // Log the error but still create the account
+            console.error(`Failed to send verification email to ${email}: ${emailResult.error}`);
+
+            // Save the user but inform them about the email issue
+            await user.save();
+            return res.status(201).json({
+                success: true,
+                message: 'User registered successfully, but there was an issue sending the verification email. Please contact support for assistance.',
+                emailSent: false,
+                user: {
+                    id: user._id,
+                    name: user.name,
+                    email: user.email,
+                    // For testing purposes only - REMOVE IN PRODUCTION
+                    verificationCode: verificationCode
+                }
+            });
+        }
+
+        // Email sent successfully, save user and return success response
         await user.save();
-        res.status(201).json({ success: true, message: 'User registered successfully', user });
+        res.status(201).json({
+            success: true,
+            message: 'User registered successfully. Please check your email for verification code.',
+            emailSent: true,
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email
+            }
+        });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Internal server error' });
+        console.error("Registration error:", error);
+        res.status(500).json({ message: 'Internal server error: ' + error.message });
     }
 }
 
@@ -67,8 +100,214 @@ const verifyEmail = async (req, res) => {
     }
 }
 
+// Login functionality with JWT token generation
+const login = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        if (!email || !password) {
+            return res.status(400).json({ message: 'Please provide email and password' });
+        }
+
+        // Find user by email
+        const user = await UserModel.findOne({ email });
+        if (!user) {
+            return res.status(401).json({ message: 'Invalid credentials' });
+        }
+
+        // Check if user is verified
+        if (!user.isVerified) {
+            return res.status(403).json({ message: 'Please verify your email first' });
+        }
+
+        // Validate password
+        const isPasswordValid = await bcryptjs.compare(password, user.password);
+        if (!isPasswordValid) {
+            return res.status(401).json({ message: 'Invalid credentials' });
+        }
+
+        // Generate JWT token
+        const token = jwt.sign(
+            { id: user._id, email: user.email, role: user.role },
+            process.env.JWT_SECRET || 'fallbacksecretkey',
+            { expiresIn: '7d' }
+        );
+
+        // Update last login
+        user.lastLogin = new Date();
+        await user.save();
+
+        // Return user info and token
+        res.status(200).json({
+            message: 'Login successful',
+            token,
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                isVerified: user.isVerified,
+                sellerStatus: user.role === 'seller' ? user.sellerStatus : undefined
+            }
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+}
+
+// Request password reset
+const forgotPassword = async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        const user = await UserModel.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ message: 'No user found with that email' });
+        }
+
+        // Generate reset token
+        const resetToken = crypto.randomBytes(32).toString('hex');
+
+        // Hash token and save to database
+        user.passwordResetToken = crypto
+            .createHash('sha256')
+            .update(resetToken)
+            .digest('hex');
+
+        // Set token expiry (1 hour)
+        user.passwordResetExpires = Date.now() + 3600000;
+        await user.save();
+
+        // Send reset email with token
+        // TODO: Implement actual email sending with proper template
+        console.log(`Password reset token for ${email}: ${resetToken}`);
+
+        res.status(200).json({
+            message: 'Password reset email sent',
+            resetToken // Only for testing - remove in production
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+}
+
+// Reset password with token
+const resetPassword = async (req, res) => {
+    try {
+        const { resetToken, newPassword } = req.body;
+
+        // Hash token for comparison
+        const hashedToken = crypto
+            .createHash('sha256')
+            .update(resetToken)
+            .digest('hex');
+
+        // Find user with valid token
+        const user = await UserModel.findOne({
+            passwordResetToken: hashedToken,
+            passwordResetExpires: { $gt: Date.now() }
+        });
+
+        if (!user) {
+            return res.status(400).json({ message: 'Token is invalid or has expired' });
+        }
+
+        // Update password
+        user.password = await bcryptjs.hash(newPassword, 10);
+
+        // Clear reset fields
+        user.passwordResetToken = undefined;
+        user.passwordResetExpires = undefined;
+
+        await user.save();
+
+        // Generate new token for auto-login
+        const token = jwt.sign(
+            { id: user._id, email: user.email, role: user.role },
+            process.env.JWT_SECRET || 'fallbacksecretkey',
+            { expiresIn: '7d' }
+        );
+
+        res.status(200).json({
+            message: 'Password reset successful',
+            token
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+}
+
+// Get current user profile
+const getCurrentUser = async (req, res) => {
+    try {
+        const user = await UserModel.findById(req.user.id).select('-password');
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        res.status(200).json({ user });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+}
+
+// Update user profile
+const updateProfile = async (req, res) => {
+    try {
+        const {
+            name,
+            phone,
+            profileImage,
+            address,
+            socialProfiles,
+            preferences
+        } = req.body;
+
+        const user = await UserModel.findById(req.user.id);
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Update fields
+        if (name) user.name = name;
+        if (phone) user.phone = phone;
+        if (profileImage) user.profileImage = profileImage;
+        if (address) user.address = { ...user.address, ...address };
+        if (socialProfiles) user.socialProfiles = { ...user.socialProfiles, ...socialProfiles };
+        if (preferences) user.preferences = { ...user.preferences, ...preferences };
+
+        user.updatedAt = new Date();
+
+        await user.save();
+
+        res.status(200).json({
+            message: 'Profile updated successfully',
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                phone: user.phone,
+                role: user.role,
+                profileImage: user.profileImage,
+                address: user.address,
+                socialProfiles: user.socialProfiles,
+                preferences: user.preferences
+            }
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+}
+
 // Register a new seller
-export const registerSeller = async (req, res, next) => {
+const registerSeller = async (req, res, next) => {
     try {
         const {
             // Personal Information
@@ -113,7 +352,7 @@ export const registerSeller = async (req, res, next) => {
 
         // Create a temporary password for the seller (can be changed later)
         const tempPassword = Math.random().toString(36).slice(-8);
-        const hashedPassword = await bcrypt.hash(tempPassword, 10);
+        const hashedPassword = await bcryptjs.hash(tempPassword, 10);
 
         // Create address object
         const address = {
@@ -175,7 +414,7 @@ export const registerSeller = async (req, res, next) => {
         await newSeller.save();
 
         // Send verification email with temporary password
-        await sendVerificationEmail(email, verificationCode, tempPassword);
+        await SendVerificationCode(email, verificationCode, tempPassword);
 
         // Return success response without sensitive information
         res.status(201).json({
@@ -193,4 +432,13 @@ export const registerSeller = async (req, res, next) => {
     }
 };
 
-export { register, verifyEmail };
+export {
+    register,
+    verifyEmail,
+    registerSeller,
+    login,
+    forgotPassword,
+    resetPassword,
+    getCurrentUser,
+    updateProfile
+};

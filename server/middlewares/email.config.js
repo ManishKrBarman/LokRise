@@ -1,13 +1,26 @@
 import nodemailer from "nodemailer";
 
+// Create a transporter using environment variables if available, fallback to config values
 const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 587,
-    secure: false, // true for port 465, false for other ports
+    host: process.env.EMAIL_HOST || "smtp.gmail.com",
+    port: parseInt(process.env.EMAIL_PORT || "587"),
+    secure: process.env.EMAIL_SECURE === "true" ? true : false,
     auth: {
-        user: "thecreons@gmail.com",
-        pass: "vcdt vgqu uitk iqjo",
+        user: process.env.EMAIL_USER || "thecreons@gmail.com",
+        pass: process.env.EMAIL_PASSWORD || "vcdt vgqu uitk iqjo", // App password for Gmail
     },
 });
 
-export { transporter };
+// Verify transporter configuration on startup
+async function verifyTransporter() {
+    try {
+        const verification = await transporter.verify();
+        console.log("Email transporter is ready to send emails:", verification);
+        return verification;
+    } catch (error) {
+        console.error("Email configuration error:", error);
+        return false;
+    }
+}
+
+export { transporter, verifyTransporter };

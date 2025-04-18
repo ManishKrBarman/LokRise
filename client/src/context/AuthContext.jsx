@@ -1,0 +1,212 @@
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { authAPI, setAuthState, clearAuthState, getAuthState } from '../services/api';
+
+// Create auth context
+const AuthContext = createContext();
+
+export const AuthProvider = ({ children }) => {
+    const [user, setUser] = useState(null);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    // Initialize auth state from localStorage
+    useEffect(() => {
+        const initializeAuth = async () => {
+            setLoading(true);
+            try {
+                const authState = getAuthState();
+                
+                if (authState.isAuthenticated && authState.user) {
+                    // Verify token validity by getting current user
+                    const response = await authAPI.getCurrentUser();
+                    setUser(response.data.user);
+                    setIsAuthenticated(true);
+                } else {
+                    // No valid auth state
+                    setUser(null);
+                    setIsAuthenticated(false);
+                }
+            } catch (error) {
+                console.error("Auth initialization error:", error);
+                // If the token is invalid, clear the auth state
+                clearAuthState();
+                setUser(null);
+                setIsAuthenticated(false);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        initializeAuth();
+    }, []);
+
+    // Login function
+    const login = async (email, password) => {
+        setLoading(true);
+        setError(null);
+        try {
+            const response = await authAPI.login({ email, password });
+            const { token, user } = response.data;
+            
+            setAuthState(token, user);
+            setUser(user);
+            setIsAuthenticated(true);
+            return { success: true, user };
+        } catch (error) {
+            console.error("Login error:", error);
+            setError(error.response?.data?.message || "Login failed");
+            return { success: false, error: error.response?.data?.message || "Login failed" };
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Register function
+    const register = async (userData) => {
+        setLoading(true);
+        setError(null);
+        try {
+            const response = await authAPI.register(userData);
+            return { success: true, data: response.data };
+        } catch (error) {
+            console.error("Registration error:", error);
+            setError(error.response?.data?.message || "Registration failed");
+            return { success: false, error: error.response?.data?.message || "Registration failed" };
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Logout function
+    const logout = () => {
+        clearAuthState();
+        setUser(null);
+        setIsAuthenticated(false);
+    };
+
+    // Verify email function
+    const verifyEmail = async (email, verificationCode) => {
+        setLoading(true);
+        setError(null);
+        try {
+            const response = await authAPI.verifyEmail({ email, verificationCode });
+            return { success: true, data: response.data };
+        } catch (error) {
+            console.error("Email verification error:", error);
+            setError(error.response?.data?.message || "Verification failed");
+            return { success: false, error: error.response?.data?.message || "Verification failed" };
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Update profile function
+    const updateProfile = async (userData) => {
+        setLoading(true);
+        setError(null);
+        try {
+            const response = await authAPI.updateProfile(userData);
+            
+            // Update local user state
+            setUser(prev => ({ ...prev, ...response.data.user }));
+            
+            // Update stored user data
+            const authState = getAuthState();
+            if (authState.isAuthenticated) {
+                setAuthState(localStorage.getItem("token"), {
+                    ...authState.user,
+                    ...response.data.user
+                });
+            }
+            
+            return { success: true, user: response.data.user };
+        } catch (error) {
+            console.error("Profile update error:", error);
+            setError(error.response?.data?.message || "Profile update failed");
+            return { success: false, error: error.response?.data?.message || "Profile update failed" };
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Forgot password function
+    const forgotPassword = async (email) => {
+        setLoading(true);
+        setError(null);
+        try {
+            const response = await authAPI.forgotPassword(email);
+            return { success: true, data: response.data };
+        } catch (error) {
+            console.error("Password reset request error:", error);
+            setError(error.response?.data?.message || "Password reset request failed");
+            return { success: false, error: error.response?.data?.message || "Password reset request failed" };
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Reset password function
+    const resetPassword = async (resetToken, newPassword, email = null) => {
+        setLoading(true);
+        setError(null);
+        try {
+            const response = await authAPI.resetPassword({ resetToken, newPassword });
+            
+            // If a token is returned and email is provided, auto-login
+            if (response.data.token && email) {
+                await login(email, newPassword);
+            }
+            
+            return { success: true, data: response.data };
+        } catch (error) {
+            console.error("Password reset error:", error);
+            setError(error.response?.data?.message || "Password reset failed");
+            return { success: false, error: error.response?.data?.message || "Password reset failed" };
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Register as seller function
+    const registerAsSeller = async (sellerData) => {
+        setLoading(true);
+        setError(null);
+        try {
+            const response = await authAPI.registerSeller(sellerData);
+            return { success: true, data: response.data };
+        } catch (error) {
+            console.error("Seller registration error:", error);
+            setError(error.response?.data?.message || "Seller registration failed");
+            return { success: false, error: error.response?.data?.message || "Seller registration failed" };
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const value = {
+        user,
+        isAuthenticated,
+        loading,
+        error,
+        login,
+        register,
+        logout,
+        verifyEmail,
+        updateProfile,
+        forgotPassword,
+        resetPassword,
+        registerAsSeller
+    };
+
+    return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+};
+
+// Custom hook to use auth context
+export const useAuth = () => {
+    const context = useContext(AuthContext);
+    if (context === undefined) {
+        throw new Error('useAuth must be used within an AuthProvider');
+    }
+    return context;
+};

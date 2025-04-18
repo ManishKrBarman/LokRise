@@ -115,6 +115,7 @@ const Register = () => {
                         <form onSubmit={handleSubmit} className="space-y-6">
                             <FormInput
                                 id="firstName"
+                                name="firstName"
                                 label="First Name"
                                 value={formData.firstName}
                                 onChange={handleChange}
@@ -126,20 +127,20 @@ const Register = () => {
                             <div className="grid grid-cols-2 gap-4">
                                 <FormInput
                                     id="middleName"
+                                    name="middleName"
                                     label="Middle Name"
                                     value={formData.middleName}
                                     onChange={handleChange}
-                                    optional
                                     autoComplete="additional-name"
                                     placeholder="Middle Name"
                                 />
 
                                 <FormInput
                                     id="lastName"
+                                    name="lastName"
                                     label="Last Name"
                                     value={formData.lastName}
                                     onChange={handleChange}
-                                    optional
                                     autoComplete="family-name"
                                     placeholder="Last Name"
                                 />
@@ -147,6 +148,7 @@ const Register = () => {
 
                             <FormInput
                                 id="phone"
+                                name="phone"
                                 label="Phone Number"
                                 value={formData.phone}
                                 onChange={handlePhoneChange}
@@ -159,6 +161,7 @@ const Register = () => {
 
                             <FormInput
                                 id="email"
+                                name="email"
                                 label="Email Address"
                                 value={formData.email}
                                 onChange={handleChange}
@@ -170,6 +173,7 @@ const Register = () => {
 
                             <FormInput
                                 id="country"
+                                name="country"
                                 label="Country"
                                 value={formData.country}
                                 disabled
@@ -190,6 +194,7 @@ const Register = () => {
                         <form onSubmit={handleVerifyOtp} className="space-y-6">
                             <FormInput
                                 id="otp"
+                                name="otp"
                                 label={`Enter OTP sent to ${formData.email}`}
                                 value={otp}
                                 onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
