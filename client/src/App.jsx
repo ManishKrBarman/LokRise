@@ -5,6 +5,8 @@ import About from "./pages/About";
 import SellerLanding from './pages/SellerLanding';
 import Edu from './pages/Edu';
 import CustomerService from './pages/CustomerService';
+import Login from './pages/Login';
+import Register from './pages/Register';
 import ChatbotButton from './components/ChatbotButton';
 import './App.css'
 
@@ -17,6 +19,8 @@ function App() {
                 <Route path="/sell" element={<SellerLanding />} />
                 <Route path="/courses" element={<Edu />} />
                 <Route path="/customer-service" element={<CustomerService />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
             </Routes>
             <ChatbotButton />
         </Router>
