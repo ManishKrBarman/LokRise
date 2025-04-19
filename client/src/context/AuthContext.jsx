@@ -1,8 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { authAPI, setAuthState, clearAuthState, getAuthState } from '../services/api';
-import { BASE_URL } from '../services/api';
+import { authAPI, setAuthState, clearAuthState, getAuthState, BASE_URL } from '../services/api';
 
-// Add this near the top of the file with other imports
+// Helper to check if running in mobile browser
 const isMobileDevice = () => {
     return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 };
@@ -10,10 +9,9 @@ const isMobileDevice = () => {
 // Helper function to get profile image URL
 const getProfileImageUrl = (userId) => {
     if (!userId) return null;
-    return `${BASE_URL}/auth/profile-image/${userId}`;
+    return `${BASE_URL}/auth/profile-image/${userId}?t=${Date.now()}`;
 };
 
-// Create auth context
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
@@ -31,23 +29,28 @@ export const AuthProvider = ({ children }) => {
 
                 if (authState.isAuthenticated && authState.user) {
                     // Verify token validity by getting current user
-                    const response = await authAPI.getCurrentUser();
-                    const currentUser = response.data.user;
-
-                    // Update user with proper image URL
-                    setUser({
-                        ...currentUser,
-                        profileImage: currentUser._id ? getProfileImageUrl(currentUser._id) : null
-                    });
-                    setIsAuthenticated(true);
+                    try {
+                        const response = await authAPI.getCurrentUser();
+                        const currentUser = response.data.user;
+                        
+                        // Update user with proper image URL
+                        setUser({
+                            ...currentUser,
+                            profileImage: currentUser._id ? getProfileImageUrl(currentUser._id) : null
+                        });
+                        setIsAuthenticated(true);
+                    } catch (tokenError) {
+                        console.error("Invalid token or session expired:", tokenError);
+                        clearAuthState();
+                        setUser(null);
+                        setIsAuthenticated(false);
+                    }
                 } else {
-                    // No valid auth state
                     setUser(null);
                     setIsAuthenticated(false);
                 }
             } catch (error) {
                 console.error("Auth initialization error:", error);
-                // If the token is invalid, clear the auth state
                 clearAuthState();
                 setUser(null);
                 setIsAuthenticated(false);
@@ -64,7 +67,6 @@ export const AuthProvider = ({ children }) => {
         setLoading(true);
         setError(null);
         try {
-            // Add device info to request
             const deviceInfo = {
                 isMobile: isMobileDevice(),
                 userAgent: navigator.userAgent,
@@ -78,36 +80,24 @@ export const AuthProvider = ({ children }) => {
                 deviceInfo
             });
 
-            // Validate response
             if (!response?.data?.token || !response?.data?.user) {
                 throw new Error('Invalid server response');
             }
 
-            const { token, user } = response.data;
+            const { token, user: userData } = response.data;
 
-            // Ensure token is stored properly
-            try {
-                setAuthState(token, user);
-                // Verify token storage
-                const storedToken = localStorage.getItem('token');
-                if (!storedToken) {
-                    throw new Error('Token storage failed');
-                }
-            } catch (storageError) {
-                console.error('Storage error:', storageError);
-                throw new Error('Failed to store authentication data');
-            }
+            // Add profile image URL to user data
+            const userWithImage = {
+                ...userData,
+                profileImage: userData.id ? getProfileImageUrl(userData.id) : null
+            };
 
-            setUser(user);
+            setAuthState(token, userWithImage);
+            setUser(userWithImage);
             setIsAuthenticated(true);
-            return { success: true, user };
+            return { success: true, user: userWithImage };
         } catch (error) {
             const errorMessage = error.response?.data?.message || error.message || 'Login failed';
-            console.error('Login error:', {
-                message: errorMessage,
-                error: error,
-                deviceInfo: { isMobile: isMobileDevice(), platform: navigator.platform }
-            });
             setError(errorMessage);
             return { success: false, error: errorMessage };
         } finally {
@@ -263,13 +253,13 @@ export const AuthProvider = ({ children }) => {
         updateProfile,
         forgotPassword,
         resetPassword,
-        registerAsSeller
+        registerAsSeller,
+        getProfileImageUrl // Export the helper function
     };
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-// Custom hook to use auth context
 export const useAuth = () => {
     const context = useContext(AuthContext);
     if (context === undefined) {

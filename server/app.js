@@ -48,16 +48,29 @@ app.use(express.urlencoded({ extended: true }));
 
 // Static files
 app.use(express.static(path.join(__dirname, './public')));
-app.use(cors({
+
+// CORS configuration
+const corsOptions = {
     origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     exposedHeaders: ['Content-Type', 'Content-Length'],
     credentials: true
-}));
+};
 
-// Add middleware to handle pre-flight requests for the profile image endpoint
-app.options('/auth/profile-image/:userId', cors());
+// Apply CORS middleware
+app.use(cors(corsOptions));
+
+// Additional CORS headers for profile images
+app.use('/auth/profile-image/:userId', (req, res, next) => {
+    res.set({
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        'Cache-Control': 'public, max-age=31557600'
+    });
+    next();
+});
 
 // Routes
 app.use('/auth', AuthRoutes);

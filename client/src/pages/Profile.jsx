@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import FormInput from '../components/FormInput';
 import NavBar from '../components/NavBar';
 import Footer from '../components/Footer';
+import { BASE_URL } from '../services/api';
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ALLOWED_FILE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
@@ -41,7 +42,12 @@ const Profile = () => {
     const [success, setSuccess] = useState('');
     const [imagePreview, setImagePreview] = useState(null);
     const [uploading, setUploading] = useState(false);
-    const [imageTimestamp, setImageTimestamp] = useState(Date.now());
+    const [imageError, setImageError] = useState(false);
+
+    const getProfileImageUrl = () => {
+        if (!user?._id) return null;
+        return `${BASE_URL}/auth/profile-image/${user._id}?t=${Date.now()}`;
+    };
 
     useEffect(() => {
         if (user) {
@@ -54,10 +60,9 @@ const Profile = () => {
                 socialProfiles: user.socialProfiles || prevData.socialProfiles,
                 preferences: user.preferences || prevData.preferences
             }));
-            // For initial load, use the user's profile image with timestamp
-            setImagePreview(user.profileImage ? `${user.profileImage}?t=${imageTimestamp}` : null);
+            setImageError(false);
         }
-    }, [user, imageTimestamp]);
+    }, [user]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -144,8 +149,6 @@ const Profile = () => {
             if (result.success) {
                 setSuccess('Profile updated successfully');
                 setIsEditing(false);
-                // Update timestamp to force image refresh
-                setImageTimestamp(Date.now());
                 // Clear the file input
                 const fileInput = document.getElementById('profile-image');
                 if (fileInput) fileInput.value = '';
@@ -171,12 +174,13 @@ const Profile = () => {
                             <div className="flex items-center">
                                 <div className="relative group">
                                     <img
-                                        src={imagePreview || (user?.profileImage ? `${user.profileImage}?t=${imageTimestamp}` : `https://placehold.co/100?text=${user?.name?.[0]}`)}
+                                        src={imagePreview || (!imageError && user?._id ? getProfileImageUrl() : `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name?.[0] || 'U')}&background=8B6B4B&color=fff`)}
                                         alt={user?.name}
                                         className={`h-16 w-16 rounded-full border-2 border-white object-cover ${uploading ? 'opacity-50' : ''}`}
                                         onError={(e) => {
                                             e.target.onerror = null; // Prevent infinite loop
-                                            e.target.src = `https://placehold.co/100?text=${user?.name?.[0]}`;
+                                            setImageError(true);
+                                            e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name?.[0] || 'U')}&background=8B6B4B&color=fff`;
                                         }}
                                     />
                                     {uploading && (
