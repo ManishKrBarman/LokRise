@@ -10,6 +10,7 @@ import AuthRoutes from './routes/Auth.routes.js';
 import PayRoutes from './routes/Pay.routes.js';
 import ProductRoutes from './routes/Product.routes.js';
 import OrderRoutes from './routes/Order.routes.js';
+import AdminRoutes from './routes/Admin.routes.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import ChatRoutes from './routes/Chat.routes.js';
 import { verifyTransporter } from './middlewares/email.config.js';
@@ -64,6 +65,7 @@ app.use('/auth', AuthRoutes);
 app.use('/payment', PayRoutes);
 app.use('/products', ProductRoutes);
 app.use('/orders', OrderRoutes);
+app.use('/admin', AdminRoutes);
 app.use('/chat', ChatRoutes);
 
 app.use(errorHandler);

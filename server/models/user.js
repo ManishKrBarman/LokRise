@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 
 // Notification schema for user notifications
 const notificationSchema = new mongoose.Schema({
@@ -159,6 +161,20 @@ const userSchema = new mongoose.Schema(
         timestamps: true
     }
 );
+
+// Add method to compare password
+userSchema.methods.comparePassword = async function(candidatePassword) {
+    return await bcrypt.compare(candidatePassword, this.password);
+};
+
+// Add method to generate JWT token
+userSchema.methods.generateAuthToken = function() {
+    return jwt.sign(
+        { id: this._id, role: this.role },
+        process.env.JWT_SECRET,
+        { expiresIn: '7d' }
+    );
+};
 
 const UserModel = mongoose.model("User", userSchema);
 

@@ -61,8 +61,8 @@ const retryRequest = async (requestFn, retries = 3, delay = 1000) => {
 
 // Admin APIs
 export const adminAPI = {
-    login: (credentials) => retryRequest(() => api.post("/auth/admin/login", credentials)),
-    getCurrentAdmin: () => retryRequest(() => api.get("/auth/admin/me")),
+    login: (credentials) => retryRequest(() => api.post("/admin/auth/admin/login", credentials)),
+    getCurrentAdmin: () => retryRequest(() => api.get("/admin/auth/admin/me")),
 
     // User management
     getAllUsers: (params) => retryRequest(() => api.get("/admin/users", { params })),
