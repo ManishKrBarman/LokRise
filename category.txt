@@ -1,0 +1,56 @@
+electronics:
+	Home appliances
+	Solar products
+	Lighting products
+	Small kitchen appliances
+    Health devices
+
+Fashion:
+    Traditional wear
+    Casual wear
+    Sleep wear
+    Children schoolwear
+    Bag & luggage
+    Jewellery
+    Health & wellness (Hat, sunglass etc.)
+
+Home & living:
+    Storage & organiser
+    Lighting
+    Home cleaning
+    Garden & outdoor
+    Bath & hygiene
+    Cooking appliances
+    Mattresses & Cushions
+    Safety & security
+
+Books:
+    Children's book
+    Local literature / Traditional stories
+    Self help & motivation
+    Religion book
+    Health & wellness book
+    Agriculture & farming
+    Cooking
+    Language learning book
+
+Beauty:
+    Natural & herbal
+    Men's grooming
+    Bath & body essentials
+    Personal hygiene products
+    Beauty tools & accessories
+    Affordable beauty kits
+    Traditional beauty items
+
+Farming:
+    Manure
+    Fertilizers
+    Seeds
+    Farming tools & equipement
+    Pesticides & insectisides
+    Animal feed & care
+    Crop protection & storage
+    Farm wear & safety wear
+    Greenhouse & nursery kits
+    Guids & educational kits
