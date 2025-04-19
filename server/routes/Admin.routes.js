@@ -209,6 +209,127 @@ router.get('/admin/products', authMiddleware, authorizeRoles('admin'), async (re
     }
 });
 
+// Get product by ID
+router.get('/admin/products/:productId', authMiddleware, authorizeRoles('admin'), async (req, res) => {
+    try {
+        const product = await Product.findById(req.params.productId)
+            .populate('category')
+            .populate('seller', 'name email');
+
+        if (!product) {
+            return res.status(404).json({ message: 'Product not found' });
+        }
+
+        res.json({ product });
+    } catch (error) {
+        console.error('Get product error:', error);
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+});
+
+// Update product
+router.put('/admin/products/:productId', authMiddleware, authorizeRoles('admin'), async (req, res) => {
+    try {
+        const product = await Product.findByIdAndUpdate(
+            req.params.productId,
+            req.body,
+            { new: true, runValidators: true }
+        );
+
+        if (!product) {
+            return res.status(404).json({ message: 'Product not found' });
+        }
+
+        res.json({ message: 'Product updated successfully', product });
+    } catch (error) {
+        console.error('Update product error:', error);
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+});
+
+// Delete product
+router.delete('/admin/products/:productId', authMiddleware, authorizeRoles('admin'), async (req, res) => {
+    try {
+        const product = await Product.findByIdAndDelete(req.params.productId);
+
+        if (!product) {
+            return res.status(404).json({ message: 'Product not found' });
+        }
+
+        res.json({ message: 'Product deleted successfully' });
+    } catch (error) {
+        console.error('Delete product error:', error);
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+});
+
+// Order management routes
+router.get('/admin/orders', authMiddleware, authorizeRoles('admin'), async (req, res) => {
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+
+        const orders = await Order.find()
+            .populate('user', 'name email')
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit);
+
+        const total = await Order.countDocuments();
+
+        res.json({
+            orders,
+            pagination: {
+                total,
+                page,
+                pages: Math.ceil(total / limit)
+            }
+        });
+    } catch (error) {
+        console.error('Get orders error:', error);
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+});
+
+// Get order by ID
+router.get('/admin/orders/:orderId', authMiddleware, authorizeRoles('admin'), async (req, res) => {
+    try {
+        const order = await Order.findById(req.params.orderId)
+            .populate('user', 'name email')
+            .populate('items.product');
+
+        if (!order) {
+            return res.status(404).json({ message: 'Order not found' });
+        }
+
+        res.json({ order });
+    } catch (error) {
+        console.error('Get order error:', error);
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+});
+
+// Update order status
+router.put('/admin/orders/:orderId/status', authMiddleware, authorizeRoles('admin'), async (req, res) => {
+    try {
+        const { status } = req.body;
+
+        const order = await Order.findById(req.params.orderId);
+        if (!order) {
+            return res.status(404).json({ message: 'Order not found' });
+        }
+
+        order.status = status;
+        await order.save();
+
+        res.json({ message: 'Order status updated successfully', order });
+    } catch (error) {
+        console.error('Update order status error:', error);
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+});
+
 // Seller application management
 router.get('/admin/seller-applications', authMiddleware, authorizeRoles('admin'), async (req, res) => {
     try {
@@ -424,6 +545,98 @@ router.get('/admin/analytics/sales', authMiddleware, authorizeRoles('admin'), as
         res.json({ salesData });
     } catch (error) {
         console.error('Sales analytics error:', error);
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+});
+
+// User stats analytics
+router.get('/admin/analytics/users', authMiddleware, authorizeRoles('admin'), async (req, res) => {
+    try {
+        const now = new Date();
+        const pastYear = new Date(now);
+        pastYear.setFullYear(now.getFullYear() - 1);
+
+        // Monthly user registrations
+        const userRegistrations = await User.aggregate([
+            {
+                $match: {
+                    createdAt: { $gte: pastYear }
+                }
+            },
+            {
+                $group: {
+                    _id: {
+                        month: { $month: "$createdAt" },
+                        year: { $year: "$createdAt" }
+                    },
+                    count: { $sum: 1 }
+                }
+            },
+            { $sort: { "_id.year": 1, "_id.month": 1 } }
+        ]);
+
+        // User role distribution
+        const roleDistribution = await User.aggregate([
+            {
+                $group: {
+                    _id: "$role",
+                    count: { $sum: 1 }
+                }
+            }
+        ]);
+
+        res.json({
+            userRegistrations,
+            roleDistribution
+        });
+    } catch (error) {
+        console.error('User stats error:', error);
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+});
+
+// Product stats analytics
+router.get('/admin/analytics/products', authMiddleware, authorizeRoles('admin'), async (req, res) => {
+    try {
+        // Product category distribution
+        const categoryDistribution = await Product.aggregate([
+            {
+                $group: {
+                    _id: "$category",
+                    count: { $sum: 1 }
+                }
+            }
+        ]);
+
+        // Products added over time
+        const now = new Date();
+        const pastYear = new Date(now);
+        pastYear.setFullYear(now.getFullYear() - 1);
+
+        const productsOverTime = await Product.aggregate([
+            {
+                $match: {
+                    createdAt: { $gte: pastYear }
+                }
+            },
+            {
+                $group: {
+                    _id: {
+                        month: { $month: "$createdAt" },
+                        year: { $year: "$createdAt" }
+                    },
+                    count: { $sum: 1 }
+                }
+            },
+            { $sort: { "_id.year": 1, "_id.month": 1 } }
+        ]);
+
+        res.json({
+            categoryDistribution,
+            productsOverTime
+        });
+    } catch (error) {
+        console.error('Product stats error:', error);
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 });
