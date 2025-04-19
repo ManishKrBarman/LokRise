@@ -1,4 +1,6 @@
-const backendURL = 'https://lokrise.netlify.app'; // use correct URL
+const backendURL = window.location.hostname === 'localhost'
+    ? 'http://localhost:3000'
+    : 'https://lokrise.netlify.app';
 
 document.getElementById('loginForm').addEventListener('submit', async (e) => {
     e.preventDefault();

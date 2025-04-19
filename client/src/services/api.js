@@ -1,15 +1,45 @@
 import axios from "axios";
 
 // API configuration
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
+const getBaseUrl = () => {
+    if (import.meta.env.VITE_API_URL) {
+        return import.meta.env.VITE_API_URL;
+    }
+    throw new Error('VITE_API_URL environment variable is not defined');
+};
+
+export const BASE_URL = getBaseUrl();
 
 // Create axios instance
 const api = axios.create({
-    baseURL: API_BASE_URL,
+    baseURL: BASE_URL,
     headers: {
         "Content-Type": "application/json",
     },
+    withCredentials: false // Allow cross-origin requests
 });
+
+// Add this after the existing axios instance creation
+const MAX_RETRIES = 3;
+const RETRY_DELAY = 1000; // 1 second
+
+// Helper function for handling retries
+const retryRequest = async (apiCall, retries = MAX_RETRIES) => {
+    for (let i = 0; i < retries; i++) {
+        try {
+            return await apiCall();
+        } catch (error) {
+            if (i === retries - 1) throw error; // Last retry failed
+
+            // Only retry on network errors or 5xx server errors
+            if (!error.response || (error.response.status >= 500 && error.response.status < 600)) {
+                await new Promise(resolve => setTimeout(resolve, RETRY_DELAY * (i + 1)));
+                continue;
+            }
+            throw error; // Don't retry on other errors
+        }
+    }
+};
 
 // Request interceptor for adding token
 api.interceptors.request.use(
@@ -46,13 +76,20 @@ api.interceptors.response.use(
 
 // Auth APIs
 export const authAPI = {
-    register: (userData) => api.post("/auth/register", userData),
-    login: (credentials) => api.post("/auth/login", credentials),
-    verifyEmail: (data) => api.post("/auth/verify-email", data),
-    forgotPassword: (email) => api.post("/auth/forgot-password", { email }),
-    resetPassword: (data) => api.post("/auth/reset-password", data),
-    getCurrentUser: () => api.get("/auth/me"),
-    updateProfile: (userData) => api.put("/auth/update-profile", userData),
+    register: (userData) => retryRequest(() => api.post("/auth/register", userData)),
+    login: (credentials) => retryRequest(() => api.post("/auth/login", {
+        ...credentials,
+        deviceInfo: {
+            isMobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
+            userAgent: navigator.userAgent,
+            platform: navigator.platform
+        }
+    })),
+    verifyEmail: (data) => retryRequest(() => api.post("/auth/verify-email", data)),
+    forgotPassword: (email) => retryRequest(() => api.post("/auth/forgot-password", { email })),
+    resetPassword: (data) => retryRequest(() => api.post("/auth/reset-password", data)),
+    getCurrentUser: () => retryRequest(() => api.get("/auth/me")),
+    updateProfile: (userData) => retryRequest(() => api.put("/auth/update-profile", userData)),
     registerSeller: (formData) => {
         // Log data being sent to server for debugging
         console.log("Seller data being sent to server:", formData);

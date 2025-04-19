@@ -61,3 +61,43 @@
 ```
 ---
 ---
+
+## Environment Variables Setup
+
+### Server Configuration
+Create a `.env` file in the `server` directory using `.env.example` as a template:
+
+```env
+# MongoDB Connection
+MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/dbname
+
+# JWT Configuration
+JWT_SECRET=your_jwt_secret_key
+
+# Server Configuration
+PORT=3000
+
+# Email Configuration
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_SECURE=false
+EMAIL_USER=your-email@gmail.com
+EMAIL_PASSWORD=your-app-specific-password
+EMAIL_FROM=your-email@gmail.com
+
+# Chat API Configuration
+GROQ_API_KEY=your_groq_api_key
+```
+
+### Client Configuration
+Create a `.env` file in the `client` directory using `.env.example` as a template:
+
+```env
+# API Configuration
+VITE_API_URL=http://localhost:3000
+
+# Chat Bot Configuration 
+VITE_CHAT_BOT_API_KEY=your_groq_api_key
+```
+
+Make sure to replace all placeholder values with your actual configuration data. Never commit the actual `.env` files to version control.

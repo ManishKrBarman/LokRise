@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import logo from '../assets/logo.svg';
 import FormInput from '../components/FormInput';
@@ -11,12 +11,14 @@ const Login = () => {
     const [error, setError] = useState('');
     const [forgotPwMode, setForgotPwMode] = useState(false);
     const [resetSent, setResetSent] = useState(false);
+    const [networkError, setNetworkError] = useState(false);
     const { login, forgotPassword } = useAuth();
     const navigate = useNavigate();
 
     const handleLogin = async (e) => {
         e.preventDefault();
         setError('');
+        setNetworkError(false);
 
         if (!email || !email.includes('@')) {
             setError('Please enter a valid email address');
@@ -31,7 +33,11 @@ const Login = () => {
         setLoading(true);
 
         try {
-            // Use the login function with email and password
+            // Check network connection
+            if (!navigator.onLine) {
+                throw new Error('No internet connection');
+            }
+
             const response = await login(email, password);
             if (response.success) {
                 navigate('/');
@@ -39,8 +45,13 @@ const Login = () => {
                 setError(response.error || 'Login failed. Please check your credentials.');
             }
         } catch (err) {
-            setError('An unexpected error occurred. Please try again.');
             console.error('Login error:', err);
+            if (!navigator.onLine || err.message === 'No internet connection') {
+                setNetworkError(true);
+                setError('Please check your internet connection and try again');
+            } else {
+                setError('An unexpected error occurred. Please try again.');
+            }
         } finally {
             setLoading(false);
         }
@@ -72,6 +83,19 @@ const Login = () => {
         }
     };
 
+    useEffect(() => {
+        const handleOnline = () => setNetworkError(false);
+        const handleOffline = () => setNetworkError(true);
+
+        window.addEventListener('online', handleOnline);
+        window.addEventListener('offline', handleOffline);
+
+        return () => {
+            window.removeEventListener('online', handleOnline);
+            window.removeEventListener('offline', handleOffline);
+        };
+    }, []);
+
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
             <div className="sm:mx-auto sm:w-full sm:max-w-md">
@@ -95,6 +119,14 @@ const Login = () => {
                     {error && (
                         <div className="mb-4 bg-red-50 border-l-4 border-red-400 p-4">
                             <p className="text-sm text-red-700">{error}</p>
+                        </div>
+                    )}
+
+                    {networkError && (
+                        <div className="mb-4 bg-yellow-50 border-l-4 border-yellow-400 p-4">
+                            <p className="text-sm text-yellow-700">
+                                You appear to be offline. Please check your internet connection.
+                            </p>
                         </div>
                     )}
 

@@ -1,4 +1,6 @@
-const backendURL = 'https://lokrise.netlify.app'; // replace with actual backend domain (e.g., Render or Railway)
+const backendURL = window.location.hostname === 'localhost'
+    ? 'http://localhost:3000'
+    : 'https://lokrise.netlify.app';
 
 document.getElementById('registerForm').addEventListener('submit', async (e) => {
     e.preventDefault();

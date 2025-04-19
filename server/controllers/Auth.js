@@ -6,6 +6,14 @@ import bcryptjs from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 
+const getJWTSecret = () => {
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+        throw new Error('JWT_SECRET environment variable is not defined');
+    }
+    return secret;
+};
+
 const register = async (req, res) => {
     try {
         const { name, email, password, phone, role, upiId } = req.body;
@@ -125,42 +133,76 @@ const verifyEmail = async (req, res) => {
 // Login functionality with JWT token generation
 const login = async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const { email, password, deviceInfo } = req.body;
+
+        console.log(`Login attempt - Email: ${email}, Device:`, deviceInfo);
 
         if (!email || !password) {
-            return res.status(400).json({ message: 'Please provide email and password' });
+            return res.status(400).json({
+                success: false,
+                message: 'Please provide both email and password'
+            });
         }
 
         // Find user by email
         const user = await UserModel.findOne({ email });
         if (!user) {
-            return res.status(401).json({ message: 'Invalid credentials' });
+            console.log(`Login failed: No user found with email ${email}`);
+            return res.status(401).json({
+                success: false,
+                message: 'Invalid credentials'
+            });
         }
 
         // Check if user is verified
         if (!user.isVerified) {
-            return res.status(403).json({ message: 'Please verify your email first' });
+            console.log(`Login failed: User ${email} is not verified`);
+            return res.status(403).json({
+                success: false,
+                message: 'Please verify your email first'
+            });
         }
 
         // Validate password
         const isPasswordValid = await bcryptjs.compare(password, user.password);
         if (!isPasswordValid) {
-            return res.status(401).json({ message: 'Invalid credentials' });
+            console.log(`Login failed: Invalid password for ${email}`);
+            return res.status(401).json({
+                success: false,
+                message: 'Invalid credentials'
+            });
         }
 
-        // Generate JWT token
+        // Generate JWT token with device info in payload
+        const tokenPayload = {
+            id: user._id,
+            email: user.email,
+            role: user.role,
+            device: deviceInfo?.isMobile ? 'mobile' : 'desktop'
+        };
+
         const token = jwt.sign(
-            { id: user._id, email: user.email, role: user.role },
-            process.env.JWT_SECRET || 'fallbacksecretkey',
+            tokenPayload,
+            getJWTSecret(),
             { expiresIn: '7d' }
         );
 
-        // Update last login
+        // Update last login and device info
         user.lastLogin = new Date();
+        user.lastLoginDevice = deviceInfo;
         await user.save();
 
-        // Return user info and token
-        res.status(200).json({
+        console.log(`Login successful for ${email} on ${deviceInfo?.isMobile ? 'mobile' : 'desktop'}`);
+
+        // Return user info and token with cache control headers for mobile
+        const headers = deviceInfo?.isMobile ? {
+            'Cache-Control': 'private, no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0'
+        } : {};
+
+        res.set(headers).status(200).json({
+            success: true,
             message: 'Login successful',
             token,
             user: {
@@ -173,8 +215,12 @@ const login = async (req, res) => {
             }
         });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Internal server error' });
+        console.error('Login error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Internal server error',
+            error: error.message
+        });
     }
 }
 
@@ -256,7 +302,7 @@ const resetPassword = async (req, res) => {
         // Generate new token for auto-login
         const token = jwt.sign(
             { id: user._id, email: user.email, role: user.role },
-            process.env.JWT_SECRET || 'fallbacksecretkey',
+            getJWTSecret(),
             { expiresIn: '7d' }
         );
 

@@ -22,13 +22,38 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Validate required environment variables
+const validateEnv = () => {
+    const required = [
+        'MONGO_URI',
+        'JWT_SECRET',
+        'EMAIL_HOST',
+        'EMAIL_PORT',
+        'EMAIL_USER',
+        'EMAIL_PASSWORD',
+        'EMAIL_FROM',
+        'GROQ_API_KEY'
+    ];
+
+    const missing = required.filter(key => !process.env[key]);
+
+    if (missing.length > 0) {
+        throw new Error(`Missing required environment variables: ${missing.join(', ')}`);
+    }
+};
+
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Static files
 app.use(express.static(path.join(__dirname, './public')));
-app.use(cors());
+app.use(cors({
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 // Routes
 app.use('/auth', AuthRoutes);
 app.use('/payment', PayRoutes);
@@ -68,6 +93,9 @@ app.get('/test-email', async (req, res) => {
 // Connect to DB and start server
 async function startServer() {
     try {
+        // Validate environment variables
+        validateEnv();
+
         // Connect to database
         await connectDB();
         console.log('Connected to MongoDB');
