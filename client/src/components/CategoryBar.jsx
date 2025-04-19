@@ -5,23 +5,27 @@ const CategoryBar = () => {
     const categories = [
         {
             name: 'Electronics',
-            subcategories: ['Smartphones', 'Laptops', 'Audio', 'Accessories']
+            subcategories: ['Home appliances', 'Solar products', 'Lighting products', 'Small kitchen appliances', 'Health devices']
         },
         {
             name: 'Fashion',
-            subcategories: ['Men', 'Women', 'Kids', 'Footwear', 'Accessories']
+            subcategories: ['Traditional wear', 'Casual wear', 'Sleep wear', 'Children schoolwear', 'Bag & luggage', 'Jewellery', 'Health & wellness']
         },
         {
             name: 'Home & Living',
-            subcategories: ['Furniture', 'Decor', 'Kitchen', 'Bedding']
+            subcategories: ['Storage & organiser', 'Lighting', 'Home cleaning', 'Garden & outdoor', 'Bath & hygiene', 'Cooking appliances', 'Mattresses & Cushions', 'Safety & security']
         },
         {
             name: 'Books',
-            subcategories: ['Fiction', 'Non-Fiction', 'Educational', 'Comics']
+            subcategories: ["Children's book", 'Local literature', 'Self help & motivation', 'Religion book', 'Health & wellness book', 'Agriculture & farming', 'Cooking', 'Language learning book']
         },
         {
             name: 'Beauty',
-            subcategories: ['Skincare', 'Makeup', 'Haircare', 'Fragrances']
+            subcategories: ['Natural & herbal', "Men's grooming", 'Bath & body essentials', 'Personal hygiene products', 'Beauty tools & accessories', 'Affordable beauty kits', 'Traditional beauty items']
+        },
+        {
+            name: 'Farming',
+            subcategories: ['Manure', 'Fertilizers', 'Seeds', 'Farming tools & equipement', 'Pesticides & insectisides', 'Animal feed & care', 'Crop protection & storage', 'Farm wear & safety wear', 'Greenhouse & nursery kits', 'Guids & educational kits']
         }
     ];
 
@@ -62,8 +66,7 @@ const CategoryBar = () => {
                                 {category.name}
                                 <FiChevronDown
                                     size={16}
-                                    className={`ml-1 transition-transform duration-200 ${activeDropdown === index ? 'rotate-180' : ''
-                                        }`}
+                                    className={`ml-1 transition-transform duration-200 ${activeDropdown === index ? 'rotate-180' : ''}`}
                                 />
                             </button>
 
@@ -78,7 +81,7 @@ const CategoryBar = () => {
                                     {category.subcategories.map((subcat, idx) => (
                                         <a
                                             key={idx}
-                                            href={`/category/${category.name.toLowerCase()}/${subcat.toLowerCase()}`}
+                                            href={`/category/${category.name.toLowerCase()}/${subcat.toLowerCase().replace(/\s+/g, '-')}`}
                                             className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[var(--primary-color)] transition-colors"
                                         >
                                             {subcat}

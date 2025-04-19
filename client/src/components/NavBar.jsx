@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { FiShoppingCart, FiBell, FiSearch, FiHeart, FiPackage, FiUser } from 'react-icons/fi';
+import { useNavigate } from 'react-router-dom';
 import logo from '../assets/logo.svg';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -14,6 +15,7 @@ const Navbar = (props) => {
     const [imageError, setImageError] = useState(false);
     const notificationRef = useRef(null);
     const profileMenuRef = useRef(null);
+    const navigate = useNavigate();
 
     // Get authentication state from context
     const { isAuthenticated, user, logout, loading: authLoading } = useAuth();
@@ -23,6 +25,14 @@ const Navbar = (props) => {
 
     // Get wishlist state from context
     const { wishlistItems } = useWishlist();
+
+    // Handle search submit
+    const handleSearch = async (e) => {
+        e.preventDefault();
+        if (searchQuery.trim()) {
+            navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+        }
+    };
 
     // Reset image error when user changes
     useEffect(() => {
@@ -91,7 +101,7 @@ const Navbar = (props) => {
                 </a>
 
                 {/* Search Bar */}
-                <div className="hidden md:flex items-center flex-1 max-w-xl mx-8">
+                <form onSubmit={handleSearch} className="hidden md:flex items-center flex-1 max-w-xl mx-8">
                     <div className="relative w-full">
                         <input
                             type="text"
@@ -100,11 +110,14 @@ const Navbar = (props) => {
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />
-                        <button className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-[var(--primary-color)]">
+                        <button 
+                            type="submit"
+                            className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-[var(--primary-color)]"
+                        >
                             <FiSearch size={20} />
                         </button>
                     </div>
-                </div>
+                </form>
 
                 {/* Navigation Icons and Login */}
                 <div className="flex items-center space-x-4">

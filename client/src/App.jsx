@@ -17,6 +17,7 @@ import BecomeSeller from './pages/BecomeSeller';
 import SellerPending from './pages/SellerPending';
 import Profile from './pages/Profile';
 import Dashboard from './pages/Dashboard';
+import Search from './pages/Search';
 import ChatbotButton from './components/ChatbotButton';
 import './App.css';
 
@@ -41,6 +42,7 @@ function App() {
                 <Route path="/qna" element={<QandA />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/search" element={<Search />} />
             </Routes>
             <ChatbotButton />
         </Router>

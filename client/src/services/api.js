@@ -124,9 +124,20 @@ export const authAPI = {
 export const productAPI = {
     // Public endpoints
     getProducts: (params) => api.get("/products", { params }),
-    getProductById: (id) => api.get(`/products/${id}`),
     getFeaturedProducts: () => api.get("/products/featured"),
+    getProductById: (id) => api.get(`/products/${id}`),
     getRelatedProducts: (id) => api.get(`/products/${id}/related`),
+    searchProducts: (params) => api.get("/products", {
+        params: {
+            search: params.query,
+            category: params.category,
+            minPrice: params.minPrice,
+            maxPrice: params.maxPrice,
+            sort: params.sort,
+            page: params.page,
+            limit: params.limit || 12
+        }
+    }),
 
     // Protected endpoints - require authentication
     createProduct: (productData) => api.post("/products", productData),
