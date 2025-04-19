@@ -163,12 +163,12 @@ const userSchema = new mongoose.Schema(
 );
 
 // Add method to compare password
-userSchema.methods.comparePassword = async function(candidatePassword) {
+userSchema.methods.comparePassword = async function (candidatePassword) {
     return await bcrypt.compare(candidatePassword, this.password);
 };
 
 // Add method to generate JWT token
-userSchema.methods.generateAuthToken = function() {
+userSchema.methods.generateAuthToken = function () {
     return jwt.sign(
         { id: this._id, role: this.role },
         process.env.JWT_SECRET,
