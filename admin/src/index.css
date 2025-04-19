@@ -1,0 +1,168 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom Admin Panel Styles */
+:root {
+    --primary: #6366f1;
+    --primary-dark: #4f46e5;
+    --primary-light: #818cf8;
+    --secondary: #10b981;
+    --secondary-dark: #059669;
+    --accent: #f97316;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --success: #10b981;
+    --background-color: #f8fafc;
+    --sidebar-width: 250px;
+}
+
+body {
+    @apply bg-gray-50 text-gray-900 min-h-screen;
+    font-family: 'Inter', sans-serif;
+    background-color: var(--background-color);
+    min-height: 100vh;
+}
+
+.admin-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+.admin-sidebar {
+    width: var(--sidebar-width);
+    background-color: #1e293b;
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.admin-sidebar.collapsed {
+    width: 80px;
+}
+
+.admin-content {
+    flex: 1;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+/* Admin card style */
+.admin-card {
+    @apply bg-white rounded-lg shadow p-6;
+}
+
+/* Admin table styles */
+.admin-table {
+    @apply min-w-full divide-y divide-gray-200;
+}
+
+.admin-table thead {
+    @apply bg-gray-50;
+}
+
+.admin-table th {
+    @apply px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider;
+}
+
+.admin-table td {
+    @apply px-6 py-4 whitespace-nowrap text-sm text-gray-600;
+}
+
+.admin-table tr:hover {
+    @apply bg-gray-50;
+}
+
+/* Button styles */
+.btn {
+    @apply px-4 py-2 rounded-md font-medium transition duration-200;
+}
+
+.btn-primary {
+    @apply bg-primary text-white hover:bg-primary-dark;
+}
+
+.btn-secondary {
+    @apply bg-secondary text-white hover:bg-secondary-dark;
+}
+
+.btn-danger {
+    @apply bg-danger text-white hover:bg-red-600;
+}
+
+.btn-outline {
+    @apply border border-gray-300 text-gray-700 hover:bg-gray-50;
+}
+
+/* Form styles */
+.form-input {
+    @apply w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent;
+}
+
+.form-label {
+    @apply block text-sm font-medium text-gray-700 mb-1;
+}
+
+.form-error {
+    @apply text-xs text-red-600 mt-1;
+}
+
+/* Sidebar active link */
+.sidebar-link {
+    @apply flex items-center px-4 py-2 text-gray-600 rounded-md transition duration-200;
+}
+
+.sidebar-link:hover {
+    @apply bg-gray-100 text-gray-900;
+}
+
+.sidebar-link.active {
+    @apply bg-primary bg-opacity-10 text-primary;
+}
+
+/* Utilities - Using direct color values instead of @apply to avoid circular dependencies */
+.custom-text-primary {
+    color: var(--primary);
+}
+
+.custom-text-secondary {
+    color: var(--secondary);
+}
+
+.custom-text-danger {
+    color: var(--danger);
+}
+
+.custom-text-warning {
+    color: var(--warning);
+}
+
+.custom-text-success {
+    color: var(--success);
+}
+
+.custom-bg-primary {
+    background-color: var(--primary);
+}
+
+.custom-bg-primary-dark {
+    background-color: var(--primary-dark);
+}
+
+/* Transition utilities */
+.fade-enter {
+    opacity: 0;
+}
+
+.fade-enter-active {
+    opacity: 1;
+    transition: opacity 300ms;
+}
+
+.fade-exit {
+    opacity: 1;
+}
+
+.fade-exit-active {
+    opacity: 0;
+    transition: opacity 300ms;
+}
