@@ -12,6 +12,8 @@ import ProductRoutes from './routes/Product.routes.js';
 import OrderRoutes from './routes/Order.routes.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import ChatRoutes from './routes/Chat.routes.js';
+import CartRoutes from './routes/Cart.routes.js';
+import WishlistRoutes from './routes/Wishlist.routes.js';
 import { verifyTransporter } from './middlewares/email.config.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -81,6 +83,8 @@ app.use('/payment', PayRoutes);
 app.use('/products', ProductRoutes);
 app.use('/orders', OrderRoutes);
 app.use('/chat', ChatRoutes);
+app.use('/cart', CartRoutes);
+app.use('/wishlist', WishlistRoutes);
 
 app.use(errorHandler);
 
