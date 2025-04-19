@@ -7,10 +7,12 @@ import {
     forgotPassword,
     resetPassword,
     getCurrentUser,
-    updateProfile
+    updateProfile,
+    getProfileImage
 } from '../controllers/Auth.js';
 import { authMiddleware } from '../middlewares/auth.js';
 import { sendTestEmail } from '../middlewares/email.js';
+import { uploadProfileImage } from '../middlewares/imageUpload.js';
 
 const AuthRoutes = express.Router();
 
@@ -21,6 +23,7 @@ AuthRoutes.post('/seller/register', registerSeller);
 AuthRoutes.post('/login', login);
 AuthRoutes.post('/forgot-password', forgotPassword);
 AuthRoutes.post('/reset-password', resetPassword);
+AuthRoutes.get('/profile-image/:userId', getProfileImage);
 
 // Test email route
 AuthRoutes.post('/test-email', async (req, res) => {
@@ -59,6 +62,6 @@ AuthRoutes.post('/test-email', async (req, res) => {
 
 // Protected routes
 AuthRoutes.get('/me', authMiddleware, getCurrentUser);
-AuthRoutes.put('/update-profile', authMiddleware, updateProfile);
+AuthRoutes.put('/update-profile', authMiddleware, uploadProfileImage, updateProfile);
 
 export default AuthRoutes;

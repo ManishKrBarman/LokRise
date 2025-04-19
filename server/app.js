@@ -51,8 +51,13 @@ app.use(express.static(path.join(__dirname, './public')));
 app.use(cors({
     origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    exposedHeaders: ['Content-Type', 'Content-Length'],
+    credentials: true
 }));
+
+// Add middleware to handle pre-flight requests for the profile image endpoint
+app.options('/auth/profile-image/:userId', cors());
 
 // Routes
 app.use('/auth', AuthRoutes);

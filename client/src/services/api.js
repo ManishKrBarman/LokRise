@@ -89,13 +89,34 @@ export const authAPI = {
     forgotPassword: (email) => retryRequest(() => api.post("/auth/forgot-password", { email })),
     resetPassword: (data) => retryRequest(() => api.post("/auth/reset-password", data)),
     getCurrentUser: () => retryRequest(() => api.get("/auth/me")),
-    updateProfile: (userData) => retryRequest(() => api.put("/auth/update-profile", userData)),
-    registerSeller: (formData) => {
-        // Log data being sent to server for debugging
-        console.log("Seller data being sent to server:", formData);
+    updateProfile: (formData) => {
+        const config = {
+            headers: formData instanceof FormData ? {
+                'Content-Type': 'multipart/form-data'
+            } : {
+                'Content-Type': 'application/json'
+            }
+        };
 
-        // Send as JSON data instead of FormData
-        return api.post("/auth/seller/register", formData);
+        // If formData is an object but not FormData, convert non-file fields
+        if (!(formData instanceof FormData) && typeof formData === 'object') {
+            const newFormData = new FormData();
+            Object.entries(formData).forEach(([key, value]) => {
+                if (value instanceof File) {
+                    newFormData.append(key, value);
+                } else if (typeof value === 'object') {
+                    newFormData.append(key, JSON.stringify(value));
+                } else {
+                    newFormData.append(key, value);
+                }
+            });
+            formData = newFormData;
+        }
+
+        return retryRequest(() => api.put("/auth/update-profile", formData, config));
+    },
+    registerSeller: (formData) => {
+        return retryRequest(() => api.post("/auth/seller/register", formData));
     },
 };
 

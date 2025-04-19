@@ -1,9 +1,16 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { authAPI, setAuthState, clearAuthState, getAuthState } from '../services/api';
+import { BASE_URL } from '../services/api';
 
 // Add this near the top of the file with other imports
 const isMobileDevice = () => {
     return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+};
+
+// Helper function to get profile image URL
+const getProfileImageUrl = (userId) => {
+    if (!userId) return null;
+    return `${BASE_URL}/auth/profile-image/${userId}`;
 };
 
 // Create auth context
@@ -25,7 +32,13 @@ export const AuthProvider = ({ children }) => {
                 if (authState.isAuthenticated && authState.user) {
                     // Verify token validity by getting current user
                     const response = await authAPI.getCurrentUser();
-                    setUser(response.data.user);
+                    const currentUser = response.data.user;
+
+                    // Update user with proper image URL
+                    setUser({
+                        ...currentUser,
+                        profileImage: currentUser._id ? getProfileImageUrl(currentUser._id) : null
+                    });
                     setIsAuthenticated(true);
                 } else {
                     // No valid auth state
@@ -142,25 +155,31 @@ export const AuthProvider = ({ children }) => {
     };
 
     // Update profile function
-    const updateProfile = async (userData) => {
+    const updateProfile = async (formData) => {
         setLoading(true);
         setError(null);
         try {
-            const response = await authAPI.updateProfile(userData);
-
-            // Update local user state
-            setUser(prev => ({ ...prev, ...response.data.user }));
-
+            const response = await authAPI.updateProfile(formData);
+            const updatedUser = response.data.user;
+            
+            // Update local user state with proper image URL
+            setUser(prev => ({
+                ...prev,
+                ...updatedUser,
+                profileImage: updatedUser.id ? getProfileImageUrl(updatedUser.id) : null
+            }));
+            
             // Update stored user data
             const authState = getAuthState();
             if (authState.isAuthenticated) {
                 setAuthState(localStorage.getItem("token"), {
                     ...authState.user,
-                    ...response.data.user
+                    ...updatedUser,
+                    profileImage: updatedUser.id ? getProfileImageUrl(updatedUser.id) : null
                 });
             }
-
-            return { success: true, user: response.data.user };
+            
+            return { success: true, user: updatedUser };
         } catch (error) {
             console.error("Profile update error:", error);
             setError(error.response?.data?.message || "Profile update failed");

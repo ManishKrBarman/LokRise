@@ -28,7 +28,11 @@ const userSchema = new mongoose.Schema(
             type: String,
             required: true
         },
-        profileImage: { type: String },
+        profileImage: {
+            data: Buffer,
+            contentType: String,
+            originalName: String
+        },
         phone: {
             type: String,
             unique: true,

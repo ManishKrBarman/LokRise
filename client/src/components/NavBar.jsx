@@ -10,6 +10,7 @@ const Navbar = (props) => {
     const [searchQuery, setSearchQuery] = useState('');
     const [showNotifications, setShowNotifications] = useState(false);
     const [showProfileMenu, setShowProfileMenu] = useState(false);
+    const [imageTimestamp] = useState(Date.now());
     const notificationRef = useRef(null);
     const profileMenuRef = useRef(null);
 
@@ -180,10 +181,14 @@ const Navbar = (props) => {
                         isAuthenticated ? (
                             <div className="relative" ref={profileMenuRef}>
                                 <img
-                                    src={user?.profileImage || "https://placehold.co/40?text=" + (user?.name?.[0] || "U")}
+                                    src={user?.profileImage ? `${user.profileImage}?t=${imageTimestamp}` : `https://placehold.co/40?text=${user?.name?.[0] || "U"}`}
                                     alt="Profile"
                                     className="h-10 w-10 rounded-full border-2 border-[var(--primary-color)] cursor-pointer"
                                     onClick={() => setShowProfileMenu(!showProfileMenu)}
+                                    onError={(e) => {
+                                        e.target.onerror = null; // Prevent infinite loop
+                                        e.target.src = `https://placehold.co/40?text=${user?.name?.[0] || "U"}`;
+                                    }}
                                 />
 
                                 {/* Profile Dropdown Menu */}

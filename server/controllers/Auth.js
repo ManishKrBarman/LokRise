@@ -5,6 +5,8 @@ import UserModel from '../models/user.js';
 import bcryptjs from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
+import fs from 'fs';
+import path from 'path';
 
 const getJWTSecret = () => {
     const secret = process.env.JWT_SECRET;
@@ -332,6 +334,46 @@ const getCurrentUser = async (req, res) => {
     }
 }
 
+// Get profile image
+const getProfileImage = async (req, res) => {
+    try {
+        const userId = req.params.userId;
+        console.log(`Fetching profile image for user: ${userId}`);
+
+        const user = await UserModel.findById(userId);
+        if (!user) {
+            console.log(`User not found: ${userId}`);
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        if (!user.profileImage) {
+            console.log(`No profile image for user: ${userId}`);
+            return res.status(404).json({ message: 'No profile image found' });
+        }
+
+        if (!user.profileImage.data) {
+            console.log(`Profile image data missing for user: ${userId}`);
+            return res.status(404).json({ message: 'Profile image data is missing' });
+        }
+
+        // Add CORS headers
+        res.set({
+            'Content-Type': user.profileImage.contentType,
+            'Cache-Control': 'public, max-age=31557600',
+            'Access-Control-Allow-Origin': '*'
+        });
+
+        console.log(`Successfully sending profile image for user: ${userId}`);
+        res.send(user.profileImage.data);
+    } catch (error) {
+        console.error('Get profile image error:', error);
+        res.status(500).json({
+            message: 'Error retrieving profile image',
+            error: error.message
+        });
+    }
+};
+
 // Update user profile
 const updateProfile = async (req, res) => {
     try {
@@ -353,14 +395,22 @@ const updateProfile = async (req, res) => {
         // Update fields
         if (name) user.name = name;
         if (phone) user.phone = phone;
-        if (profileImage) user.profileImage = profileImage;
+        if (profileImage && profileImage.data) {
+            user.profileImage = {
+                data: profileImage.data,
+                contentType: profileImage.contentType,
+                originalName: profileImage.originalName
+            };
+        }
         if (address) user.address = { ...user.address, ...address };
         if (socialProfiles) user.socialProfiles = { ...user.socialProfiles, ...socialProfiles };
         if (preferences) user.preferences = { ...user.preferences, ...preferences };
 
         user.updatedAt = new Date();
-
         await user.save();
+
+        // Create URL for profile image in response
+        const profileImageUrl = user.profileImage ? `/api/auth/profile-image/${user._id}` : null;
 
         res.status(200).json({
             message: 'Profile updated successfully',
@@ -370,7 +420,7 @@ const updateProfile = async (req, res) => {
                 email: user.email,
                 phone: user.phone,
                 role: user.role,
-                profileImage: user.profileImage,
+                profileImage: profileImageUrl,
                 address: user.address,
                 socialProfiles: user.socialProfiles,
                 preferences: user.preferences
@@ -563,5 +613,6 @@ export {
     forgotPassword,
     resetPassword,
     getCurrentUser,
-    updateProfile
+    updateProfile,
+    getProfileImage
 };
