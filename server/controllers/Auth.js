@@ -339,50 +339,91 @@ const updateProfile = async (req, res) => {
 // Register a new seller
 const registerSeller = async (req, res, next) => {
     try {
+        console.log("Received seller registration request");
+        console.log("Request body:", req.body);
+
+        // Check if req.body is undefined or empty
+        if (!req.body || Object.keys(req.body).length === 0) {
+            console.error("Empty or undefined request body");
+            return res.status(400).json({ message: "No data received. Please provide seller information." });
+        }
+
+        // Extract data from request body with defaults for empty values
         const {
             // Personal Information
-            fullName,
-            email,
-            phone,
+            fullName = '',
+            email = '',
+            phone = '',
 
             // Business Information
-            businessName,
-            gstin,
-            businessType,
-            businessCategory,
-            businessDescription,
-            establishedYear,
+            businessName = '',
+            gstin = '',
+            businessType = 'individual',
+            businessCategory = 'other',
+            businessDescription = '',
+            establishedYear = new Date().getFullYear(),
 
             // Address Information
-            addressLine1,
-            addressLine2,
-            city,
-            district,
-            state,
-            pinCode,
+            addressLine1 = '',
+            addressLine2 = '',
+            city = '',
+            district = '',
+            state = '',
+            pinCode = '',
 
             // Payment Information
-            accountHolderName,
-            accountNumber,
-            ifscCode,
-            bankName,
-            branchName,
+            accountHolderName = '',
+            accountNumber = '',
+            ifscCode = '',
+            bankName = '',
+            branchName = '',
             upiId,
 
             // Identity Verification
-            panNumber,
-            aadharNumber,
+            panNumber = '',
+            aadharNumber = '',
         } = req.body;
 
-        // Check if user with the email already exists
-        const existingUser = await UserModel.findOne({ email });
-        if (existingUser) {
-            return res.status(409).json({ message: "User with this email already exists" });
+        // For development - only UPI ID is required
+        if (!upiId) {
+            return res.status(400).json({ message: "UPI ID is required for seller registration" });
         }
 
-        // Create a temporary password for the seller (can be changed later)
-        const tempPassword = Math.random().toString(36).slice(-8);
-        const hashedPassword = await bcryptjs.hash(tempPassword, 10);
+        let user;
+
+        // If user is authenticated, update their existing account
+        if (req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
+            try {
+                // Extract token
+                const token = req.headers.authorization.split(' ')[1];
+
+                // Verify token
+                const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallbacksecretkey');
+
+                // Find the user
+                user = await UserModel.findById(decoded.id);
+
+                if (!user) {
+                    return res.status(404).json({ message: "User not found. Please login before registering as a seller." });
+                }
+
+                console.log(`Updating existing user (${user.email}) to seller role`);
+            } catch (tokenError) {
+                console.error("Token validation error:", tokenError);
+                return res.status(401).json({ message: "Invalid authentication token. Please login again." });
+            }
+        } else if (email) {
+            // If no token but email provided, try to find user by email
+            user = await UserModel.findOne({ email });
+
+            if (!user) {
+                return res.status(404).json({ message: "User not found with this email. Please register or login first." });
+            }
+
+            console.log(`Found user by email: ${email}`);
+        } else {
+            return res.status(400).json({ message: "Authentication required. Please login before registering as a seller." });
+        }
 
         // Create address object
         const address = {
@@ -405,7 +446,7 @@ const registerSeller = async (req, res, next) => {
 
         // Create business details object
         const businessDetails = {
-            businessName,
+            businessName: businessName || user.name + "'s Shop",
             gstin,
             businessType,
             businessCategory,
@@ -419,91 +460,52 @@ const registerSeller = async (req, res, next) => {
             aadharNumber,
         };
 
-        // Generate verification code
-        const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
-        console.log(`Generated seller verification code for ${email}: ${verificationCode}`);
+        // Update user with seller information
+        user.role = "seller";
+        user.upiId = upiId;
+        user.address = address;
+        user.bankDetails = bankDetails;
+        user.businessDetails = businessDetails;
+        user.identityDetails = identityDetails;
+        user.sellerStatus = "pending";
+        user.updatedAt = new Date();
 
-        // Create seller user
-        const newSeller = new UserModel({
-            name: fullName,
-            email,
-            password: hashedPassword,
-            phone,
-            role: "seller",
-            upiId,
-            address,
-            bankDetails,
-            businessDetails,
-            identityDetails,
-            verificationCode,
-            sellerStatus: "pending", // pending, approved, rejected
-            isVerified: false,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-        });
-
-        // Save the seller first to ensure they're in the system
-        await newSeller.save();
-
-        // Try to send verification email with temporary password
-        try {
-            console.log(`Sending seller verification email to ${email}`);
-            const emailResult = await SendVerificationCode(email, verificationCode, tempPassword);
-
-            if (!emailResult.success) {
-                console.warn(`Seller email sending failed for ${email}: ${emailResult.error}`);
-                // Return verification code and temp password for testing environments
-                return res.status(201).json({
-                    success: true,
-                    message: 'Seller registered successfully but email could not be sent. Use the verification code and temporary password below.',
-                    emailSent: false,
-                    verificationCode: verificationCode,
-                    tempPassword: tempPassword,
-                    user: {
-                        id: newSeller._id,
-                        name: newSeller.name,
-                        email: newSeller.email,
-                        role: newSeller.role,
-                        sellerStatus: newSeller.sellerStatus
-                    }
-                });
-            }
-
-            // Email sent successfully
-            return res.status(201).json({
-                success: true,
-                message: "Seller registration successful! Please check your email to verify your account.",
-                emailSent: true,
-                user: {
-                    id: newSeller._id,
-                    name: newSeller.name,
-                    email: newSeller.email,
-                    role: newSeller.role,
-                    sellerStatus: newSeller.sellerStatus
-                }
-            });
-        } catch (emailError) {
-            // Email sending failed but seller account is created
-            console.error(`Error sending verification email to seller ${email}:`, emailError);
-
-            // Return verification info for testing environments
-            return res.status(201).json({
-                success: true,
-                message: 'Seller registered, but email sending failed. Use the verification code and temporary password below.',
-                emailSent: false,
-                verificationCode: verificationCode,
-                tempPassword: tempPassword,
-                user: {
-                    id: newSeller._id,
-                    name: newSeller.name,
-                    email: newSeller.email,
-                    role: newSeller.role,
-                    sellerStatus: newSeller.sellerStatus
-                }
-            });
+        // If fullName is provided, update the name
+        if (fullName && fullName.trim() !== '') {
+            user.name = fullName;
         }
+
+        // If phone is provided, update the phone
+        if (phone && phone.trim() !== '') {
+            user.phone = phone;
+        }
+
+        // Save the updated user
+        await user.save();
+        console.log(`User ${user.email} updated to seller role successfully`);
+
+        // Generate new token with updated role
+        const token = jwt.sign(
+            { id: user._id, email: user.email, role: user.role },
+            process.env.JWT_SECRET || 'fallbacksecretkey',
+            { expiresIn: '7d' }
+        );
+
+        return res.status(200).json({
+            success: true,
+            message: "Your seller application has been submitted successfully! We will review it and get back to you shortly.",
+            token, // Send new token with updated role
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                sellerStatus: user.sellerStatus
+            }
+        });
     } catch (err) {
-        next(err);
+        console.error("Seller registration error:", err);
+        res.status(500).json({ message: 'Server error: ' + (err.message || 'Unknown error') });
     }
 };
 

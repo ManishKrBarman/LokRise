@@ -16,7 +16,7 @@ export const AuthProvider = ({ children }) => {
             setLoading(true);
             try {
                 const authState = getAuthState();
-                
+
                 if (authState.isAuthenticated && authState.user) {
                     // Verify token validity by getting current user
                     const response = await authAPI.getCurrentUser();
@@ -48,7 +48,7 @@ export const AuthProvider = ({ children }) => {
         try {
             const response = await authAPI.login({ email, password });
             const { token, user } = response.data;
-            
+
             setAuthState(token, user);
             setUser(user);
             setIsAuthenticated(true);
@@ -107,10 +107,10 @@ export const AuthProvider = ({ children }) => {
         setError(null);
         try {
             const response = await authAPI.updateProfile(userData);
-            
+
             // Update local user state
             setUser(prev => ({ ...prev, ...response.data.user }));
-            
+
             // Update stored user data
             const authState = getAuthState();
             if (authState.isAuthenticated) {
@@ -119,7 +119,7 @@ export const AuthProvider = ({ children }) => {
                     ...response.data.user
                 });
             }
-            
+
             return { success: true, user: response.data.user };
         } catch (error) {
             console.error("Profile update error:", error);
@@ -152,12 +152,12 @@ export const AuthProvider = ({ children }) => {
         setError(null);
         try {
             const response = await authAPI.resetPassword({ resetToken, newPassword });
-            
+
             // If a token is returned and email is provided, auto-login
             if (response.data.token && email) {
                 await login(email, newPassword);
             }
-            
+
             return { success: true, data: response.data };
         } catch (error) {
             console.error("Password reset error:", error);
@@ -174,6 +174,14 @@ export const AuthProvider = ({ children }) => {
         setError(null);
         try {
             const response = await authAPI.registerSeller(sellerData);
+
+            // Update user data and token if successful
+            if (response.data.token) {
+                // Update authentication state with new token and updated user data
+                setAuthState(response.data.token, response.data.user);
+                setUser(response.data.user);
+            }
+
             return { success: true, data: response.data };
         } catch (error) {
             console.error("Seller registration error:", error);

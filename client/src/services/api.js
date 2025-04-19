@@ -54,11 +54,11 @@ export const authAPI = {
     getCurrentUser: () => api.get("/auth/me"),
     updateProfile: (userData) => api.put("/auth/update-profile", userData),
     registerSeller: (formData) => {
-        return api.post("/auth/seller/register", formData, {
-            headers: {
-                "Content-Type": "multipart/form-data",
-            },
-        });
+        // Log data being sent to server for debugging
+        console.log("Seller data being sent to server:", formData);
+
+        // Send as JSON data instead of FormData
+        return api.post("/auth/seller/register", formData);
     },
 };
 
