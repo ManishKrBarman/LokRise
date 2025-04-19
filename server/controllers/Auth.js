@@ -1,6 +1,6 @@
 // controllers/Auth.js
 import { welcomeEmailTemplate } from '../libs/emailTemplate.js';
-import { SendVerificationCode, sendWelcomeEmail } from '../middlewares/email.js';
+import { SendVerificationCode, sendWelcomeEmail, sendPasswordResetEmail } from '../middlewares/email.js';
 import UserModel from '../models/user.js';
 import bcryptjs from 'bcryptjs';
 import jwt from 'jsonwebtoken';
@@ -202,12 +202,20 @@ const forgotPassword = async (req, res) => {
         await user.save();
 
         // Send reset email with token
-        // TODO: Implement actual email sending with proper template
-        console.log(`Password reset token for ${email}: ${resetToken}`);
+        const emailResult = await sendPasswordResetEmail(email, resetToken);
+
+        if (!emailResult.success) {
+            console.warn(`Failed to send password reset email to ${email}: ${emailResult.error}`);
+            // Just for development purposes, return the token - remove in production
+            return res.status(200).json({
+                message: 'Password reset email could not be sent, but token was generated',
+                resetToken // Only for testing - remove in production
+            });
+        }
 
         res.status(200).json({
-            message: 'Password reset email sent',
-            resetToken // Only for testing - remove in production
+            message: 'Password reset email sent successfully',
+            email: email
         });
     } catch (error) {
         console.error(error);
