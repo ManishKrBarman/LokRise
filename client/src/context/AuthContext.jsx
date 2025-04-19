@@ -9,7 +9,10 @@ const isMobileDevice = () => {
 // Helper function to get profile image URL
 const getProfileImageUrl = (userId) => {
     if (!userId) return null;
-    return `${BASE_URL}/auth/profile-image/${userId}?t=${Date.now()}`;
+    const apiUrl = import.meta.env.VITE_API_URL || window.location.origin;
+    // Remove any trailing slashes from the API URL
+    const baseUrl = apiUrl.replace(/\/$/, '');
+    return `${baseUrl}/auth/profile-image/${userId}?t=${Date.now()}`;
 };
 
 const AuthContext = createContext();

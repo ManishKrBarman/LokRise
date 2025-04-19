@@ -55,19 +55,22 @@ const corsOptions = {
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     exposedHeaders: ['Content-Type', 'Content-Length'],
-    credentials: true
+    credentials: true,
+    maxAge: 86400 // 24 hours
 };
 
 // Apply CORS middleware
 app.use(cors(corsOptions));
 
-// Additional CORS headers for profile images
+// Additional CORS and cache headers for profile images
 app.use('/auth/profile-image/:userId', (req, res, next) => {
     res.set({
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'GET',
         'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-        'Cache-Control': 'public, max-age=31557600'
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
     });
     next();
 });
