@@ -15,6 +15,8 @@ import Forum from './pages/Forum';
 import QandA from './pages/QandA';
 import BecomeSeller from './pages/BecomeSeller';
 import SellerPending from './pages/SellerPending';
+import Profile from './pages/Profile';
+import Dashboard from './pages/Dashboard';
 import ChatbotButton from './components/ChatbotButton';
 import './App.css';
 
@@ -37,6 +39,8 @@ function App() {
                 <Route path="/orders" element={<Orders />} />
                 <Route path="/forum" element={<Forum />} />
                 <Route path="/qna" element={<QandA />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/dashboard" element={<Dashboard />} />
             </Routes>
             <ChatbotButton />
         </Router>
