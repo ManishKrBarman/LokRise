@@ -5,12 +5,13 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
+import { BASE_URL } from '../services/api';
 
 const Navbar = (props) => {
     const [searchQuery, setSearchQuery] = useState('');
     const [showNotifications, setShowNotifications] = useState(false);
     const [showProfileMenu, setShowProfileMenu] = useState(false);
-    const [imageTimestamp] = useState(Date.now());
+    const [imageError, setImageError] = useState(false);
     const notificationRef = useRef(null);
     const profileMenuRef = useRef(null);
 
@@ -22,6 +23,18 @@ const Navbar = (props) => {
 
     // Get wishlist state from context
     const { wishlistItems } = useWishlist();
+
+    // Reset image error when user changes
+    useEffect(() => {
+        setImageError(false);
+    }, [user]);
+
+    const getProfileImageUrl = () => {
+        if (!user?._id) return null;
+        return `${BASE_URL}/auth/profile-image/${user._id}?t=${Date.now()}`;
+    };
+
+    const profileImage = !imageError && user?._id ? getProfileImageUrl() : null;
 
     // Close notification panel when clicking outside
     useEffect(() => {
@@ -181,13 +194,14 @@ const Navbar = (props) => {
                         isAuthenticated ? (
                             <div className="relative" ref={profileMenuRef}>
                                 <img
-                                    src={user?.profileImage ? `${user.profileImage}?t=${imageTimestamp}` : `https://placehold.co/40?text=${user?.name?.[0] || "U"}`}
+                                    src={profileImage || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'U')}&background=8B6B4B&color=fff&t=${Date.now()}`}
                                     alt="Profile"
                                     className="h-10 w-10 rounded-full border-2 border-[var(--primary-color)] cursor-pointer"
                                     onClick={() => setShowProfileMenu(!showProfileMenu)}
                                     onError={(e) => {
-                                        e.target.onerror = null; // Prevent infinite loop
-                                        e.target.src = `https://placehold.co/40?text=${user?.name?.[0] || "U"}`;
+                                        e.target.onerror = null;
+                                        setImageError(true);
+                                        e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'U')}&background=8B6B4B&color=fff&t=${Date.now()}`;
                                     }}
                                 />
 

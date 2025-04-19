@@ -13,6 +13,8 @@ import OrderRoutes from './routes/Order.routes.js';
 import AdminRoutes from './routes/Admin.routes.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import ChatRoutes from './routes/Chat.routes.js';
+import CartRoutes from './routes/Cart.routes.js';
+import WishlistRoutes from './routes/Wishlist.routes.js';
 import { verifyTransporter } from './middlewares/email.config.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -49,16 +51,32 @@ app.use(express.urlencoded({ extended: true }));
 
 // Static files
 app.use(express.static(path.join(__dirname, './public')));
-app.use(cors({
+
+// CORS configuration
+const corsOptions = {
     origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     exposedHeaders: ['Content-Type', 'Content-Length'],
-    credentials: true
-}));
+    credentials: true,
+    maxAge: 86400 // 24 hours
+};
 
-// Add middleware to handle pre-flight requests for the profile image endpoint
-app.options('/auth/profile-image/:userId', cors());
+// Apply CORS middleware
+app.use(cors(corsOptions));
+
+// Additional CORS and cache headers for profile images
+app.use('/auth/profile-image/:userId', (req, res, next) => {
+    res.set({
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+    });
+    next();
+});
 
 // Routes
 app.use('/auth', AuthRoutes);
@@ -67,6 +85,8 @@ app.use('/products', ProductRoutes);
 app.use('/orders', OrderRoutes);
 app.use('/admin', AdminRoutes);
 app.use('/chat', ChatRoutes);
+app.use('/cart', CartRoutes);
+app.use('/wishlist', WishlistRoutes);
 
 app.use(errorHandler);
 

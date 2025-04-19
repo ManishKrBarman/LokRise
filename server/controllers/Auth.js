@@ -356,21 +356,22 @@ const getProfileImage = async (req, res) => {
             return res.status(404).json({ message: 'Profile image data is missing' });
         }
 
-        // Add CORS headers
+        // Add cache control and CORS headers
         res.set({
             'Content-Type': user.profileImage.contentType,
-            'Cache-Control': 'public, max-age=31557600',
-            'Access-Control-Allow-Origin': '*'
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET',
+            'Access-Control-Allow-Headers': 'Content-Type, Authorization'
         });
 
         console.log(`Successfully sending profile image for user: ${userId}`);
         res.send(user.profileImage.data);
     } catch (error) {
         console.error('Get profile image error:', error);
-        res.status(500).json({
-            message: 'Error retrieving profile image',
-            error: error.message
-        });
+        res.status(500).json({ message: 'Failed to fetch profile image' });
     }
 };
 
