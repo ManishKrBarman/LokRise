@@ -5,8 +5,7 @@ const getBaseUrl = () => {
     if (import.meta.env.VITE_API_URL) {
         return import.meta.env.VITE_API_URL;
     }
-    // For local development without .env
-    return 'http://localhost:3000';
+    throw new Error('VITE_API_URL environment variable is not defined');
 };
 
 export const BASE_URL = getBaseUrl();

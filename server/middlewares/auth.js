@@ -20,7 +20,7 @@ export const authMiddleware = async (req, res, next) => {
 
         try {
             // Verify token
-            const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallbacksecretkey');
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
             // Find user and exclude password
             const user = await UserModel.findById(decoded.id).select('-password');

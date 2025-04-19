@@ -6,6 +6,14 @@ import bcryptjs from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 
+const getJWTSecret = () => {
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+        throw new Error('JWT_SECRET environment variable is not defined');
+    }
+    return secret;
+};
+
 const register = async (req, res) => {
     try {
         const { name, email, password, phone, role, upiId } = req.body;
@@ -175,7 +183,7 @@ const login = async (req, res) => {
 
         const token = jwt.sign(
             tokenPayload,
-            process.env.JWT_SECRET || 'fallbacksecretkey',
+            getJWTSecret(),
             { expiresIn: '7d' }
         );
 
@@ -294,7 +302,7 @@ const resetPassword = async (req, res) => {
         // Generate new token for auto-login
         const token = jwt.sign(
             { id: user._id, email: user.email, role: user.role },
-            process.env.JWT_SECRET || 'fallbacksecretkey',
+            getJWTSecret(),
             { expiresIn: '7d' }
         );
 
