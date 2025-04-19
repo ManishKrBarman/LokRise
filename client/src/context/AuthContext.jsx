@@ -1,6 +1,11 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { authAPI, setAuthState, clearAuthState, getAuthState } from '../services/api';
 
+// Add this near the top of the file with other imports
+const isMobileDevice = () => {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+};
+
 // Create auth context
 const AuthContext = createContext();
 
@@ -46,17 +51,52 @@ export const AuthProvider = ({ children }) => {
         setLoading(true);
         setError(null);
         try {
-            const response = await authAPI.login({ email, password });
+            // Add device info to request
+            const deviceInfo = {
+                isMobile: isMobileDevice(),
+                userAgent: navigator.userAgent,
+                platform: navigator.platform
+            };
+            
+            console.log('Login attempt:', { email, deviceInfo });
+            const response = await authAPI.login({ 
+                email, 
+                password,
+                deviceInfo 
+            });
+            
+            // Validate response
+            if (!response?.data?.token || !response?.data?.user) {
+                throw new Error('Invalid server response');
+            }
+            
             const { token, user } = response.data;
             
-            setAuthState(token, user);
+            // Ensure token is stored properly
+            try {
+                setAuthState(token, user);
+                // Verify token storage
+                const storedToken = localStorage.getItem('token');
+                if (!storedToken) {
+                    throw new Error('Token storage failed');
+                }
+            } catch (storageError) {
+                console.error('Storage error:', storageError);
+                throw new Error('Failed to store authentication data');
+            }
+            
             setUser(user);
             setIsAuthenticated(true);
             return { success: true, user };
         } catch (error) {
-            console.error("Login error:", error);
-            setError(error.response?.data?.message || "Login failed");
-            return { success: false, error: error.response?.data?.message || "Login failed" };
+            const errorMessage = error.response?.data?.message || error.message || 'Login failed';
+            console.error('Login error:', {
+                message: errorMessage,
+                error: error,
+                deviceInfo: { isMobile: isMobileDevice(), platform: navigator.platform }
+            });
+            setError(errorMessage);
+            return { success: false, error: errorMessage };
         } finally {
             setLoading(false);
         }

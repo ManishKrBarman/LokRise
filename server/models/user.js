@@ -137,7 +137,19 @@ const userSchema = new mongoose.Schema(
         verificationCode: String,
         passwordResetToken: String,
         passwordResetExpires: Date,
-        lastLogin: Date
+        lastLogin: Date,
+        lastLoginDevice: {
+            isMobile: Boolean,
+            userAgent: String,
+            platform: String,
+            loginTime: Date
+        },
+        devices: [{
+            isMobile: Boolean,
+            userAgent: String,
+            platform: String,
+            lastUsed: Date
+        }]
     },
     {
         timestamps: true
