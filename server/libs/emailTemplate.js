@@ -312,7 +312,7 @@ function welcomeEmailTemplate(email) {
     <div class="content">
       <h2>Welcome to LokRise! 🎉</h2>
       <p>Your email has been successfully verified. We're excited to have you on board!</p>
-      <a class="button" href="https://lokrise.com/dashboard">Go to Dashboard</a>
+      <a class="button" href="https://lokrise-front.netlify.app/">Go to Dashboard</a>
     </div>
     
     <div class="features">

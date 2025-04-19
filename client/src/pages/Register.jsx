@@ -14,6 +14,8 @@ const Register = () => {
         lastName: '',
         phone: '',
         email: '',
+        password: '',
+        confirmPassword: '',
         country: 'India'
     });
     const [loading, setLoading] = useState(false);
@@ -50,6 +52,21 @@ const Register = () => {
             return false;
         }
 
+        if (!formData.password) {
+            setError('Password is required');
+            return false;
+        }
+
+        if (formData.password.length < 8) {
+            setError('Password must be at least 8 characters long');
+            return false;
+        }
+
+        if (formData.password !== formData.confirmPassword) {
+            setError('Passwords do not match');
+            return false;
+        }
+
         return true;
     };
 
@@ -76,8 +93,7 @@ const Register = () => {
                 name: fullName,
                 email: formData.email,
                 phone: formData.phone,
-                // A temporary password that will be changed after verification
-                password: Math.random().toString(36).substring(2, 10)
+                password: formData.password
             };
 
             // Call the actual register function from AuthContext
@@ -223,6 +239,31 @@ const Register = () => {
                                 required
                                 autoComplete="email"
                                 placeholder="Email Address"
+                            />
+
+                            <FormInput
+                                id="password"
+                                name="password"
+                                label="Password"
+                                value={formData.password}
+                                onChange={handleChange}
+                                type="password"
+                                required
+                                autoComplete="new-password"
+                                placeholder="Create a password"
+                                helperText="Password must be at least 8 characters"
+                            />
+
+                            <FormInput
+                                id="confirmPassword"
+                                name="confirmPassword"
+                                label="Confirm Password"
+                                value={formData.confirmPassword}
+                                onChange={handleChange}
+                                type="password"
+                                required
+                                autoComplete="new-password"
+                                placeholder="Confirm your password"
                             />
 
                             <FormInput
