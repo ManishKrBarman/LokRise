@@ -1,5 +1,30 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { adminAPI, setAuthState, clearAuthState, getAuthState } from '../services/api';
+import { adminAPI, setAuthState } from '../services/api';
+
+// Local implementation of auth state management functions to avoid import issues
+const clearAuthState = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+};
+
+const getAuthState = () => {
+    const token = localStorage.getItem("token");
+    const userJson = localStorage.getItem("user");
+
+    if (!token || !userJson) {
+        return { isAuthenticated: false, user: null };
+    }
+
+    try {
+        const user = JSON.parse(userJson);
+        return { isAuthenticated: true, user };
+    } catch (error) {
+        console.error("Error parsing user data:", error);
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        return { isAuthenticated: false, user: null };
+    }
+};
 
 // Create auth context
 const AuthContext = createContext();

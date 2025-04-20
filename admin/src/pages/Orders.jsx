@@ -24,151 +24,14 @@ const Orders = () => {
                     status: statusFilter !== 'all' ? statusFilter : undefined
                 });
 
-                // Using mock data for now since API isn't fully implemented
-                const mockOrders = [
-                    {
-                        _id: 'ORD12345',
-                        user: {
-                            _id: 'user1',
-                            name: 'John Smith',
-                            email: 'john@example.com',
-                            phone: '9876543210'
-                        },
-                        items: [
-                            { product: { _id: 'p1', name: 'Wireless Bluetooth Headphones' }, quantity: 1, price: 1299 },
-                            { product: { _id: 'p6', name: 'Smart Watch' }, quantity: 1, price: 2499 }
-                        ],
-                        totalAmount: 3798,
-                        paymentStatus: 'paid',
-                        paymentMethod: 'card',
-                        orderStatus: 'delivered',
-                        address: {
-                            addressLine1: '123 Main St',
-                            city: 'Mumbai',
-                            state: 'Maharashtra',
-                            pinCode: '400001'
-                        },
-                        createdAt: '2023-04-15',
-                        updatedAt: '2023-04-18'
-                    },
-                    {
-                        _id: 'ORD12346',
-                        user: {
-                            _id: 'user2',
-                            name: 'Priya Sharma',
-                            email: 'priya@example.com',
-                            phone: '8765432109'
-                        },
-                        items: [
-                            { product: { _id: 'p2', name: 'Cotton T-Shirt (Blue)' }, quantity: 2, price: 499 }
-                        ],
-                        totalAmount: 998,
-                        paymentStatus: 'paid',
-                        paymentMethod: 'upi',
-                        orderStatus: 'processing',
-                        address: {
-                            addressLine1: '456 Park Avenue',
-                            city: 'Delhi',
-                            state: 'Delhi',
-                            pinCode: '110001'
-                        },
-                        createdAt: '2023-04-20',
-                        updatedAt: '2023-04-20'
-                    },
-                    {
-                        _id: 'ORD12347',
-                        user: {
-                            _id: 'user3',
-                            name: 'Raj Patel',
-                            email: 'raj@example.com',
-                            phone: '7654321098'
-                        },
-                        items: [
-                            { product: { _id: 'p5', name: 'Bestseller Fiction Novel' }, quantity: 3, price: 349 }
-                        ],
-                        totalAmount: 1047,
-                        paymentStatus: 'pending',
-                        paymentMethod: 'cod',
-                        orderStatus: 'pending',
-                        address: {
-                            addressLine1: '789 Gandhi Road',
-                            city: 'Ahmedabad',
-                            state: 'Gujarat',
-                            pinCode: '380001'
-                        },
-                        createdAt: '2023-04-22',
-                        updatedAt: '2023-04-22'
-                    },
-                    {
-                        _id: 'ORD12348',
-                        user: {
-                            _id: 'user4',
-                            name: 'Sarah Wilson',
-                            email: 'sarah@example.com',
-                            phone: '6543210987'
-                        },
-                        items: [
-                            { product: { _id: 'p8', name: 'Leather Wallet' }, quantity: 1, price: 699 },
-                            { product: { _id: 'p4', name: 'Yoga Mat' }, quantity: 1, price: 899 }
-                        ],
-                        totalAmount: 1598,
-                        paymentStatus: 'paid',
-                        paymentMethod: 'card',
-                        orderStatus: 'shipped',
-                        address: {
-                            addressLine1: '101 Oak Street',
-                            city: 'Bangalore',
-                            state: 'Karnataka',
-                            pinCode: '560001'
-                        },
-                        createdAt: '2023-04-23',
-                        updatedAt: '2023-04-24'
-                    },
-                    {
-                        _id: 'ORD12349',
-                        user: {
-                            _id: 'user5',
-                            name: 'Michael Wong',
-                            email: 'michael@example.com',
-                            phone: '5432109876'
-                        },
-                        items: [
-                            { product: { _id: 'p3', name: 'Stainless Steel Water Bottle' }, quantity: 2, price: 799 }
-                        ],
-                        totalAmount: 1598,
-                        paymentStatus: 'failed',
-                        paymentMethod: 'card',
-                        orderStatus: 'cancelled',
-                        address: {
-                            addressLine1: '202 Pine Avenue',
-                            city: 'Pune',
-                            state: 'Maharashtra',
-                            pinCode: '411001'
-                        },
-                        createdAt: '2023-04-24',
-                        updatedAt: '2023-04-24'
-                    }
-                ];
-
-                // Filter mock orders based on search and status filter
-                let filtered = mockOrders;
-                if (search) {
-                    const searchLower = search.toLowerCase();
-                    filtered = filtered.filter(order =>
-                        order._id.toLowerCase().includes(searchLower) ||
-                        order.user.name.toLowerCase().includes(searchLower) ||
-                        order.user.email.toLowerCase().includes(searchLower) ||
-                        order.user.phone.includes(search) ||
-                        order.items.some(item => item.product.name.toLowerCase().includes(searchLower))
-                    );
+                // Use real data from the API response
+                if (response.data && response.data.orders) {
+                    setOrders(response.data.orders);
+                    setTotalPages(response.data.totalPages || Math.ceil(response.data.totalOrders / 10) || 1);
+                } else {
+                    setOrders([]);
+                    setTotalPages(1);
                 }
-
-                if (statusFilter !== 'all') {
-                    filtered = filtered.filter(order => order.orderStatus === statusFilter);
-                }
-
-                setOrders(filtered);
-                setTotalPages(Math.ceil(filtered.length / 10));
                 setError(null);
             } catch (err) {
                 setError('Failed to load orders');
@@ -327,74 +190,80 @@ const Orders = () => {
                 </div>
             )}
 
-            <div className="overflow-x-auto shadow rounded-lg">
-                <table className="admin-table">
-                    <thead>
-                        <tr>
-                            <th>Order ID</th>
-                            <th>Customer</th>
-                            <th>Order Date</th>
-                            <th>Items</th>
-                            <th>Total</th>
-                            <th>Payment</th>
-                            <th>Status</th>
-                            <th className="text-center">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {orders.map(order => (
-                            <tr
-                                key={order._id}
-                                className={order.orderStatus === 'cancelled' ? 'bg-red-50' : (order.orderStatus === 'delivered' ? 'bg-green-50' : '')}
-                            >
-                                <td className="font-medium">{order._id}</td>
-                                <td>
-                                    <div>{order.user.name}</div>
-                                    <div className="text-xs text-gray-500">{order.user.email}</div>
-                                </td>
-                                <td>{formatDate(order.createdAt)}</td>
-                                <td>
-                                    <div>{order.items.length} item(s)</div>
-                                    <div className="text-xs text-gray-500 truncate max-w-xs">
-                                        {order.items.map(item => `${item.quantity}x ${item.product.name}`).join(', ')}
-                                    </div>
-                                </td>
-                                <td className="font-medium">{formatPrice(order.totalAmount)}</td>
-                                <td>
-                                    <div className="capitalize">{order.paymentMethod}</div>
-                                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPaymentStatusBadgeClass(order.paymentStatus)}`}>
-                                        {order.paymentStatus}
-                                    </span>
-                                </td>
-                                <td>
-                                    <span className={`px-2 py-1 rounded-full text-xs font-medium capitalize ${getStatusBadgeClass(order.orderStatus)}`}>
-                                        {order.orderStatus}
-                                    </span>
-                                </td>
-                                <td>
-                                    <div className="flex justify-center space-x-2">
-                                        <button
-                                            onClick={() => openOrderModal(order)}
-                                            className="p-1 text-blue-600 hover:text-blue-800"
-                                            title="View Details"
-                                        >
-                                            <FiEye size={18} />
-                                        </button>
-
-                                        <button
-                                            onClick={() => openOrderModal(order)}
-                                            className="p-1 text-green-600 hover:text-green-800"
-                                            title="Edit Order"
-                                        >
-                                            <FiEdit size={18} />
-                                        </button>
-                                    </div>
-                                </td>
+            {orders.length === 0 && !loading ? (
+                <div className="bg-white rounded-lg shadow p-6 text-center">
+                    <p className="text-gray-500">No orders found matching your criteria.</p>
+                </div>
+            ) : (
+                <div className="overflow-x-auto shadow rounded-lg">
+                    <table className="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Customer</th>
+                                <th>Order Date</th>
+                                <th>Items</th>
+                                <th>Total</th>
+                                <th>Payment</th>
+                                <th>Status</th>
+                                <th className="text-center">Actions</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+                        </thead>
+                        <tbody>
+                            {orders.map(order => (
+                                <tr
+                                    key={order._id}
+                                    className={order.orderStatus === 'cancelled' ? 'bg-red-50' : (order.orderStatus === 'delivered' ? 'bg-green-50' : '')}
+                                >
+                                    <td className="font-medium">{order._id}</td>
+                                    <td>
+                                        <div>{order.user?.name || 'Unknown User'}</div>
+                                        <div className="text-xs text-gray-500">{order.user?.email || 'No email'}</div>
+                                    </td>
+                                    <td>{formatDate(order.createdAt)}</td>
+                                    <td>
+                                        <div>{order.items?.length || 0} item(s)</div>
+                                        <div className="text-xs text-gray-500 truncate max-w-xs">
+                                            {order.items?.map(item => `${item.quantity}x ${item.product?.name || 'Unknown Product'}`).join(', ')}
+                                        </div>
+                                    </td>
+                                    <td className="font-medium">{formatPrice(order.totalAmount)}</td>
+                                    <td>
+                                        <div className="capitalize">{order.paymentMethod}</div>
+                                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPaymentStatusBadgeClass(order.paymentStatus)}`}>
+                                            {order.paymentStatus}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span className={`px-2 py-1 rounded-full text-xs font-medium capitalize ${getStatusBadgeClass(order.orderStatus)}`}>
+                                            {order.orderStatus}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div className="flex justify-center space-x-2">
+                                            <button
+                                                onClick={() => openOrderModal(order)}
+                                                className="p-1 text-blue-600 hover:text-blue-800"
+                                                title="View Details"
+                                            >
+                                                <FiEye size={18} />
+                                            </button>
+
+                                            <button
+                                                onClick={() => openOrderModal(order)}
+                                                className="p-1 text-green-600 hover:text-green-800"
+                                                title="Edit Order"
+                                            >
+                                                <FiEdit size={18} />
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            )}
 
             {/* Pagination */}
             {totalPages > 1 && (
@@ -446,13 +315,13 @@ const Orders = () => {
                                     <h3 className="font-semibold text-lg border-b pb-1">Customer Information</h3>
                                     <div className="grid grid-cols-2 gap-2 mt-2">
                                         <div className="text-sm text-gray-500">Name:</div>
-                                        <div>{selectedOrder.user.name}</div>
+                                        <div>{selectedOrder.user?.name || 'Unknown User'}</div>
 
                                         <div className="text-sm text-gray-500">Email:</div>
-                                        <div>{selectedOrder.user.email}</div>
+                                        <div>{selectedOrder.user?.email || 'No email'}</div>
 
                                         <div className="text-sm text-gray-500">Phone:</div>
-                                        <div>{selectedOrder.user.phone}</div>
+                                        <div>{selectedOrder.user?.phone || 'No phone'}</div>
                                     </div>
                                 </div>
 
@@ -460,16 +329,16 @@ const Orders = () => {
                                     <h3 className="font-semibold text-lg border-b pb-1">Shipping Address</h3>
                                     <div className="grid grid-cols-2 gap-2 mt-2">
                                         <div className="text-sm text-gray-500">Address:</div>
-                                        <div>{selectedOrder.address.addressLine1}</div>
+                                        <div>{selectedOrder.address?.addressLine1 || 'No address'}</div>
 
                                         <div className="text-sm text-gray-500">City:</div>
-                                        <div>{selectedOrder.address.city}</div>
+                                        <div>{selectedOrder.address?.city || 'No city'}</div>
 
                                         <div className="text-sm text-gray-500">State:</div>
-                                        <div>{selectedOrder.address.state}</div>
+                                        <div>{selectedOrder.address?.state || 'No state'}</div>
 
                                         <div className="text-sm text-gray-500">PIN Code:</div>
-                                        <div>{selectedOrder.address.pinCode}</div>
+                                        <div>{selectedOrder.address?.pinCode || 'No PIN code'}</div>
                                     </div>
                                 </div>
                             </div>
@@ -521,9 +390,9 @@ const Orders = () => {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {selectedOrder.items.map((item, index) => (
+                                        {selectedOrder.items && selectedOrder.items.map((item, index) => (
                                             <tr key={index} className="border-b">
-                                                <td className="px-4 py-3">{item.product.name}</td>
+                                                <td className="px-4 py-3">{item.product?.name || 'Unknown Product'}</td>
                                                 <td className="px-4 py-3">{formatPrice(item.price)}</td>
                                                 <td className="px-4 py-3">{item.quantity}</td>
                                                 <td className="px-4 py-3 text-right font-medium">{formatPrice(item.price * item.quantity)}</td>

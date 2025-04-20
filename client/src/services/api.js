@@ -1,5 +1,35 @@
 import axios from "axios";
 
+// Auth state management functions - moved to top for proper export
+export const getAuthState = () => {
+    const token = localStorage.getItem("token");
+    const userJson = localStorage.getItem("user");
+
+    if (!token || !userJson) {
+        return { isAuthenticated: false, user: null };
+    }
+
+    try {
+        const user = JSON.parse(userJson);
+        return { isAuthenticated: true, user };
+    } catch (error) {
+        console.error("Error parsing user data:", error);
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        return { isAuthenticated: false, user: null };
+    }
+};
+
+export const setAuthState = (token, user) => {
+    localStorage.setItem("token", token);
+    localStorage.setItem("user", JSON.stringify(user));
+};
+
+export const clearAuthState = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+};
+
 // API configuration
 const getBaseUrl = () => {
     if (import.meta.env.VITE_API_URL) {
@@ -251,36 +281,6 @@ export const uploadAPI = {
             },
         });
     }
-};
-
-// User state management
-export const getAuthState = () => {
-    const token = localStorage.getItem("token");
-    const userJson = localStorage.getItem("user");
-
-    if (!token || !userJson) {
-        return { isAuthenticated: false, user: null };
-    }
-
-    try {
-        const user = JSON.parse(userJson);
-        return { isAuthenticated: true, user };
-    } catch (error) {
-        console.error("Error parsing user data:", error);
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        return { isAuthenticated: false, user: null };
-    }
-};
-
-export const setAuthState = (token, user) => {
-    localStorage.setItem("token", token);
-    localStorage.setItem("user", JSON.stringify(user));
-};
-
-export const clearAuthState = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
 };
 
 export default api;

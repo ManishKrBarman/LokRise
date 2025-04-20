@@ -47,7 +47,7 @@ const userSchema = new mongoose.Schema(
         },
         upiId: {
             type: String,
-            required: function () { return this.role === 'seller'; }
+            required: function () { return this.role === 'seller' && this.sellerApplication?.status === 'approved'; }
         },
         address: {
             addressLine1: String,
@@ -68,12 +68,50 @@ const userSchema = new mongoose.Schema(
             pinCode: String,
             isDefault: Boolean
         }],
-        // Additional seller-specific fields
-        sellerStatus: {
-            type: String,
-            enum: ["pending", "approved", "rejected"],
-            default: function () { return this.role === 'seller' ? 'pending' : undefined; }
+        // Complete seller application data
+        sellerApplication: {
+            status: {
+                type: String,
+                enum: ["pending", "approved", "rejected"],
+                default: "pending"
+            },
+            businessDetails: {
+                businessName: String,
+                gstin: String,
+                businessType: {
+                    type: String,
+                    enum: ["individual", "partnership", "company", "other"]
+                },
+                businessCategory: String,
+                businessDescription: String,
+                establishedYear: Number
+            },
+            address: {
+                addressLine1: String,
+                addressLine2: String,
+                city: String,
+                district: String,
+                state: String,
+                pinCode: String
+            },
+            bankDetails: {
+                accountHolderName: String,
+                accountNumber: String,
+                ifscCode: String,
+                bankName: String,
+                branchName: String,
+                upiId: String
+            },
+            identityDetails: {
+                panNumber: String,
+                aadharNumber: String
+            },
+            submittedAt: { type: Date, default: Date.now },
+            reviewedAt: Date,
+            reviewedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+            rejectionReason: String
         },
+        // Additional seller-specific fields (existing for backward compatibility)
         businessDetails: {
             businessName: String,
             gstin: String,
@@ -137,6 +175,10 @@ const userSchema = new mongoose.Schema(
         createdAt: Date,
         updatedAt: Date,
         isVerified: {
+            type: Boolean,
+            default: false
+        },
+        isBanned: {
             type: Boolean,
             default: false
         },

@@ -11,182 +11,83 @@ const SellerApplications = () => {
     const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
     const [rejectionReason, setRejectionReason] = useState('');
     const [currentStatus, setCurrentStatus] = useState('pending');
+    const [refreshTrigger, setRefreshTrigger] = useState(0);
 
     useEffect(() => {
         const fetchSellerApplications = async () => {
             setLoading(true);
             try {
-                const response = await adminAPI.getSellerApplications({ status: currentStatus });
+                // Get seller applications based on current status filter
+                const response = await adminAPI.getSellerApplications(currentStatus);
 
-                // Using mock data for now since API isn't fully implemented
-                const mockApplications = [
-                    {
-                        _id: 'app1',
-                        user: {
-                            _id: 'user1',
-                            name: 'John Smith',
-                            email: 'john@example.com',
-                            phone: '9876543210',
-                            createdAt: '2023-01-10'
-                        },
-                        businessDetails: {
-                            businessName: "John's Electronics",
-                            gstin: 'GST1234567890',
-                            businessType: 'individual',
-                            businessCategory: 'electronics',
-                            businessDescription: 'Selling high-quality electronics and accessories',
-                            establishedYear: '2022'
-                        },
-                        address: {
-                            addressLine1: '123 Main St',
-                            addressLine2: 'Apt 4B',
-                            city: 'Mumbai',
-                            district: 'Mumbai',
-                            state: 'Maharashtra',
-                            pinCode: '400001'
-                        },
-                        bankDetails: {
-                            accountHolderName: 'John Smith',
-                            accountNumber: 'XXXX1234',
-                            ifscCode: 'SBIN0001234',
-                            bankName: 'State Bank of India',
-                            branchName: 'Mumbai Main'
-                        },
-                        identityDetails: {
-                            panNumber: 'ABCDE1234F',
-                            aadharNumber: 'XXXX-XXXX-1234'
-                        },
-                        submittedAt: '2023-05-15',
-                        status: 'pending'
-                    },
-                    {
-                        _id: 'app2',
-                        user: {
-                            _id: 'user2',
-                            name: 'Priya Sharma',
-                            email: 'priya@example.com',
-                            phone: '8765432109',
-                            createdAt: '2023-02-05'
-                        },
-                        businessDetails: {
-                            businessName: "Priya's Fashions",
-                            gstin: 'GST0987654321',
-                            businessType: 'partnership',
-                            businessCategory: 'fashion',
-                            businessDescription: 'Trendy fashion items for women',
-                            establishedYear: '2021'
-                        },
-                        address: {
-                            addressLine1: '456 Park Avenue',
-                            addressLine2: '',
-                            city: 'Delhi',
-                            district: 'New Delhi',
-                            state: 'Delhi',
-                            pinCode: '110001'
-                        },
-                        bankDetails: {
-                            accountHolderName: 'Priya Sharma',
-                            accountNumber: 'XXXX5678',
-                            ifscCode: 'HDFC0002345',
-                            bankName: 'HDFC Bank',
-                            branchName: 'Delhi Central'
-                        },
-                        identityDetails: {
-                            panNumber: 'FGHIJ5678K',
-                            aadharNumber: 'XXXX-XXXX-5678'
-                        },
-                        submittedAt: '2023-05-20',
-                        status: 'pending'
-                    },
-                    {
-                        _id: 'app3',
-                        user: {
-                            _id: 'user3',
-                            name: 'Raj Patel',
-                            email: 'raj@example.com',
-                            phone: '7654321098',
-                            createdAt: '2023-03-15'
-                        },
-                        businessDetails: {
-                            businessName: "Raj Home Decor",
-                            gstin: 'GST5678901234',
-                            businessType: 'company',
-                            businessCategory: 'home',
-                            businessDescription: 'Quality home decor items and furniture',
-                            establishedYear: '2020'
-                        },
-                        address: {
-                            addressLine1: '789 Gandhi Road',
-                            addressLine2: 'Floor 3',
-                            city: 'Ahmedabad',
-                            district: 'Ahmedabad',
-                            state: 'Gujarat',
-                            pinCode: '380001'
-                        },
-                        bankDetails: {
-                            accountHolderName: 'Raj Patel',
-                            accountNumber: 'XXXX9012',
-                            ifscCode: 'ICIC0003456',
-                            bankName: 'ICICI Bank',
-                            branchName: 'Ahmedabad Main'
-                        },
-                        identityDetails: {
-                            panNumber: 'KLMNO9012P',
-                            aadharNumber: 'XXXX-XXXX-9012'
-                        },
-                        submittedAt: '2023-05-25',
-                        status: 'pending'
-                    }
-                ];
-
-                // Filter mock applications based on current status filter
-                const filteredApplications = mockApplications.filter(app => app.status === currentStatus);
-
-                setApplications(filteredApplications);
-                setError(null);
+                if (response.data && response.data.applications) {
+                    setApplications(response.data.applications);
+                    setError(null);
+                } else {
+                    setApplications([]);
+                    setError('No applications data received');
+                }
             } catch (err) {
                 setError('Failed to load seller applications');
                 console.error('Applications fetch error:', err);
+                setApplications([]);
             } finally {
                 setLoading(false);
             }
         };
 
         fetchSellerApplications();
-    }, [currentStatus]);
+    }, [currentStatus, refreshTrigger]);
 
-    const handleApprove = async (applicationId) => {
+    const handleApprove = async (userId) => {
+        if (!window.confirm('Are you sure you want to approve this seller application?')) {
+            return;
+        }
+
         try {
             setLoading(true);
-            await adminAPI.approveSellerApplication(applicationId);
+            const response = await adminAPI.approveSellerApplication(userId);
 
-            // Update local state
-            setApplications(applications.filter(app => app._id !== applicationId));
+            if (response.data && response.data.success) {
+                // Refresh the applications list
+                setRefreshTrigger(prev => prev + 1);
+                // Show success message
+                alert('Seller application approved successfully');
 
-            // For demo/mock, we'll just remove the application from the list
-            // In a real application, you might want to refresh data or move to another status
+                if (isDetailsModalOpen) {
+                    setIsDetailsModalOpen(false);
+                }
+            }
         } catch (err) {
-            setError('Failed to approve seller application');
+            setError(`Failed to approve seller application: ${err.response?.data?.message || err.message}`);
             console.error('Approval error:', err);
         } finally {
             setLoading(false);
         }
     };
 
-    const handleReject = async (applicationId) => {
+    const handleReject = async (userId) => {
+        if (!rejectionReason.trim()) {
+            setError('Please provide a reason for rejection');
+            return;
+        }
+
         try {
             setLoading(true);
-            await adminAPI.rejectSellerApplication(applicationId, rejectionReason);
+            const response = await adminAPI.rejectSellerApplication(userId, { reason: rejectionReason });
 
-            // Update local state
-            setApplications(applications.filter(app => app._id !== applicationId));
-
-            // Close modal
-            setIsRejectModalOpen(false);
-            setRejectionReason('');
-            setSelectedApplication(null);
+            if (response.data && response.data.success) {
+                // Refresh the applications list
+                setRefreshTrigger(prev => prev + 1);
+                // Close modal and reset
+                setIsRejectModalOpen(false);
+                setRejectionReason('');
+                setSelectedApplication(null);
+                // Show success message
+                alert('Seller application rejected successfully');
+            }
         } catch (err) {
-            setError('Failed to reject seller application');
+            setError(`Failed to reject seller application: ${err.response?.data?.message || err.message}`);
             console.error('Rejection error:', err);
         } finally {
             setLoading(false);
@@ -204,11 +105,16 @@ const SellerApplications = () => {
     };
 
     const formatDate = (dateString) => {
+        if (!dateString) return 'N/A';
         return new Date(dateString).toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'short',
             day: 'numeric'
         });
+    };
+
+    const refreshApplications = () => {
+        setRefreshTrigger(prev => prev + 1);
     };
 
     if (loading && applications.length === 0) {
@@ -228,6 +134,15 @@ const SellerApplications = () => {
                 <h1 className="text-2xl font-semibold">Seller Applications</h1>
 
                 <div className="flex space-x-4">
+                    <button
+                        onClick={refreshApplications}
+                        className="flex items-center px-3 py-2 bg-blue-50 text-blue-600 rounded hover:bg-blue-100"
+                        disabled={loading}
+                    >
+                        <FiRefreshCw className={`mr-2 ${loading ? 'animate-spin' : ''}`} />
+                        Refresh
+                    </button>
+
                     <div>
                         <select
                             value={currentStatus}
@@ -258,29 +173,49 @@ const SellerApplications = () => {
                 </div>
             ) : (
                 <div className="overflow-x-auto shadow rounded-lg">
-                    <table className="admin-table">
-                        <thead>
+                    <table className="w-full">
+                        <thead className="bg-gray-50">
                             <tr>
-                                <th>Business Name</th>
-                                <th>Seller Name</th>
-                                <th>Contact Info</th>
-                                <th>Business Type</th>
-                                <th>Submitted On</th>
-                                <th className="text-center">Actions</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Business Name
+                                </th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Seller Name
+                                </th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Contact Info
+                                </th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Business Type
+                                </th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Submitted On
+                                </th>
+                                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Actions
+                                </th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody className="bg-white divide-y divide-gray-200">
                             {applications.map(app => (
-                                <tr key={app._id}>
-                                    <td className="font-medium">{app.businessDetails.businessName}</td>
-                                    <td>{app.user.name}</td>
-                                    <td>
-                                        <div>{app.user.email}</div>
-                                        <div className="text-gray-500 text-sm">{app.user.phone}</div>
+                                <tr key={app._id} className="hover:bg-gray-50">
+                                    <td className="px-6 py-4 whitespace-nowrap font-medium">
+                                        {app.sellerApplication?.businessDetails?.businessName || 'N/A'}
                                     </td>
-                                    <td className="capitalize">{app.businessDetails.businessType}</td>
-                                    <td>{formatDate(app.submittedAt)}</td>
-                                    <td>
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                        {app.name}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                        <div>{app.email}</div>
+                                        <div className="text-gray-500 text-sm">{app.phone || 'No phone'}</div>
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap capitalize">
+                                        {app.sellerApplication?.businessDetails?.businessType || 'N/A'}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                        {formatDate(app.sellerApplication?.submittedAt || app.updatedAt)}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap">
                                         <div className="flex justify-center space-x-2">
                                             <button
                                                 onClick={() => openDetailsModal(app)}
@@ -331,16 +266,16 @@ const SellerApplications = () => {
                                     <h3 className="font-semibold text-lg border-b pb-1">Seller Information</h3>
                                     <div className="grid grid-cols-2 gap-2 mt-2">
                                         <div className="text-sm text-gray-500">Name:</div>
-                                        <div>{selectedApplication.user.name}</div>
+                                        <div>{selectedApplication.name}</div>
 
                                         <div className="text-sm text-gray-500">Email:</div>
-                                        <div>{selectedApplication.user.email}</div>
+                                        <div>{selectedApplication.email}</div>
 
                                         <div className="text-sm text-gray-500">Phone:</div>
-                                        <div>{selectedApplication.user.phone}</div>
+                                        <div>{selectedApplication.phone || 'Not provided'}</div>
 
                                         <div className="text-sm text-gray-500">Member Since:</div>
-                                        <div>{formatDate(selectedApplication.user.createdAt)}</div>
+                                        <div>{formatDate(selectedApplication.createdAt)}</div>
                                     </div>
                                 </div>
 
@@ -348,19 +283,19 @@ const SellerApplications = () => {
                                     <h3 className="font-semibold text-lg border-b pb-1">Business Information</h3>
                                     <div className="grid grid-cols-2 gap-2 mt-2">
                                         <div className="text-sm text-gray-500">Business Name:</div>
-                                        <div>{selectedApplication.businessDetails.businessName}</div>
+                                        <div>{selectedApplication.sellerApplication?.businessDetails?.businessName || 'N/A'}</div>
 
                                         <div className="text-sm text-gray-500">GSTIN:</div>
-                                        <div>{selectedApplication.businessDetails.gstin}</div>
+                                        <div>{selectedApplication.sellerApplication?.businessDetails?.gstin || 'N/A'}</div>
 
                                         <div className="text-sm text-gray-500">Business Type:</div>
-                                        <div className="capitalize">{selectedApplication.businessDetails.businessType}</div>
+                                        <div className="capitalize">{selectedApplication.sellerApplication?.businessDetails?.businessType || 'N/A'}</div>
 
                                         <div className="text-sm text-gray-500">Category:</div>
-                                        <div className="capitalize">{selectedApplication.businessDetails.businessCategory}</div>
+                                        <div className="capitalize">{selectedApplication.sellerApplication?.businessDetails?.businessCategory || 'N/A'}</div>
 
                                         <div className="text-sm text-gray-500">Established:</div>
-                                        <div>{selectedApplication.businessDetails.establishedYear}</div>
+                                        <div>{selectedApplication.sellerApplication?.businessDetails?.establishedYear || 'N/A'}</div>
                                     </div>
                                 </div>
                             </div>
@@ -371,26 +306,26 @@ const SellerApplications = () => {
                                     <h3 className="font-semibold text-lg border-b pb-1">Business Address</h3>
                                     <div className="grid grid-cols-2 gap-2 mt-2">
                                         <div className="text-sm text-gray-500">Address Line 1:</div>
-                                        <div>{selectedApplication.address.addressLine1}</div>
+                                        <div>{selectedApplication.sellerApplication?.address?.addressLine1 || 'N/A'}</div>
 
-                                        {selectedApplication.address.addressLine2 && (
+                                        {selectedApplication.sellerApplication?.address?.addressLine2 && (
                                             <>
                                                 <div className="text-sm text-gray-500">Address Line 2:</div>
-                                                <div>{selectedApplication.address.addressLine2}</div>
+                                                <div>{selectedApplication.sellerApplication?.address?.addressLine2}</div>
                                             </>
                                         )}
 
                                         <div className="text-sm text-gray-500">City:</div>
-                                        <div>{selectedApplication.address.city}</div>
+                                        <div>{selectedApplication.sellerApplication?.address?.city || 'N/A'}</div>
 
                                         <div className="text-sm text-gray-500">District:</div>
-                                        <div>{selectedApplication.address.district}</div>
+                                        <div>{selectedApplication.sellerApplication?.address?.district || 'N/A'}</div>
 
                                         <div className="text-sm text-gray-500">State:</div>
-                                        <div>{selectedApplication.address.state}</div>
+                                        <div>{selectedApplication.sellerApplication?.address?.state || 'N/A'}</div>
 
                                         <div className="text-sm text-gray-500">PIN Code:</div>
-                                        <div>{selectedApplication.address.pinCode}</div>
+                                        <div>{selectedApplication.sellerApplication?.address?.pinCode || 'N/A'}</div>
                                     </div>
                                 </div>
 
@@ -398,19 +333,22 @@ const SellerApplications = () => {
                                     <h3 className="font-semibold text-lg border-b pb-1">Banking Details</h3>
                                     <div className="grid grid-cols-2 gap-2 mt-2">
                                         <div className="text-sm text-gray-500">Account Holder:</div>
-                                        <div>{selectedApplication.bankDetails.accountHolderName}</div>
+                                        <div>{selectedApplication.sellerApplication?.bankDetails?.accountHolderName || 'N/A'}</div>
 
                                         <div className="text-sm text-gray-500">Account Number:</div>
-                                        <div>{selectedApplication.bankDetails.accountNumber}</div>
+                                        <div>{selectedApplication.sellerApplication?.bankDetails?.accountNumber || 'N/A'}</div>
 
                                         <div className="text-sm text-gray-500">IFSC Code:</div>
-                                        <div>{selectedApplication.bankDetails.ifscCode}</div>
+                                        <div>{selectedApplication.sellerApplication?.bankDetails?.ifscCode || 'N/A'}</div>
 
                                         <div className="text-sm text-gray-500">Bank:</div>
-                                        <div>{selectedApplication.bankDetails.bankName}</div>
+                                        <div>{selectedApplication.sellerApplication?.bankDetails?.bankName || 'N/A'}</div>
 
                                         <div className="text-sm text-gray-500">Branch:</div>
-                                        <div>{selectedApplication.bankDetails.branchName}</div>
+                                        <div>{selectedApplication.sellerApplication?.bankDetails?.branchName || 'N/A'}</div>
+
+                                        <div className="text-sm text-gray-500">UPI ID:</div>
+                                        <div>{selectedApplication.sellerApplication?.bankDetails?.upiId || 'N/A'}</div>
                                     </div>
                                 </div>
                             </div>
@@ -419,7 +357,7 @@ const SellerApplications = () => {
                         {/* Description */}
                         <div className="mt-4">
                             <h3 className="font-semibold text-lg border-b pb-1">Business Description</h3>
-                            <p className="mt-2">{selectedApplication.businessDetails.businessDescription}</p>
+                            <p className="mt-2">{selectedApplication.sellerApplication?.businessDetails?.businessDescription || 'No description provided'}</p>
                         </div>
 
                         {/* Identity Information */}
@@ -427,12 +365,26 @@ const SellerApplications = () => {
                             <h3 className="font-semibold text-lg border-b pb-1">Identity Details</h3>
                             <div className="grid grid-cols-2 gap-2 mt-2 max-w-md">
                                 <div className="text-sm text-gray-500">PAN Number:</div>
-                                <div>{selectedApplication.identityDetails.panNumber}</div>
+                                <div>{selectedApplication.sellerApplication?.identityDetails?.panNumber || 'N/A'}</div>
 
-                                <div className="text-sm text-gray-500">Aadhar Number:</div>
-                                <div>{selectedApplication.identityDetails.aadharNumber}</div>
+                                <div className="text-sm text-gray-500">Aadhar Number (Last 4):</div>
+                                <div>{selectedApplication.sellerApplication?.identityDetails?.aadharNumber || 'N/A'}</div>
                             </div>
                         </div>
+
+                        {currentStatus === 'rejected' && selectedApplication.sellerApplication.rejectionReason && (
+                            <div className="mt-4">
+                                <h3 className="font-semibold text-lg border-b pb-1 text-red-600">Rejection Reason</h3>
+                                <p className="mt-2 text-red-600">{selectedApplication.sellerApplication.rejectionReason}</p>
+                            </div>
+                        )}
+
+                        {currentStatus === 'approved' && selectedApplication.sellerApplication.reviewedAt && (
+                            <div className="mt-4">
+                                <h3 className="font-semibold text-lg border-b pb-1 text-green-600">Approval Information</h3>
+                                <p className="mt-2">Approved on: {formatDate(selectedApplication.sellerApplication.reviewedAt)}</p>
+                            </div>
+                        )}
 
                         <div className="flex justify-end space-x-3 mt-6">
                             <button
@@ -476,7 +428,7 @@ const SellerApplications = () => {
                     <div className="bg-white rounded-lg p-6 max-w-md w-full">
                         <h2 className="text-xl font-bold mb-4">Reject Seller Application</h2>
                         <p className="mb-4">
-                            You are about to reject the seller application for <strong>{selectedApplication.businessDetails.businessName}</strong>.
+                            You are about to reject the seller application for <strong>{selectedApplication.sellerApplication?.businessDetails?.businessName || selectedApplication.name}</strong>.
                             Please provide a reason for rejection.
                         </p>
 

@@ -18,42 +18,29 @@ const Users = () => {
         const fetchUsers = async () => {
             setLoading(true);
             try {
-                const response = await adminAPI.getAllUsers({
+                // Changed getAllUsers to getUsers to match the API service
+                const response = await adminAPI.getUsers({
                     page: currentPage,
-                    limit: 10,
+                    limit: 50, // Increase this to see more users at once
                     search,
                     role: role !== 'all' ? role : undefined
                 });
 
-                // Using mock data for now since API isn't fully implemented
-                const mockUsers = [
-                    { _id: '1', name: 'John Doe', email: 'john@example.com', phone: '9876543210', role: 'buyer', isVerified: true, isBanned: false, createdAt: '2023-01-15' },
-                    { _id: '2', name: 'Jane Smith', email: 'jane@example.com', phone: '8765432109', role: 'seller', isVerified: true, isBanned: false, createdAt: '2023-02-22' },
-                    { _id: '3', name: 'Robert Brown', email: 'robert@example.com', phone: '7654321098', role: 'buyer', isVerified: true, isBanned: true, createdAt: '2023-03-10' },
-                    { _id: '4', name: 'Emily Johnson', email: 'emily@example.com', phone: '6543210987', role: 'seller', isVerified: false, isBanned: false, createdAt: '2023-04-05' },
-                    { _id: '5', name: 'Michael Lee', email: 'michael@example.com', phone: '5432109876', role: 'admin', isVerified: true, isBanned: false, createdAt: '2023-01-05' },
-                    { _id: '6', name: 'Sarah Wilson', email: 'sarah@example.com', phone: '4321098765', role: 'buyer', isVerified: true, isBanned: false, createdAt: '2023-05-12' },
-                    { _id: '7', name: 'David Taylor', email: 'david@example.com', phone: '3210987654', role: 'buyer', isVerified: true, isBanned: false, createdAt: '2023-06-18' },
-                    { _id: '8', name: 'Lisa Anderson', email: 'lisa@example.com', phone: '2109876543', role: 'seller', isVerified: true, isBanned: false, createdAt: '2023-02-28' },
-                ];
+                console.log('User data response:', response.data); // For debugging
 
-                // Filter mock users based on search and role
-                let filtered = mockUsers;
-                if (search) {
-                    const searchLower = search.toLowerCase();
-                    filtered = filtered.filter(user =>
-                        user.name.toLowerCase().includes(searchLower) ||
-                        user.email.toLowerCase().includes(searchLower) ||
-                        user.phone.includes(search)
-                    );
+                // Use real data from the API response
+                if (response.data && response.data.users) {
+                    setUsers(response.data.users);
+                    // Fix pagination to match server structure
+                    if (response.data.pagination) {
+                        setTotalPages(response.data.pagination.pages || 1);
+                    } else {
+                        setTotalPages(1);
+                    }
+                } else {
+                    setUsers([]);
+                    setTotalPages(1);
                 }
-
-                if (role !== 'all') {
-                    filtered = filtered.filter(user => user.role === role);
-                }
-
-                setUsers(filtered);
-                setTotalPages(Math.ceil(filtered.length / 10));
                 setError(null);
             } catch (err) {
                 setError('Failed to load users');
@@ -190,80 +177,92 @@ const Users = () => {
                 </div>
             )}
 
-            <div className="overflow-x-auto shadow rounded-lg">
-                <table className="admin-table">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Phone</th>
-                            <th>Role</th>
-                            <th>Status</th>
-                            <th>Joined On</th>
-                            <th className="text-center">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {users.map(user => (
-                            <tr key={user._id} className={user.isBanned ? 'bg-red-50' : ''}>
-                                <td className="font-medium">{user.name}</td>
-                                <td>{user.email}</td>
-                                <td>{user.phone}</td>
-                                <td>
-                                    <span className={`px-2 py-1 rounded-full text-xs font-medium capitalize
-                    ${user.role === 'admin' ? 'bg-purple-100 text-purple-800' :
-                                            user.role === 'seller' ? 'bg-blue-100 text-blue-800' :
-                                                'bg-green-100 text-green-800'
-                                        }
-                  `}>
-                                        {user.role}
-                                    </span>
-                                </td>
-                                <td>
-                                    {user.isBanned ? (
-                                        <span className="px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                            Banned
-                                        </span>
-                                    ) : user.isVerified ? (
-                                        <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                            Active
-                                        </span>
-                                    ) : (
-                                        <span className="px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                                            Unverified
-                                        </span>
-                                    )}
-                                </td>
-                                <td>{formatDate(user.createdAt)}</td>
-                                <td>
-                                    <div className="flex justify-center space-x-2">
-                                        <button
-                                            onClick={() => openUserModal(user)}
-                                            className="p-1 text-blue-600 hover:text-blue-800"
-                                        >
-                                            <FiEdit size={18} />
-                                        </button>
-
-                                        <button
-                                            onClick={() => handleBanUser(user._id, user.isBanned)}
-                                            className={`p-1 ${user.isBanned ? 'text-green-600 hover:text-green-800' : 'text-red-600 hover:text-red-800'}`}
-                                        >
-                                            {user.isBanned ? <FiUserCheck size={18} /> : <FiUserX size={18} />}
-                                        </button>
-
-                                        <button
-                                            onClick={() => handleDeleteUser(user._id)}
-                                            className="p-1 text-red-600 hover:text-red-800"
-                                        >
-                                            <FiTrash2 size={18} />
-                                        </button>
-                                    </div>
-                                </td>
+            {users.length === 0 && !loading ? (
+                <div className="bg-white rounded-lg shadow p-6 text-center">
+                    <p className="text-gray-500">No users found matching your criteria.</p>
+                </div>
+            ) : (
+                <div className="overflow-x-auto shadow rounded-lg">
+                    <table className="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Joined On</th>
+                                <th className="text-center">Actions</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+                        </thead>
+                        <tbody>
+                            {users.map(user => (
+                                <tr key={user._id} className={user.isBanned ? 'bg-red-50' : ''}>
+                                    <td className="font-medium">{user.name}</td>
+                                    <td>{user.email}</td>
+                                    <td>{user.phone || 'N/A'}</td>
+                                    <td>
+                                        <span className={`px-2 py-1 rounded-full text-xs font-medium capitalize
+                                            ${user.role === 'admin' ? 'bg-purple-100 text-purple-800' :
+                                                user.role === 'seller' ? 'bg-blue-100 text-blue-800' :
+                                                    'bg-green-100 text-green-800'
+                                            }
+                                        `}>
+                                            {user.role}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {user.isBanned ? (
+                                            <span className="px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                                Banned
+                                            </span>
+                                        ) : user.isVerified ? (
+                                            <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                Active
+                                            </span>
+                                        ) : (
+                                            <span className="px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                                Unverified
+                                            </span>
+                                        )}
+                                    </td>
+                                    <td>{formatDate(user.createdAt)}</td>
+                                    <td>
+                                        <div className="flex justify-center space-x-2">
+                                            <button
+                                                onClick={() => openUserModal(user)}
+                                                className="p-1 text-blue-600 hover:text-blue-800"
+                                                title="Edit User"
+                                            >
+                                                <FiEdit size={18} />
+                                            </button>
+
+                                            <button
+                                                onClick={() => handleBanUser(user._id, user.isBanned)}
+                                                className={`p-1 ${user.isBanned ? 'text-green-600 hover:text-green-800' : 'text-red-600 hover:text-red-800'}`}
+                                                title={user.isBanned ? 'Unban User' : 'Ban User'}
+                                            >
+                                                {user.isBanned ? <FiUserCheck size={18} /> : <FiUserX size={18} />}
+                                            </button>
+
+                                            {/* Only show delete for non-admin users - safeguard */}
+                                            {user.role !== 'admin' && (
+                                                <button
+                                                    onClick={() => handleDeleteUser(user._id)}
+                                                    className="p-1 text-red-600 hover:text-red-800"
+                                                    title="Delete User"
+                                                >
+                                                    <FiTrash2 size={18} />
+                                                </button>
+                                            )}
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            )}
 
             {/* Pagination */}
             {totalPages > 1 && (
@@ -297,28 +296,97 @@ const Users = () => {
                 </div>
             )}
 
-            {/* User Edit Modal - Basic version */}
+            {/* User Edit Modal - Enhanced version */}
             {isModalOpen && selectedUser && (
                 <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-lg p-6 max-w-md w-full">
-                        <h2 className="text-xl font-bold mb-4">Edit User</h2>
-                        <p className="mb-4">User: {selectedUser.name}</p>
+                    <div className="bg-white rounded-lg p-6 max-w-lg w-full">
+                        <h2 className="text-xl font-bold mb-4">User Details</h2>
+
+                        <div className="space-y-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">Name</label>
+                                    <div className="mt-1 p-2 border border-gray-300 rounded-md bg-gray-50">
+                                        {selectedUser.name}
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">Email</label>
+                                    <div className="mt-1 p-2 border border-gray-300 rounded-md bg-gray-50">
+                                        {selectedUser.email}
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">Phone</label>
+                                    <div className="mt-1 p-2 border border-gray-300 rounded-md bg-gray-50">
+                                        {selectedUser.phone || 'Not provided'}
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">Role</label>
+                                    <div className="mt-1 p-2 border border-gray-300 rounded-md bg-gray-50">
+                                        <span className={`px-2 py-1 rounded-full text-xs font-medium capitalize
+                                            ${selectedUser.role === 'admin' ? 'bg-purple-100 text-purple-800' :
+                                                selectedUser.role === 'seller' ? 'bg-blue-100 text-blue-800' :
+                                                    'bg-green-100 text-green-800'
+                                            }
+                                        `}>
+                                            {selectedUser.role}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">Status</label>
+                                    <div className="mt-1 p-2 border border-gray-300 rounded-md bg-gray-50">
+                                        {selectedUser.isBanned ? (
+                                            <span className="px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                                Banned
+                                            </span>
+                                        ) : selectedUser.isVerified ? (
+                                            <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                Active
+                                            </span>
+                                        ) : (
+                                            <span className="px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                                Unverified
+                                            </span>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">Joined On</label>
+                                    <div className="mt-1 p-2 border border-gray-300 rounded-md bg-gray-50">
+                                        {formatDate(selectedUser.createdAt)}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
                         <div className="flex justify-end space-x-2 mt-6">
                             <button
                                 onClick={() => setIsModalOpen(false)}
                                 className="px-4 py-2 border rounded text-gray-700"
                             >
-                                Cancel
+                                Close
                             </button>
+
+                            {/* Ban/Unban button */}
                             <button
                                 onClick={() => {
-                                    // Implement update functionality
+                                    handleBanUser(selectedUser._id, selectedUser.isBanned);
                                     setIsModalOpen(false);
                                 }}
-                                className="px-4 py-2 bg-primary text-white rounded"
+                                className={`px-4 py-2 rounded ${selectedUser.isBanned
+                                    ? 'bg-green-600 hover:bg-green-700 text-white'
+                                    : 'bg-red-600 hover:bg-red-700 text-white'
+                                    }`}
                             >
-                                Save Changes
+                                {selectedUser.isBanned ? 'Unban User' : 'Ban User'}
                             </button>
                         </div>
                     </div>

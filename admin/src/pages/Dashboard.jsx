@@ -18,15 +18,25 @@ const Dashboard = () => {
     const [stats, setStats] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [recentOrders, setRecentOrders] = useState([]);
 
     // Fetch dashboard stats
     useEffect(() => {
         const fetchDashboardStats = async () => {
             setLoading(true);
             try {
-                const response = await adminAPI.getDashboardStats();
+                const response = await adminAPI.getDashboardAnalytics();
                 setStats(response.data);
                 setError(null);
+
+                // Also fetch recent orders
+                const ordersResponse = await adminAPI.getAllOrders({
+                    limit: 5,
+                    page: 1,
+                    sort: '-createdAt'  // Sort by most recent first
+                });
+
+                setRecentOrders(ordersResponse.data.orders || []);
             } catch (err) {
                 setError('Failed to load dashboard statistics');
                 console.error('Dashboard data fetch error:', err);
@@ -38,106 +48,7 @@ const Dashboard = () => {
         fetchDashboardStats();
     }, []);
 
-    // For testing/demo purposes - mock data when API doesn't return data
-    const mockStats = {
-        users: {
-            total: 542,
-            today: 48
-        },
-        products: {
-            total: 879,
-            today: 23
-        },
-        orders: {
-            total: 1245,
-            today: 28
-        },
-        revenue: {
-            total: 230500,
-            monthly: 21000,
-            daily: 1200
-        },
-        salesData: {
-            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-            data: [12500, 15000, 18000, 16500, 21000, 22500]
-        },
-        categoryData: {
-            labels: ['Electronics', 'Fashion', 'Home', 'Sports', 'Books'],
-            data: [35, 25, 20, 10, 10]
-        },
-        recentOrders: [
-            { id: 'ORD9876', customer: 'Jane Smith', amount: 230.50, status: 'Delivered' },
-            { id: 'ORD9875', customer: 'John Doe', amount: 120.00, status: 'Pending' },
-            { id: 'ORD9874', customer: 'Robert Brown', amount: 315.75, status: 'Processing' },
-            { id: 'ORD9873', customer: 'Emily Johnson', amount: 79.99, status: 'Delivered' },
-            { id: 'ORD9872', customer: 'Michael Wong', amount: 189.25, status: 'Delivered' }
-        ]
-    };
-
-    // Use real data if available, otherwise use mock data
-    const displayStats = stats || mockStats;
-
-    // Calculate growth percentage for users
-    const userGrowth = displayStats.users && displayStats.users.total > 0
-        ? ((displayStats.users.today / displayStats.users.total) * 100).toFixed(1)
-        : 0;
-
-    // Generate mock data for charts if real data is not available
-    // In a real application, this would come from the API
-    const generateSalesChartData = () => {
-        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
-        return {
-            labels: months,
-            datasets: [
-                {
-                    label: 'Revenue',
-                    data: [
-                        displayStats.revenue?.monthly * 0.7 || 0,
-                        displayStats.revenue?.monthly * 0.8 || 0,
-                        displayStats.revenue?.monthly * 0.9 || 0,
-                        displayStats.revenue?.monthly * 0.95 || 0,
-                        displayStats.revenue?.monthly * 0.98 || 0,
-                        displayStats.revenue?.monthly || 0
-                    ],
-                    borderColor: '#3B82F6',
-                    backgroundColor: 'rgba(59, 130, 246, 0.2)',
-                    tension: 0.4
-                }
-            ]
-        };
-    };
-
-    const generateCategoryChartData = () => {
-        return {
-            labels: ['Electronics', 'Fashion', 'Home', 'Sports', 'Books'],
-            datasets: [
-                {
-                    data: [35, 25, 20, 10, 10],
-                    backgroundColor: [
-                        'rgba(54, 162, 235, 0.6)',
-                        'rgba(255, 99, 132, 0.6)',
-                        'rgba(75, 192, 192, 0.6)',
-                        'rgba(255, 206, 86, 0.6)',
-                        'rgba(153, 102, 255, 0.6)'
-                    ],
-                    borderWidth: 1
-                }
-            ]
-        };
-    };
-
-    const salesChartData = generateSalesChartData();
-    const categoryChartData = generateCategoryChartData();
-
-    // Generate mock recent orders
-    const recentOrders = [
-        { id: 'ORD9876', customer: 'Jane Smith', amount: 230.50, status: 'Delivered' },
-        { id: 'ORD9875', customer: 'John Doe', amount: 120.00, status: 'Pending' },
-        { id: 'ORD9874', customer: 'Robert Brown', amount: 315.75, status: 'Processing' },
-        { id: 'ORD9873', customer: 'Emily Johnson', amount: 79.99, status: 'Delivered' },
-        { id: 'ORD9872', customer: 'Michael Wong', amount: 189.25, status: 'Delivered' }
-    ];
-
+    // If no data is available yet, show loading state
     if (loading) {
         return (
             <div className="flex items-center justify-center h-96">
@@ -166,6 +77,62 @@ const Dashboard = () => {
         );
     }
 
+    if (!stats) {
+        return (
+            <div className="flex items-center justify-center h-96">
+                <div className="flex flex-col items-center text-red-600">
+                    <FiAlertCircle className="h-12 w-12 mb-4" />
+                    <p className="text-lg">No data available</p>
+                    <button
+                        onClick={() => window.location.reload()}
+                        className="mt-4 px-4 py-2 bg-primary text-white rounded hover:bg-primary-dark"
+                    >
+                        Refresh
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
+    // Calculate growth percentage for users
+    const userGrowth = stats.users && stats.users.total > 0
+        ? ((stats.users.today / stats.users.total) * 100).toFixed(1)
+        : 0;
+
+    // Generate sales chart data from real data
+    const salesChartData = {
+        labels: stats.salesData?.labels || [],
+        datasets: [
+            {
+                label: 'Revenue',
+                data: stats.salesData?.data || [],
+                borderColor: '#3B82F6',
+                backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                tension: 0.4
+            }
+        ]
+    };
+
+    // Generate category chart data from real data
+    const categoryChartData = {
+        labels: stats.categoryData?.labels || [],
+        datasets: [
+            {
+                data: stats.categoryData?.data || [],
+                backgroundColor: [
+                    'rgba(54, 162, 235, 0.6)',
+                    'rgba(255, 99, 132, 0.6)',
+                    'rgba(75, 192, 192, 0.6)',
+                    'rgba(255, 206, 86, 0.6)',
+                    'rgba(153, 102, 255, 0.6)',
+                    'rgba(255, 159, 64, 0.6)',
+                    'rgba(201, 203, 207, 0.6)'
+                ],
+                borderWidth: 1
+            }
+        ]
+    };
+
     return (
         <div className="space-y-6">
             {/* Stats Cards */}
@@ -176,9 +143,9 @@ const Dashboard = () => {
                     </div>
                     <div>
                         <h3 className="text-lg font-semibold">Users</h3>
-                        <p className="text-3xl font-bold">{displayStats.users.total}</p>
+                        <p className="text-3xl font-bold">{stats.users.total}</p>
                         <p className="text-sm text-green-600">
-                            +{displayStats.users.today} new ({userGrowth}%)
+                            +{stats.users.today} new ({userGrowth}%)
                         </p>
                     </div>
                 </div>
@@ -189,9 +156,9 @@ const Dashboard = () => {
                     </div>
                     <div>
                         <h3 className="text-lg font-semibold">Products</h3>
-                        <p className="text-3xl font-bold">{displayStats.products.total}</p>
+                        <p className="text-3xl font-bold">{stats.products.total}</p>
                         <p className="text-sm">
-                            {displayStats.products.today} new today
+                            {stats.products.today} new today
                         </p>
                     </div>
                 </div>
@@ -202,9 +169,9 @@ const Dashboard = () => {
                     </div>
                     <div>
                         <h3 className="text-lg font-semibold">Orders</h3>
-                        <p className="text-3xl font-bold">{displayStats.orders.total}</p>
+                        <p className="text-3xl font-bold">{stats.orders.total}</p>
                         <p className="text-sm">
-                            {displayStats.orders.today} new today
+                            {stats.orders.today} new today
                         </p>
                     </div>
                 </div>
@@ -215,9 +182,9 @@ const Dashboard = () => {
                     </div>
                     <div>
                         <h3 className="text-lg font-semibold">Revenue</h3>
-                        <p className="text-3xl font-bold">${displayStats.revenue.total.toLocaleString()}</p>
+                        <p className="text-3xl font-bold">${stats.revenue.total.toLocaleString()}</p>
                         <p className="text-sm text-orange-600">
-                            ${displayStats.revenue.daily.toLocaleString()} today
+                            ${stats.revenue.daily.toLocaleString()} today
                         </p>
                     </div>
                 </div>
@@ -278,7 +245,11 @@ const Dashboard = () => {
             <div className="admin-card">
                 <div className="flex justify-between items-center mb-4">
                     <h3 className="text-xl font-semibold">Recent Orders</h3>
-                    <button className="text-primary hover:text-primary-dark">View All</button>
+                    <button
+                        onClick={() => window.location.href = '/orders'}
+                        className="text-primary hover:text-primary-dark">
+                        View All
+                    </button>
                 </div>
                 <div className="overflow-x-auto">
                     <table className="admin-table">
@@ -291,23 +262,29 @@ const Dashboard = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {recentOrders.map(order => (
-                                <tr key={order.id}>
-                                    <td className="font-medium">{order.id}</td>
-                                    <td>{order.customer}</td>
-                                    <td>${order.amount.toFixed(2)}</td>
-                                    <td>
-                                        <span className={`px-2 py-1 rounded-full text-xs font-medium
-                      ${order.status === 'Delivered' ? 'bg-green-100 text-green-800' :
-                                                order.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
-                                                    'bg-blue-100 text-blue-800'
-                                            }
-                    `}>
-                                            {order.status}
-                                        </span>
-                                    </td>
+                            {recentOrders.length > 0 ? (
+                                recentOrders.map(order => (
+                                    <tr key={order._id}>
+                                        <td className="font-medium">{order._id}</td>
+                                        <td>{order.user?.name || 'Unknown'}</td>
+                                        <td>${order.totalAmount.toFixed(2)}</td>
+                                        <td>
+                                            <span className={`px-2 py-1 rounded-full text-xs font-medium
+                                                ${order.orderStatus === 'delivered' ? 'bg-green-100 text-green-800' :
+                                                    order.orderStatus === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                                                        'bg-blue-100 text-blue-800'
+                                                }
+                                            `}>
+                                                {order.orderStatus.charAt(0).toUpperCase() + order.orderStatus.slice(1)}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="4" className="text-center py-4">No recent orders found</td>
                                 </tr>
-                            ))}
+                            )}
                         </tbody>
                     </table>
                 </div>
