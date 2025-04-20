@@ -216,7 +216,7 @@ const Navbar = (props) => {
                                                 </Link>
                                             )}
                                             {/* Add option to view seller application if pending or rejected */}
-                                            {user?.sellerApplication && user.role !== 'seller' && (
+                                            {user?.sellerApplication && user?.sellerApplication?.status && user.role !== 'seller' && (
                                                 <Link to="/profile?tab=seller" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                                     Seller Application {user.sellerApplication.status === 'rejected' ? '(Rejected)' : '(Pending)'}
                                                 </Link>

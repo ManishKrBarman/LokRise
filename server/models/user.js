@@ -72,8 +72,8 @@ const userSchema = new mongoose.Schema(
         sellerApplication: {
             status: {
                 type: String,
-                enum: ["pending", "approved", "rejected"],
-                default: "pending"
+                enum: ["pending", "approved", "rejected"]
+                // Removed default: "pending" to prevent auto-creation
             },
             businessDetails: {
                 businessName: String,

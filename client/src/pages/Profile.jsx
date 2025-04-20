@@ -180,7 +180,7 @@ const Profile = () => {
     };
 
     // Helper to check if user has seller application
-    const hasSellerApplication = user?.sellerApplication || user?.role === 'seller';
+    const hasSellerApplication = user?.sellerApplication?.status && (user?.sellerApplication || user?.role === 'seller');
 
     // Helper to check if tab should be visible
     const showTab = (tabName) => {
@@ -526,8 +526,8 @@ const Profile = () => {
                                         key={tab.id}
                                         onClick={() => setActiveTab(tab.id)}
                                         className={`${activeTab === tab.id
-                                                ? 'border-[var(--primary-color)] text-[var(--primary-color)]'
-                                                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                            ? 'border-[var(--primary-color)] text-[var(--primary-color)]'
+                                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                                             } flex items-center px-4 py-4 border-b-2 font-medium text-sm`}
                                     >
                                         {tab.icon && <span className="mr-2">{tab.icon}</span>}

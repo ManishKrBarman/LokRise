@@ -22,9 +22,20 @@ const SellerApplicationStatus = ({ user, refreshUser }) => {
                     setApplicationData(user.sellerApplication);
                 } else {
                     // Otherwise fetch from API
-                    const response = await authAPI.getSellerApplicationStatus();
-                    if (response.data && response.data.hasApplication) {
-                        setApplicationData(response.data.application);
+                    try {
+                        const response = await authAPI.getSellerApplicationStatus();
+                        if (response.data && response.data.hasApplication) {
+                            setApplicationData(response.data.application);
+                        }
+                    } catch (apiError) {
+                        // If the API returns a 404 (no application found), that's not an error
+                        // Just means the user hasn't submitted an application yet
+                        if (apiError.response && apiError.response.status === 404) {
+                            // This is expected if the user hasn't submitted an application
+                            console.log("User has no seller application yet");
+                        } else {
+                            throw apiError; // Re-throw if it's a real error
+                        }
                     }
                 }
             } catch (err) {
