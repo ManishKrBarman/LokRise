@@ -1,6 +1,5 @@
 import React from 'react';
 import ProductCard from './ProductCard';
-import SellerProfile from './SellerProfile';
 
 const ProductsSection = () => {
     // Sample product data
@@ -80,47 +79,7 @@ const ProductsSection = () => {
                         ))}
                     </div>
 
-                    {/* Famous Sellers */}
-                    <div className="md:w-64 lg:w-72">
-                        <div className="bg-gray-50 rounded-lg p-4">
-                            <h3 className="font-bold text-gray-800 mb-4 font-museo">Top Sellers</h3>
 
-                            <div className="space-y-4">
-                                {famousSellers.map(seller => (
-                                    <div key={seller.id} className="bg-white p-3 rounded-lg shadow-sm">
-                                        <div className="flex items-center mb-2">
-                                            <div className="w-12 h-12 rounded-full overflow-hidden mr-3">
-                                                <img
-                                                    src={seller.avatar}
-                                                    alt={seller.name}
-                                                    className="w-full h-full object-cover"
-                                                />
-                                            </div>
-                                            <div>
-                                                <h4 className="font-medium text-gray-800">{seller.name}</h4>
-                                                <p className="text-sm text-gray-500">{seller.category}</p>
-                                            </div>
-                                        </div>
-
-                                        <div className="flex justify-between text-sm">
-                                            <span className="text-gray-600">{seller.followers.toLocaleString()} followers</span>
-                                            <span className="flex items-center text-yellow-500">
-                                                {seller.rating} <span className="ml-1">★</span>
-                                            </span>
-                                        </div>
-
-                                        <button className="mt-2 w-full bg-[var(--tertiary-color)] hover:bg-[#7980b8] text-white text-sm py-1.5 rounded-md transition duration-300">
-                                            Visit Store
-                                        </button>
-                                    </div>
-                                ))}
-                            </div>
-
-                            <a href="/sellers" className="block text-center text-[var(--primary-color)] hover:underline mt-4 text-sm font-medium">
-                                View All Sellers
-                            </a>
-                        </div>
-                    </div>
                 </div>
             </div>
         </section>

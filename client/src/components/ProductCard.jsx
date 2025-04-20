@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FiStar, FiShoppingCart, FiHeart } from 'react-icons/fi';
+import { FiStar, FiShoppingCart, FiHeart, FiCheck } from 'react-icons/fi';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { useAuth } from '../context/AuthContext';
@@ -11,6 +11,8 @@ const ProductCard = ({ product }) => {
     const { addToCart } = useCart();
     const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
     const [loading, setLoading] = useState(false);
+    const [addedToCart, setAddedToCart] = useState(false);
+    const [error, setError] = useState(null);
 
     const isWishlisted = isInWishlist(product._id);
 
@@ -41,22 +43,35 @@ const ProductCard = ({ product }) => {
         }
 
         setLoading(true);
+        setError(null);
         try {
             const result = await addToCart(product, 1);
             if (result.success) {
-                // Could show a success toast here
+                // Show success state temporarily
+                setAddedToCart(true);
+                setTimeout(() => setAddedToCart(false), 2000);
+            } else {
+                setError(result.error || 'Failed to add to cart');
             }
         } catch (error) {
             console.error('Add to cart failed:', error);
+            setError('An unexpected error occurred');
         } finally {
             setLoading(false);
         }
     };
 
+    const handleProductClick = () => {
+        navigate(`/product/${product._id}`);
+    };
+
     return (
         <div className="bg-white rounded-lg shadow-md flex flex-col border border-gray-100 hover:shadow-lg transition duration-300">
             {/* Product Image */}
-            <div className="relative h-[180px]">
+            <div
+                className="relative h-[180px] cursor-pointer"
+                onClick={handleProductClick}
+            >
                 <img
                     src={product.images?.[0] || "/placeholder-image.jpg"}
                     alt={product.name}
@@ -68,7 +83,10 @@ const ProductCard = ({ product }) => {
                     </div>
                 )}
                 <button
-                    onClick={handleWishlistClick}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        handleWishlistClick();
+                    }}
                     disabled={loading}
                     className={`absolute top-2 right-2 p-1.5 rounded-full bg-white shadow-md 
                         ${isWishlisted ? 'text-red-500' : 'text-gray-400'} 
@@ -80,7 +98,10 @@ const ProductCard = ({ product }) => {
 
             {/* Product Info */}
             <div className="p-3 flex flex-col flex-grow">
-                <div className="mb-1 flex justify-between items-start">
+                <div
+                    className="mb-1 flex justify-between items-start cursor-pointer"
+                    onClick={handleProductClick}
+                >
                     <h3 className="text-sm font-medium line-clamp-2">{product.name}</h3>
                     <div className="flex items-center text-sm">
                         <FiStar className="text-yellow-400" size={14} />
@@ -105,16 +126,34 @@ const ProductCard = ({ product }) => {
                         <span className="text-xs text-gray-500">{product.reviews} reviews</span>
                     </div>
 
+                    {error && (
+                        <div className="text-xs text-red-500 mb-1">{error}</div>
+                    )}
+
                     <button
-                        onClick={handleAddToCart}
-                        disabled={loading || product.quantityAvailable === 0}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            handleAddToCart();
+                        }}
+                        disabled={loading || product.quantityAvailable === 0 || addedToCart}
                         className={`w-full py-1.5 rounded-md flex items-center justify-center transition duration-300 text-sm
-                            ${product.quantityAvailable === 0 
+                            ${product.quantityAvailable === 0
                                 ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                                : 'bg-[var(--secondary-color)] hover:bg-green-600 text-white'}`}
+                                : addedToCart
+                                    ? 'bg-green-600 text-white'
+                                    : 'bg-[var(--secondary-color)] hover:bg-green-600 text-white'}`}
                     >
-                        <FiShoppingCart className="mr-1" size={14} />
-                        {product.quantityAvailable === 0 ? 'Out of Stock' : 'Add to Cart'}
+                        {addedToCart ? (
+                            <>
+                                <FiCheck className="mr-1" size={14} />
+                                Added to Cart
+                            </>
+                        ) : (
+                            <>
+                                <FiShoppingCart className="mr-1" size={14} />
+                                {product.quantityAvailable === 0 ? 'Out of Stock' : 'Add to Cart'}
+                            </>
+                        )}
                     </button>
                 </div>
             </div>
