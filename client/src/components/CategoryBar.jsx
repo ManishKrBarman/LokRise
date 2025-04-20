@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { FiChevronDown } from 'react-icons/fi';
+import React, { useState, useEffect, useRef } from 'react';
+import { FiChevronDown, FiMenu, FiX } from 'react-icons/fi';
 
 const CategoryBar = () => {
     const categories = [
@@ -30,28 +30,63 @@ const CategoryBar = () => {
     ];
 
     const [activeDropdown, setActiveDropdown] = useState(null);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const menuRef = useRef(null);
+    const mobileMenuRef = useRef(null);
 
-    // Close dropdown when clicking outside
     useEffect(() => {
         const handleClickOutside = (event) => {
+            // Close mobile menu when clicking outside
+            if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target) && 
+                !event.target.closest('[data-menu-toggle]')) {
+                setIsMobileMenuOpen(false);
+            }
+            // Close dropdown when clicking outside
             if (!event.target.closest('.category-item')) {
                 setActiveDropdown(null);
             }
         };
 
-        document.addEventListener('click', handleClickOutside);
-        return () => document.removeEventListener('click', handleClickOutside);
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
+
+    useEffect(() => {
+        if (isMobileMenuOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
+        }
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, [isMobileMenuOpen]);
 
     const toggleDropdown = (index, event) => {
         event.stopPropagation();
         setActiveDropdown(activeDropdown === index ? null : index);
     };
 
+    const toggleMobileMenu = () => {
+        setIsMobileMenuOpen(!isMobileMenuOpen);
+        setActiveDropdown(null);
+    };
+
     return (
         <div className="bg-white border-b border-gray-200 sticky top-[0px] left-0 right-0 z-40 shadow-sm">
-            <div className="max-w-7xl mx-auto px-4">
-                <div className="flex items-center h-12 gap-6 overflow-visible">
+            <div className="max-w-7xl mx-auto px-4" ref={menuRef}>
+                {/* Mobile Menu Button */}
+                <button
+                    className="md:hidden absolute left-4 top-3 text-gray-700 hover:text-[var(--primary-color)] z-50"
+                    onClick={toggleMobileMenu}
+                    data-menu-toggle
+                    aria-label="Toggle menu"
+                >
+                    <FiMenu size={24} />
+                </button>
+
+                {/* Desktop Navigation */}
+                <div className="hidden md:flex items-center h-12 gap-6 overflow-visible">
                     <a href="/"
                         className="flex-none text-[var(--primary-color)] font-medium hover:text-[var(--primary-color)]/80 text-sm whitespace-nowrap">
                         Home
@@ -116,6 +151,70 @@ const CategoryBar = () => {
                         className="flex-none text-gray-700 hover:text-[var(--primary-color)] text-sm whitespace-nowrap">
                         Customer Service
                     </a>
+                </div>
+
+                {/* Mobile Menu */}
+                <div ref={mobileMenuRef}>
+                    <div 
+                        className={`fixed inset-0 bg-black bg-opacity-50 z-[60] transition-opacity duration-300 md:hidden ${
+                            isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+                        }`}
+                    >
+                        <div className={`fixed inset-y-0 left-0 w-64 bg-white shadow-xl transform transition-transform duration-300 ease-in-out z-[61] ${
+                            isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+                        }`}>
+                            <div className="p-4 border-b border-gray-200 flex justify-between items-center">
+                                <span className="font-medium text-lg text-[var(--primary-color)]">Menu</span>
+                                <button
+                                    onClick={toggleMobileMenu}
+                                    className="text-gray-500 hover:text-gray-700"
+                                    aria-label="Close menu"
+                                >
+                                    <FiX size={24} />
+                                </button>
+                            </div>
+                            <nav className="py-4">
+                                <a href="/" className="block px-4 py-2 text-[var(--primary-color)] hover:bg-gray-50">
+                                    Home
+                                </a>
+                                {categories.map((category, index) => (
+                                    <div key={index} className="category-item">
+                                        <button
+                                            className="w-full px-4 py-2 flex items-center justify-between text-gray-700 hover:bg-gray-50"
+                                            onClick={(e) => toggleDropdown(index, e)}
+                                        >
+                                            <span>{category.name}</span>
+                                            <FiChevronDown
+                                                size={16}
+                                                className={`transition-transform duration-200 ${activeDropdown === index ? 'rotate-180' : ''}`}
+                                            />
+                                        </button>
+                                        {activeDropdown === index && (
+                                            <div className="bg-gray-50 py-2">
+                                                {category.subcategories.map((subcat, idx) => (
+                                                    <a
+                                                        key={idx}
+                                                        href={`/category/${category.name.toLowerCase()}/${subcat.toLowerCase().replace(/\s+/g, '-')}`}
+                                                        className="block px-8 py-2 text-sm text-gray-700 hover:text-[var(--primary-color)]"
+                                                    >
+                                                        {subcat}
+                                                    </a>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                                <div className="border-t border-gray-200 mt-2 pt-2">
+                                    <a href="/courses" className="block px-4 py-2 text-gray-700 hover:bg-gray-50">Courses</a>
+                                    <a href="/about" className="block px-4 py-2 text-gray-700 hover:bg-gray-50">About</a>
+                                    <a href="/forum" className="block px-4 py-2 text-gray-700 hover:bg-gray-50">Forum</a>
+                                    <a href="/qna" className="block px-4 py-2 text-gray-700 hover:bg-gray-50">Q&A</a>
+                                    <a href="/sell" className="block px-4 py-2 text-gray-700 hover:bg-gray-50">Sell on Lokrise</a>
+                                    <a href="/customer-service" className="block px-4 py-2 text-gray-700 hover:bg-gray-50">Customer Service</a>
+                                </div>
+                            </nav>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

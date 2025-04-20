@@ -179,25 +179,24 @@ const Profile = () => {
         }
     };
 
-    // Helper to check if user has seller application
-    const hasSellerApplication = user?.sellerApplication || user?.role === 'seller';
-
-    // Helper to check if tab should be visible
-    const showTab = (tabName) => {
-        if (tabName === 'seller' && !hasSellerApplication && user?.role !== 'seller') {
-            return false;
-        }
-        return true;
-    };
-
-    // Tab navigation functions
+    // Tab navigation
     const tabs = [
         { id: 'profile', label: 'Profile', icon: <FiUser /> },
         { id: 'orders', label: 'Orders', icon: <FiPackage /> },
         { id: 'notifications', label: 'Notifications', icon: <FiBell /> },
-        { id: 'seller', label: 'Seller Application', icon: <FiShoppingBag /> },
+        { id: 'seller', label: 'Seller', icon: <FiShoppingBag /> },
         { id: 'settings', label: 'Settings', icon: <FiSettings /> }
     ];
+
+    // Show tab function
+    const showTab = (tabId) => {
+        if (tabId === 'seller') {
+            // Show seller tab if user is a seller or has a seller application
+            return user?.role === 'seller' || user?.sellerApplication;
+        }
+        // Show all other tabs by default
+        return true;
+    };
 
     const renderTabContent = () => {
         switch (activeTab) {
@@ -519,16 +518,20 @@ const Profile = () => {
                         </div>
 
                         {/* Tab Navigation */}
-                        <div className="border-b border-gray-200">
-                            <nav className="flex -mb-px">
+                        <div className="border-b border-gray-200 overflow-x-auto">
+                            <nav className="flex -mb-px min-w-full">
                                 {tabs.filter(tab => showTab(tab.id)).map(tab => (
                                     <button
                                         key={tab.id}
                                         onClick={() => setActiveTab(tab.id)}
-                                        className={`${activeTab === tab.id
+                                        className={`
+                                            flex-shrink-0 min-w-[120px] flex items-center justify-center px-4 py-4 
+                                            border-b-2 font-medium text-sm whitespace-nowrap
+                                            ${activeTab === tab.id
                                                 ? 'border-[var(--primary-color)] text-[var(--primary-color)]'
                                                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                                            } flex items-center px-4 py-4 border-b-2 font-medium text-sm`}
+                                            }
+                                        `}
                                     >
                                         {tab.icon && <span className="mr-2">{tab.icon}</span>}
                                         {tab.label}

@@ -76,92 +76,77 @@ const NotificationsPanel = ({
         }
     };
 
-    // Extract seller application notifications for highlighting
-    const hasSellerApplicationUpdate = notifications.some(
-        notification =>
-            notification.message.includes("seller application") &&
-            !notification.read
-    );
-
     return (
-        <div className="absolute right-0 top-full mt-2 w-80 bg-white rounded-md shadow-lg z-50 overflow-hidden">
-            <div className="py-2 px-3 bg-gray-100 border-b border-gray-200">
-                <div className="flex justify-between items-center">
-                    <h3 className="font-semibold text-sm">Notifications</h3>
-
-                    {notifications.some(n => !n.read) && (
-                        <button
-                            onClick={onMarkAllAsRead}
-                            className="text-xs text-blue-600 hover:text-blue-800"
-                        >
-                            Mark all as read
-                        </button>
-                    )}
-                </div>
+        <div className="bg-white w-full h-full md:h-auto md:w-[320px] flex flex-col overflow-hidden">
+            {/* Panel Header */}
+            <div className="py-3 px-4 bg-gray-100 border-b border-gray-200 flex items-center justify-between">
+                <h3 className="font-semibold text-sm">Notifications</h3>
+                {notifications.some(n => !n.read) && (
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onMarkAllAsRead?.();
+                        }}
+                        className="text-xs text-blue-600 hover:text-blue-800"
+                    >
+                        Mark all as read
+                    </button>
+                )}
             </div>
 
-            <div className="max-h-80 overflow-y-auto">
+            {/* Panel Content */}
+            <div className="flex-1 overflow-y-auto">
                 {notifications.length > 0 ? (
                     notifications.map(notification => {
-                        // Check if it's a seller application notification to apply special styling
                         const isSellerApplication = notification.message.includes("seller application");
-
                         return (
                             <div
-                                key={notification._id}
-                                onClick={() => handleNotificationClick(notification)}
-                                className={`border-b border-gray-100 px-4 py-3 hover:bg-gray-50 transition-colors duration-200 cursor-pointer
+                                key={notification._id || notification.id}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleNotificationClick(notification);
+                                }}
+                                className={`cursor-pointer border-b border-gray-100 px-4 py-3 hover:bg-gray-50 transition-colors duration-200
                                     ${notification.read ? 'bg-white' : isSellerApplication ? 'bg-yellow-50' : 'bg-blue-50'}`}
                             >
                                 <div className="flex items-start">
                                     <div className="mr-3 mt-1">
-                                        {isSellerApplication ? (
-                                            notification.message.includes("approved") ? (
-                                                <FiCheckCircle className="text-green-500" size={16} />
-                                            ) : notification.message.includes("unable to approve") ? (
-                                                <FiAlertCircle className="text-red-500" size={16} />
-                                            ) : (
-                                                <FiShoppingBag className="text-blue-500" size={16} />
-                                            )
-                                        ) : (
-                                            getNotificationIcon(notification.type)
-                                        )}
+                                        {getNotificationIcon(notification.type)}
                                     </div>
-
-                                    <div className="flex-1">
-                                        <div className="flex justify-between">
-                                            <p className={`text-sm ${notification.read ? 'text-gray-600' : 'text-gray-800 font-semibold'}`}>
-                                                {notification.message}
-                                            </p>
-                                            {!notification.read && (
-                                                <span className="h-2 w-2 bg-blue-500 rounded-full ml-2 mt-1 flex-shrink-0"></span>
-                                            )}
-                                        </div>
+                                    <div className="flex-1 min-w-0">
+                                        <p className={`text-sm ${notification.read ? 'text-gray-600' : 'text-gray-800 font-semibold'} break-words`}>
+                                            {notification.message}
+                                        </p>
                                         <p className="text-xs text-gray-500 mt-1">
                                             {getRelativeTime(notification.createdAt)}
                                         </p>
                                     </div>
+                                    {!notification.read && (
+                                        <span className="h-2 w-2 bg-blue-500 rounded-full ml-2 mt-1 flex-shrink-0"></span>
+                                    )}
                                 </div>
                             </div>
                         );
                     })
                 ) : (
-                    <div className="py-8 text-center text-gray-500">
+                    <div className="flex flex-col items-center justify-center h-full py-8 text-center text-gray-500">
                         <div className="flex justify-center mb-3">
                             <FiBell className="text-gray-300" size={24} />
                         </div>
-                        No notifications
+                        <p>No notifications</p>
                     </div>
                 )}
             </div>
 
-            {hasSellerApplicationUpdate && notifications.length > 3 && (
-                <div className="py-2 text-center border-t border-gray-100 bg-gray-50">
+            {/* Panel Footer */}
+            {notifications.length > 0 && (
+                <div className="py-3 text-center border-t border-gray-100 bg-gray-50">
                     <button
                         className="text-sm text-blue-600 hover:text-blue-800"
-                        onClick={() => {
+                        onClick={(e) => {
+                            e.stopPropagation();
                             navigate('/profile?tab=notifications');
-                            if (onClose) onClose();
+                            onClose?.();
                         }}
                     >
                         View all notifications
