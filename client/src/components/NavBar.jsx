@@ -229,118 +229,179 @@ const Navbar = (props) => {
                                         </div>
                                     )}
                                 </div>
-                                ) : (
-                                <Link to={props.buttonLink || "/login"}>
-                                    <button className="bg-[var(--primary-color)] hover:bg-[#8b6b4b] text-white py-2 px-4 rounded-lg transition duration-300 flex items-center">
-                                        <FiUser size={18} className="mr-2" />
-                                        {props.buttonText || 'Login'}
-                                    </button>
-                                </>
+                            </>
                         )}
 
-                                {!isAuthenticated && !authLoading && (
-                                    <Link
-                                        to={props.buttonLink || "/login"}
-                                        className="bg-[var(--primary-color)] hover:bg-[#8b6b4b] text-white py-2 px-4 rounded-lg transition duration-300 flex items-center"
-                                    >
-                                        <FiUser size={18} className="mr-2" />
-                                        {props.buttonText || 'Login'}
+                        {!isAuthenticated && !authLoading && (
+                            <Link
+                                to={props.buttonLink || "/login"}
+                                className="bg-[var(--primary-color)] hover:bg-[#8b6b4b] text-white py-2 px-4 rounded-lg transition duration-300 flex items-center"
+                            >
+                                <FiUser size={18} className="mr-2" />
+                                {props.buttonText || 'Login'}
+                            </Link>
+                        )}
+                    </div>
+
+                    {/* Mobile Navigation Menu */}
+                    <div className="flex md:hidden items-center space-x-2">
+                        <button
+                            className="p-2 hover:bg-gray-100 rounded-full"
+                            onClick={() => setShowMobileSearch(!showMobileSearch)}
+                        >
+                            <FiSearch size={20} />
+                        </button>
+
+                        {isAuthenticated && (
+                            <>
+                                <button
+                                    className="p-2 hover:bg-gray-100 rounded-full relative"
+                                    onClick={() => {
+                                        setShowNotifications(!showNotifications);
+                                        setShowProfileMenu(false);
+                                    }}
+                                >
+                                    <FiBell size={20} />
+                                    {unreadNotificationsCount > 0 && (
+                                        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
+                                            {unreadNotificationsCount > 9 ? '9+' : unreadNotificationsCount}
+                                        </span>
+                                    )}
+                                </button>
+
+                                {props.cartBtn && (
+                                    <Link to="/cart" className="p-2 hover:bg-gray-100 rounded-full relative">
+                                        <FiShoppingCart size={20} />
+                                        {cartItems?.length > 0 && (
+                                            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-4 h-4 flex items-center justify-center rounded-full">
+                                                {cartItems.length}
+                                            </span>
+                                        )}
                                     </Link>
                                 )}
-                            </div>
-                    </div>
 
-                    {/* Mobile Search - Shown when search is active */}
-                    {showMobileSearch && (
-                        <div className="mt-4 md:hidden">
-                            <form onSubmit={handleSearch} className="relative">
-                                <input
-                                    type="text"
-                                    placeholder="Search products, courses, and more..."
-                                    className="w-full py-2 px-4 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)]"
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                />
                                 <button
-                                    type="submit"
-                                    className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-[var(--primary-color)]"
+                                    className="flex items-center"
+                                    onClick={() => {
+                                        setShowProfileMenu(!showProfileMenu);
+                                        setShowNotifications(false);
+                                    }}
                                 >
-                                    <FiSearch size={20} />
+                                    <img
+                                        src={profileImage || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'U')}&background=8B6B4B&color=fff`}
+                                        alt="Profile"
+                                        className="h-8 w-8 rounded-full border-2 border-[var(--primary-color)]"
+                                        onError={(e) => {
+                                            setImageError(true);
+                                            e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'U')}&background=8B6B4B&color=fff`;
+                                        }}
+                                    />
                                 </button>
-                            </form>
-                        </div>
-                    )}
+                            </>
+                        )}
+
+                        {!isAuthenticated && !authLoading && (
+                            <Link to={props.buttonLink || "/login"}>
+                                <button className="bg-[var(--primary-color)] hover:bg-[#8b6b4b] text-white py-2 px-4 rounded-lg transition duration-300 flex items-center">
+                                    <FiUser size={18} className="mr-2" />
+                                    {props.buttonText || 'Login'}
+                                </button>
+                            </Link>
+                        )}
+                    </div>
                 </div>
 
-                {/* Mobile Menus */}
-                {showNotifications && (
-                    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 md:hidden">
-                        <div className="fixed top-[4rem] inset-x-4 bg-white rounded-lg shadow-xl max-h-[80vh] overflow-y-auto">
-                            <NotificationsPanel
-                                notifications={user?.notifications || []}
-                                onClose={() => setShowNotifications(false)}
-                                onMarkAsRead={handleMarkAsRead}
-                                onMarkAllAsRead={handleMarkAllAsRead}
+                {/* Mobile Search - Shown when search is active */}
+                {showMobileSearch && (
+                    <div className="mt-4 md:hidden">
+                        <form onSubmit={handleSearch} className="relative">
+                            <input
+                                type="text"
+                                placeholder="Search products, courses, and more..."
+                                className="w-full py-2 px-4 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)]"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
                             />
-                        </div>
+                            <button
+                                type="submit"
+                                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-[var(--primary-color)]"
+                            >
+                                <FiSearch size={20} />
+                            </button>
+                        </form>
                     </div>
                 )}
+            </div>
 
-                {showProfileMenu && (
-                    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 md:hidden">
-                        <div className="fixed top-[4rem] inset-x-4 bg-white rounded-lg shadow-xl">
-                            <div className="px-4 py-3 border-b border-gray-100">
-                                <p className="text-sm font-semibold">{user?.name}</p>
-                                <p className="text-xs text-gray-600 truncate">{user?.email}</p>
-                            </div>
+            {/* Mobile Menus */}
+            {showNotifications && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 z-50 md:hidden">
+                    <div className="fixed top-[4rem] inset-x-4 bg-white rounded-lg shadow-xl max-h-[80vh] overflow-y-auto">
+                        <NotificationsPanel
+                            notifications={user?.notifications || []}
+                            onClose={() => setShowNotifications(false)}
+                            onMarkAsRead={handleMarkAsRead}
+                            onMarkAllAsRead={handleMarkAllAsRead}
+                        />
+                    </div>
+                </div>
+            )}
 
-                            <div className="py-2">
+            {showProfileMenu && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 z-50 md:hidden">
+                    <div className="fixed top-[4rem] inset-x-4 bg-white rounded-lg shadow-xl">
+                        <div className="px-4 py-3 border-b border-gray-100">
+                            <p className="text-sm font-semibold">{user?.name}</p>
+                            <p className="text-xs text-gray-600 truncate">{user?.email}</p>
+                        </div>
+
+                        <div className="py-2">
+                            <button
+                                onClick={() => handleMenuItemClick('/profile')}
+                                className="w-full px-4 py-3 text-sm text-left hover:bg-gray-50"
+                            >
+                                Profile
+                            </button>
+                            <button
+                                onClick={() => handleMenuItemClick('/orders')}
+                                className="w-full px-4 py-3 text-sm text-left hover:bg-gray-50 flex items-center"
+                            >
+                                <FiPackage className="mr-2" size={16} />
+                                Orders
+                            </button>
+                            <button
+                                onClick={() => handleMenuItemClick('/wishlist')}
+                                className="w-full px-4 py-3 text-sm text-left hover:bg-gray-50 flex items-center"
+                            >
+                                <FiHeart className="mr-2" size={16} />
+                                Wishlist {wishlistItems.length > 0 && `(${wishlistItems.length})`}
+                            </button>
+                            {user?.role === 'seller' && (
                                 <button
-                                    onClick={() => handleMenuItemClick('/profile')}
+                                    onClick={() => handleMenuItemClick('/seller/dashboard')}
                                     className="w-full px-4 py-3 text-sm text-left hover:bg-gray-50"
                                 >
-                                    Profile
+                                    Seller Dashboard
                                 </button>
+                            )}
+                            {user?.sellerApplication && user.role !== 'seller' && (
                                 <button
-                                    onClick={() => handleMenuItemClick('/orders')}
-                                    className="w-full px-4 py-3 text-sm text-left hover:bg-gray-50 flex items-center"
+                                    onClick={() => handleMenuItemClick('/profile?tab=seller')}
+                                    className="w-full px-4 py-3 text-sm text-left hover:bg-gray-50"
                                 >
-                                    <FiPackage className="mr-2" size={16} />
-                                    Orders
+                                    Seller Application {user.sellerApplication.status === 'rejected' ? '(Rejected)' : '(Pending)'}
                                 </button>
-                                <button
-                                    onClick={() => handleMenuItemClick('/wishlist')}
-                                    className="w-full px-4 py-3 text-sm text-left hover:bg-gray-50 flex items-center"
-                                >
-                                    <FiHeart className="mr-2" size={16} />
-                                    Wishlist {wishlistItems.length > 0 && `(${wishlistItems.length})`}
-                                </button>
-                                {user?.role === 'seller' && (
-                                    <button
-                                        onClick={() => handleMenuItemClick('/seller/dashboard')}
-                                        className="w-full px-4 py-3 text-sm text-left hover:bg-gray-50"
-                                    >
-                                        Seller Dashboard
-                                    </button>
-                                )}
-                                {user?.sellerApplication && user.role !== 'seller' && (
-                                    <button
-                                        onClick={() => handleMenuItemClick('/profile?tab=seller')}
-                                        className="w-full px-4 py-3 text-sm text-left hover:bg-gray-50"
-                                    >
-                                        Seller Application {user.sellerApplication.status === 'rejected' ? '(Rejected)' : '(Pending)'}
-                                    </button>
-                                )}
-                                <button
-                                    onClick={handleLogout}
-                                    className="w-full px-4 py-3 text-sm text-left text-red-600 hover:bg-gray-50"
-                                >
-                                    Logout
-                                </button>
-                            </div>
+                            )}
+                            <button
+                                onClick={handleLogout}
+                                className="w-full px-4 py-3 text-sm text-left text-red-600 hover:bg-gray-50"
+                            >
+                                Logout
+                            </button>
                         </div>
                     </div>
-                )}
+                </div>
+            )}
         </nav>
     );
 };

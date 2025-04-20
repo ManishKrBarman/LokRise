@@ -199,16 +199,6 @@ const Profile = () => {
         { id: 'settings', label: 'Settings', icon: <FiSettings /> }
     ];
 
-    // Show tab function
-    const showTab = (tabId) => {
-        if (tabId === 'seller') {
-            // Show seller tab if user is a seller or has a seller application
-            return user?.role === 'seller' || user?.sellerApplication;
-        }
-        // Show all other tabs by default
-        return true;
-    };
-
     const renderTabContent = () => {
         switch (activeTab) {
             case 'profile':

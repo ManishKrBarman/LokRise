@@ -57,7 +57,7 @@ const Cart = () => {
     const renderShippingForm = () => (
         <form onSubmit={handleShippingSubmit} className="max-w-2xl mx-auto">
             <h2 className="text-2xl font-semibold mb-6">Shipping Details</h2>
-            
+
             <div className="grid gap-6 mb-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
@@ -190,7 +190,7 @@ const Cart = () => {
                 return renderShippingForm();
             case 'payment':
                 return (
-                    <Checkout 
+                    <Checkout
                         shippingDetails={shippingDetails}
                         onBack={() => setCheckoutStep('shipping')}
                     />
@@ -206,7 +206,7 @@ const Cart = () => {
                             />
                         </div>
                         <div className="lg:w-1/3">
-                            <CartSummary 
+                            <CartSummary
                                 totals={getCartTotals()}
                                 onCheckout={handleProceedToCheckout}
                             />
@@ -228,18 +228,18 @@ const Cart = () => {
     };
 
     return (
-        <>
+        <div className="flex flex-col min-h-screen">
             <NavBar fixed={true} cartBtn={true} />
-            <div className="max-w-7xl mx-auto px-4 py-8">
+            <main className="flex-grow max-w-7xl mx-auto px-4 py-8 w-full">
                 <h1 className="text-3xl font-bold mb-8">
-                    {checkoutStep === 'cart' ? 'Shopping Cart' : 
-                     checkoutStep === 'shipping' ? 'Shipping Information' : 
-                     'Payment'}
+                    {checkoutStep === 'cart' ? 'Shopping Cart' :
+                        checkoutStep === 'shipping' ? 'Shipping Information' :
+                            'Payment'}
                 </h1>
                 {renderContent()}
-            </div>
+            </main>
             <Footer />
-        </>
+        </div>
     );
 };
 
