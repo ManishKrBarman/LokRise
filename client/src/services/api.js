@@ -148,6 +148,12 @@ export const authAPI = {
     registerSeller: (formData) => {
         return retryRequest(() => api.post("/auth/seller/register", formData));
     },
+
+    // Notification related endpoints
+    getNotifications: () => retryRequest(() => api.get("/auth/notifications")),
+    markNotificationRead: (notificationId) => retryRequest(() => api.post(`/auth/notifications/${notificationId}/read`)),
+    markAllNotificationsRead: () => retryRequest(() => api.post("/auth/notifications/mark-all-read")),
+    getSellerApplicationStatus: () => retryRequest(() => api.get("/auth/seller/application-status")),
 };
 
 // Product APIs

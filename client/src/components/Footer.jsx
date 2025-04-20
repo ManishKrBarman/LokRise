@@ -4,7 +4,6 @@ import { AiFillInstagram } from "react-icons/ai";
 import { FaDiscord, FaYoutube, FaTwitter } from "react-icons/fa";
 
 const Footer = (props) => {
-    console.log(props.bgcolor)
     return (
         <footer className={`relative bottom-0 w-full py-6 px-4 ${props.bgcolor ? props.bgcolor : "bg-[var(--primary-color)]"} text-white flex flex-col gap-y-8 md:flex-row md:justify-between md:items-start`}>
             {/* Logo Section */}

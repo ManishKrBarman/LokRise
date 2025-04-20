@@ -10,8 +10,12 @@ const ApplicationStatus = () => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
     const [applicationData, setApplicationData] = useState(null);
+    const [dataFetched, setDataFetched] = useState(false);
 
     useEffect(() => {
+        // Only run this effect once on component mount to prevent re-renders
+        if (dataFetched) return;
+
         // Check authentication
         if (!isAuthenticated) {
             navigate('/login?returnTo=/seller/application-status');
@@ -21,25 +25,31 @@ const ApplicationStatus = () => {
         const fetchUserData = async () => {
             setLoading(true);
             try {
-                // Fetch the latest user data to get updated application status
-                const userData = await getCurrentUser();
+                // If user data already has seller application, use it
+                if (user?.sellerApplication) {
+                    setApplicationData(user.sellerApplication);
+                } else {
+                    // Fetch the latest user data to get updated application status
+                    const userData = await getCurrentUser();
 
-                if (!userData.sellerApplication) {
-                    // No seller application found, redirect to become-seller page
-                    navigate('/become-seller');
-                    return;
+                    if (!userData.sellerApplication) {
+                        // No seller application found, redirect to become-seller page
+                        navigate('/become-seller');
+                        return;
+                    }
+
+                    setApplicationData(userData.sellerApplication);
                 }
-
-                setApplicationData(userData.sellerApplication);
             } catch (error) {
                 console.error('Error fetching user data:', error);
             } finally {
                 setLoading(false);
+                setDataFetched(true);
             }
         };
 
         fetchUserData();
-    }, [isAuthenticated, navigate, getCurrentUser]);
+    }, [isAuthenticated, navigate, user, getCurrentUser, dataFetched]);
 
     const formatDate = (dateString) => {
         if (!dateString) return 'N/A';

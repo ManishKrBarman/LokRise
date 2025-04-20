@@ -338,40 +338,43 @@ const getCurrentUser = async (req, res) => {
 const getProfileImage = async (req, res) => {
     try {
         const userId = req.params.userId;
-        console.log(`Fetching profile image for user: ${userId}`);
 
-        const user = await UserModel.findById(userId);
-        if (!user) {
-            console.log(`User not found: ${userId}`);
-            return res.status(404).json({ message: 'User not found' });
-        }
-
-        if (!user.profileImage) {
-            console.log(`No profile image for user: ${userId}`);
-            return res.status(404).json({ message: 'No profile image found' });
-        }
-
-        if (!user.profileImage.data) {
-            console.log(`Profile image data missing for user: ${userId}`);
-            return res.status(404).json({ message: 'Profile image data is missing' });
-        }
-
-        // Add cache control and CORS headers
+        // Add cache control header to prevent frequent requests
         res.set({
-            'Content-Type': user.profileImage.contentType,
-            'Cache-Control': 'no-cache, no-store, must-revalidate',
-            'Pragma': 'no-cache',
-            'Expires': '0',
+            'Cache-Control': 'public, max-age=86400', // Cache for 24 hours
             'Access-Control-Allow-Origin': '*',
             'Access-Control-Allow-Methods': 'GET',
             'Access-Control-Allow-Headers': 'Content-Type, Authorization'
         });
 
-        console.log(`Successfully sending profile image for user: ${userId}`);
-        res.send(user.profileImage.data);
+        // Try to get user from database
+        const user = await UserModel.findById(userId);
+        if (!user) {
+            // Instead of logging (which causes console spam), just return a 404 with proper caching
+            return res.status(404).redirect(`https://ui-avatars.com/api/?name=U&background=8B6B4B&color=fff`);
+        }
+
+        // Check if user has a profile image
+        if (!user.profileImage || !user.profileImage.data) {
+            // Use user's first initial or 'U' as fallback, but don't log this
+            const defaultName = user.name ? encodeURIComponent(user.name[0]) : 'U';
+
+            // Redirect to default avatar with proper cache headers
+            return res.redirect(`https://ui-avatars.com/api/?name=${defaultName}&background=8B6B4B&color=fff`);
+        }
+
+        // Set proper headers for image response
+        res.set({
+            'Content-Type': user.profileImage.contentType
+            // Cache headers already set above
+        });
+
+        // Send the image data
+        return res.send(user.profileImage.data);
     } catch (error) {
         console.error('Get profile image error:', error);
-        res.status(500).json({ message: 'Failed to fetch profile image' });
+        // In case of error, redirect to default avatar instead of returning error
+        return res.redirect(`https://ui-avatars.com/api/?name=U&background=8B6B4B&color=fff`);
     }
 };
 
