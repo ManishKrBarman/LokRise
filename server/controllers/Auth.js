@@ -18,14 +18,10 @@ const getJWTSecret = () => {
 
 const register = async (req, res) => {
     try {
-        const { name, email, password, phone, role, upiId } = req.body;
+        const { name, email, password, phone } = req.body;
 
         if (!name || !email || !password) {
             return res.status(400).json({ message: 'Please fill all the fields' });
-        }
-
-        if (role === 'seller' && !upiId) {
-            return res.status(400).json({ message: 'UPI ID is required for sellers' });
         }
 
         const ExistsUser = await UserModel.findOne({ email });
@@ -43,8 +39,7 @@ const register = async (req, res) => {
             email,
             password: hashedPassword,
             phone,
-            role: role || 'buyer',
-            upiId: role === "seller" ? upiId : undefined,
+            role: 'buyer', // Always create as buyer, user can apply to be seller later
             verificationCode,
             createdAt: new Date(),
             updatedAt: new Date()

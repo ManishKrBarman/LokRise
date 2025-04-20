@@ -49,8 +49,7 @@ const validateEnv = () => {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Static files
-app.use(express.static(path.join(__dirname, './public')));
+// Removed static files middleware - no longer serving files from public folder
 
 // CORS configuration
 const corsOptions = {
@@ -90,9 +89,12 @@ app.use('/wishlist', WishlistRoutes);
 
 app.use(errorHandler);
 
-// 404
+// 404 - Returning JSON instead of HTML file
 app.use((req, res) => {
-    res.status(404).sendFile(path.join(__dirname, '../temp/404.html'));
+    res.status(404).json({
+        success: false,
+        message: 'Resource not found'
+    });
 });
 
 // Basic routes for testing

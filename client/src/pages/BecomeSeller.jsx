@@ -58,6 +58,10 @@ const BecomeSeller = () => {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
 
+    // Add state to track user interaction with checkboxes
+    const [termsInteracted, setTermsInteracted] = useState(false);
+    const [policyInteracted, setPolicyInteracted] = useState(false);
+
     // Pre-fill form with user data if logged in
     useEffect(() => {
         if (isAuthenticated && user) {
@@ -99,6 +103,14 @@ const BecomeSeller = () => {
             // Clear error when terms are checked
             if ((name === 'agreeToTerms' || name === 'agreeToSellerPolicy') && checked) {
                 setError('');
+            }
+
+            // Track user interaction with checkboxes
+            if (name === 'agreeToTerms') {
+                setTermsInteracted(true);
+            }
+            if (name === 'agreeToSellerPolicy') {
+                setPolicyInteracted(true);
             }
         } else {
             setFormData({
@@ -588,7 +600,6 @@ const BecomeSeller = () => {
                                         checked={formData.agreeToTerms}
                                         onChange={handleInputChange}
                                         className="h-4 w-4 text-[var(--primary-color)] focus:ring-[var(--primary-color)] border-gray-300 rounded"
-                                    // required - removed for dev
                                     />
                                 </div>
                                 <div className="ml-3 text-sm">
@@ -603,6 +614,9 @@ const BecomeSeller = () => {
                                         </a>
                                         .
                                     </label>
+                                    {termsInteracted && !formData.agreeToTerms && (
+                                        <p className="text-red-600 text-xs mt-1">You must agree to the terms to continue</p>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -617,7 +631,6 @@ const BecomeSeller = () => {
                                         checked={formData.agreeToSellerPolicy}
                                         onChange={handleInputChange}
                                         className="h-4 w-4 text-[var(--primary-color)] focus:ring-[var(--primary-color)] border-gray-300 rounded"
-                                    // required - removed for dev
                                     />
                                 </div>
                                 <div className="ml-3 text-sm">
@@ -628,6 +641,9 @@ const BecomeSeller = () => {
                                         </a>{" "}
                                         and confirm that the information provided is accurate.
                                     </label>
+                                    {policyInteracted && !formData.agreeToSellerPolicy && (
+                                        <p className="text-red-600 text-xs mt-1">You must agree to the seller policy to continue</p>
+                                    )}
                                 </div>
                             </div>
                         </div>
