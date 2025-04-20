@@ -1,5 +1,35 @@
 import axios from "axios";
 
+// Auth state management functions - moved to top for proper export
+export const getAuthState = () => {
+    const token = localStorage.getItem("token");
+    const userJson = localStorage.getItem("user");
+
+    if (!token || !userJson) {
+        return { isAuthenticated: false, user: null };
+    }
+
+    try {
+        const user = JSON.parse(userJson);
+        return { isAuthenticated: true, user };
+    } catch (error) {
+        console.error("Error parsing user data:", error);
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        return { isAuthenticated: false, user: null };
+    }
+};
+
+export const setAuthState = (token, user) => {
+    localStorage.setItem("token", token);
+    localStorage.setItem("user", JSON.stringify(user));
+};
+
+export const clearAuthState = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+};
+
 // API configuration
 const getBaseUrl = () => {
     if (import.meta.env.VITE_API_URL) {
@@ -118,6 +148,12 @@ export const authAPI = {
     registerSeller: (formData) => {
         return retryRequest(() => api.post("/auth/seller/register", formData));
     },
+
+    // Notification related endpoints
+    getNotifications: () => retryRequest(() => api.get("/auth/notifications")),
+    markNotificationRead: (notificationId) => retryRequest(() => api.post(`/auth/notifications/${notificationId}/read`)),
+    markAllNotificationsRead: () => retryRequest(() => api.post("/auth/notifications/mark-all-read")),
+    getSellerApplicationStatus: () => retryRequest(() => api.get("/auth/seller/application-status")),
 };
 
 // Product APIs
@@ -251,36 +287,6 @@ export const uploadAPI = {
             },
         });
     }
-};
-
-// User state management
-export const getAuthState = () => {
-    const token = localStorage.getItem("token");
-    const userJson = localStorage.getItem("user");
-
-    if (!token || !userJson) {
-        return { isAuthenticated: false, user: null };
-    }
-
-    try {
-        const user = JSON.parse(userJson);
-        return { isAuthenticated: true, user };
-    } catch (error) {
-        console.error("Error parsing user data:", error);
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        return { isAuthenticated: false, user: null };
-    }
-};
-
-export const setAuthState = (token, user) => {
-    localStorage.setItem("token", token);
-    localStorage.setItem("user", JSON.stringify(user));
-};
-
-export const clearAuthState = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
 };
 
 export default api;

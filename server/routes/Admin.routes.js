@@ -333,10 +333,16 @@ router.put('/orders/:orderId/status', authMiddleware, authorizeRoles('admin'), a
 // Seller application management
 router.get('/seller-applications', authMiddleware, authorizeRoles('admin'), async (req, res) => {
     try {
-        // Find users with pending seller applications
-        const applications = await User.find({
-            'sellerApplication.status': 'pending'
-        }).select('name email sellerApplication createdAt');
+        const { status = 'pending' } = req.query;
+
+        // Create a query to find users with seller applications matching the requested status
+        // Only find users that have a sellerApplication field with the requested status
+        const query = { 'sellerApplication.status': status };
+
+        // Find users with seller applications of the specified status
+        const applications = await User.find(query)
+            .select('name email phone sellerApplication address bankDetails businessDetails identityDetails createdAt updatedAt')
+            .sort({ 'sellerApplication.submittedAt': -1 });
 
         res.json({ applications });
     } catch (error) {
@@ -363,11 +369,21 @@ router.post('/seller-applications/:userId/approve', authMiddleware, authorizeRol
         user.sellerApplication.reviewedAt = new Date();
         user.sellerApplication.reviewedBy = req.user.id;
 
+        // Add notification to the user
+        user.notifications.push({
+            message: 'Congratulations! Your seller application has been approved. You can now start selling on LokRise.',
+            type: 'system',
+            read: false,
+            link: '/seller/dashboard',
+            createdAt: new Date()
+        });
+
         await user.save();
 
-        // You could send notification email here
+        // In a production environment, you could send notification email here
 
         res.json({
+            success: true,
             message: 'Seller application approved successfully',
             user: {
                 _id: user._id,
@@ -388,6 +404,10 @@ router.post('/seller-applications/:userId/reject', authMiddleware, authorizeRole
     try {
         const { reason } = req.body;
 
+        if (!reason || reason.trim() === '') {
+            return res.status(400).json({ message: 'Rejection reason is required' });
+        }
+
         const user = await User.findById(req.params.userId);
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
@@ -399,21 +419,35 @@ router.post('/seller-applications/:userId/reject', authMiddleware, authorizeRole
 
         // Update application status
         user.sellerApplication.status = 'rejected';
-        user.sellerApplication.rejectionReason = reason || 'Application rejected by administrator';
+        user.sellerApplication.rejectionReason = reason;
         user.sellerApplication.reviewedAt = new Date();
         user.sellerApplication.reviewedBy = req.user.id;
 
+        // Add notification to the user
+        user.notifications.push({
+            message: 'Your seller application has been reviewed. Unfortunately, we are unable to approve it at this time. Please check your application status for details.',
+            type: 'system',
+            read: false,
+            link: '/seller/application-status',
+            createdAt: new Date()
+        });
+
         await user.save();
 
-        // You could send notification email here
+        // In a production environment, you could send notification email here
 
         res.json({
+            success: true,
             message: 'Seller application rejected',
             user: {
                 _id: user._id,
                 name: user.name,
                 email: user.email,
-                sellerApplication: user.sellerApplication
+                sellerApplication: {
+                    status: user.sellerApplication.status,
+                    rejectionReason: user.sellerApplication.rejectionReason,
+                    reviewedAt: user.sellerApplication.reviewedAt
+                }
             }
         });
     } catch (error) {

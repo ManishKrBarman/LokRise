@@ -1,16 +1,21 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import FormInput from '../components/FormInput';
 import NavBar from '../components/NavBar';
 import Footer from '../components/Footer';
+import SellerApplicationStatus from '../components/SellerApplicationStatus';
 import { BASE_URL } from '../services/api';
+import { FiUser, FiPackage, FiSettings, FiShoppingBag, FiBell } from 'react-icons/fi';
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ALLOWED_FILE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
 const Profile = () => {
-    const { user, updateProfile, loading } = useAuth();
+    const location = useLocation();
+    const { user, updateProfile, loading, getCurrentUser } = useAuth();
     const [isEditing, setIsEditing] = useState(false);
+    const [activeTab, setActiveTab] = useState('profile');
     const [formData, setFormData] = useState({
         name: '',
         phone: '',
@@ -48,6 +53,15 @@ const Profile = () => {
         if (!user?._id) return null;
         return `${BASE_URL}/auth/profile-image/${user._id}?t=${Date.now()}`;
     };
+
+    // Set active tab from URL query parameter
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const tab = params.get('tab');
+        if (tab) {
+            setActiveTab(tab);
+        }
+    }, [location]);
 
     useEffect(() => {
         if (user) {
@@ -108,7 +122,7 @@ const Profile = () => {
                 setImagePreview(reader.result);
             };
             reader.readAsDataURL(file);
-            
+
             setFormData(prev => ({
                 ...prev,
                 profileImage: file
@@ -128,7 +142,7 @@ const Profile = () => {
         try {
             // Create FormData for file upload
             const formDataToSend = new FormData();
-            
+
             // Append file if it's a File object
             if (formData.profileImage instanceof File) {
                 formDataToSend.append('profileImage', formData.profileImage);
@@ -152,6 +166,8 @@ const Profile = () => {
                 // Clear the file input
                 const fileInput = document.getElementById('profile-image');
                 if (fileInput) fileInput.value = '';
+                // Refresh user data
+                await getCurrentUser();
             } else {
                 setError(result.error || 'Failed to update profile');
             }
@@ -163,11 +179,295 @@ const Profile = () => {
         }
     };
 
+    // Helper to check if user has seller application
+    const hasSellerApplication = user?.sellerApplication || user?.role === 'seller';
+
+    // Helper to check if tab should be visible
+    const showTab = (tabName) => {
+        if (tabName === 'seller' && !hasSellerApplication && user?.role !== 'seller') {
+            return false;
+        }
+        return true;
+    };
+
+    // Tab navigation functions
+    const tabs = [
+        { id: 'profile', label: 'Profile', icon: <FiUser /> },
+        { id: 'orders', label: 'Orders', icon: <FiPackage /> },
+        { id: 'notifications', label: 'Notifications', icon: <FiBell /> },
+        { id: 'seller', label: 'Seller Application', icon: <FiShoppingBag /> },
+        { id: 'settings', label: 'Settings', icon: <FiSettings /> }
+    ];
+
+    const renderTabContent = () => {
+        switch (activeTab) {
+            case 'profile':
+                return renderProfileTab();
+            case 'seller':
+                return <SellerApplicationStatus user={user} refreshUser={getCurrentUser} />;
+            case 'notifications':
+                return renderNotificationsTab();
+            case 'orders':
+                return <div className="text-center py-8 text-gray-500">Orders view is coming soon.</div>;
+            case 'settings':
+                return <div className="text-center py-8 text-gray-500">Settings view is coming soon.</div>;
+            default:
+                return renderProfileTab();
+        }
+    };
+
+    const renderNotificationsTab = () => {
+        if (!user?.notifications?.length) {
+            return (
+                <div className="text-center py-8">
+                    <div className="mb-4">
+                        <FiBell className="mx-auto h-12 w-12 text-gray-400" />
+                    </div>
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">No Notifications</h3>
+                    <p className="text-gray-500">
+                        You don't have any notifications yet.
+                    </p>
+                </div>
+            );
+        }
+
+        const formatDate = (dateString) => {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        };
+
+        return (
+            <div className="space-y-4">
+                <h3 className="text-lg font-medium text-gray-900">Your Notifications</h3>
+                <div className="border rounded-md overflow-hidden">
+                    {user.notifications.map((notification, index) => (
+                        <div key={notification._id || index}
+                            className={`p-4 ${notification.read ? 'bg-white' : 'bg-blue-50'} ${index !== user.notifications.length - 1 ? 'border-b' : ''}`}>
+                            <div className="flex justify-between items-start">
+                                <div className="flex-1">
+                                    <p className={`text-sm ${notification.read ? 'text-gray-600' : 'text-gray-900 font-medium'}`}>
+                                        {notification.message}
+                                    </p>
+                                    <p className="text-xs text-gray-500 mt-1">{formatDate(notification.createdAt)}</p>
+                                </div>
+                                {!notification.read && (
+                                    <span className="h-2 w-2 bg-blue-500 rounded-full"></span>
+                                )}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        );
+    };
+
+    const renderProfileTab = () => {
+        return (
+            <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                    <FormInput
+                        id="name"
+                        label="Full Name"
+                        type="text"
+                        value={formData.name}
+                        onChange={handleChange}
+                        disabled={!isEditing}
+                        required
+                    />
+                    <FormInput
+                        id="phone"
+                        label="Phone Number"
+                        type="tel"
+                        value={formData.phone}
+                        onChange={handleChange}
+                        disabled={!isEditing}
+                        required
+                    />
+                </div>
+
+                {/* Address Section */}
+                <div className="border-t pt-6">
+                    <h3 className="text-lg font-medium mb-4">Address</h3>
+                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                        <FormInput
+                            id="address.addressLine1"
+                            label="Address Line 1"
+                            type="text"
+                            value={formData.address.addressLine1}
+                            onChange={handleChange}
+                            disabled={!isEditing}
+                        />
+                        <FormInput
+                            id="address.addressLine2"
+                            label="Address Line 2"
+                            type="text"
+                            value={formData.address.addressLine2}
+                            onChange={handleChange}
+                            disabled={!isEditing}
+                        />
+                        <FormInput
+                            id="address.city"
+                            label="City"
+                            type="text"
+                            value={formData.address.city}
+                            onChange={handleChange}
+                            disabled={!isEditing}
+                        />
+                        <FormInput
+                            id="address.district"
+                            label="District"
+                            type="text"
+                            value={formData.address.district}
+                            onChange={handleChange}
+                            disabled={!isEditing}
+                        />
+                        <FormInput
+                            id="address.state"
+                            label="State"
+                            type="text"
+                            value={formData.address.state}
+                            onChange={handleChange}
+                            disabled={!isEditing}
+                        />
+                        <FormInput
+                            id="address.pinCode"
+                            label="PIN Code"
+                            type="text"
+                            value={formData.address.pinCode}
+                            onChange={handleChange}
+                            disabled={!isEditing}
+                        />
+                    </div>
+                </div>
+
+                {/* Social Profiles Section */}
+                <div className="border-t pt-6">
+                    <h3 className="text-lg font-medium mb-4">Social Profiles</h3>
+                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                        <FormInput
+                            id="socialProfiles.website"
+                            label="Website"
+                            type="url"
+                            value={formData.socialProfiles.website}
+                            onChange={handleChange}
+                            disabled={!isEditing}
+                        />
+                        <FormInput
+                            id="socialProfiles.github"
+                            label="GitHub"
+                            type="url"
+                            value={formData.socialProfiles.github}
+                            onChange={handleChange}
+                            disabled={!isEditing}
+                        />
+                        <FormInput
+                            id="socialProfiles.linkedin"
+                            label="LinkedIn"
+                            type="url"
+                            value={formData.socialProfiles.linkedin}
+                            onChange={handleChange}
+                            disabled={!isEditing}
+                        />
+                        <FormInput
+                            id="socialProfiles.twitter"
+                            label="Twitter"
+                            type="url"
+                            value={formData.socialProfiles.twitter}
+                            onChange={handleChange}
+                            disabled={!isEditing}
+                        />
+                    </div>
+                </div>
+
+                {/* Preferences Section */}
+                <div className="border-t pt-6">
+                    <h3 className="text-lg font-medium mb-4">Preferences</h3>
+                    <div className="space-y-4">
+                        <div className="flex items-center">
+                            <input
+                                id="preferences.emailNotifications"
+                                name="preferences.emailNotifications"
+                                type="checkbox"
+                                checked={formData.preferences.emailNotifications}
+                                onChange={(e) => handleChange({
+                                    target: {
+                                        name: 'preferences.emailNotifications',
+                                        value: e.target.checked
+                                    }
+                                })}
+                                disabled={!isEditing}
+                                className="h-4 w-4 text-[var(--primary-color)] focus:ring-[var(--primary-color)] border-gray-300 rounded"
+                            />
+                            <label htmlFor="preferences.emailNotifications" className="ml-2 block text-sm text-gray-900">
+                                Receive Email Notifications
+                            </label>
+                        </div>
+                        <div className="flex items-center">
+                            <input
+                                id="preferences.newsletter"
+                                name="preferences.newsletter"
+                                type="checkbox"
+                                checked={formData.preferences.newsletter}
+                                onChange={(e) => handleChange({
+                                    target: {
+                                        name: 'preferences.newsletter',
+                                        value: e.target.checked
+                                    }
+                                })}
+                                disabled={!isEditing}
+                                className="h-4 w-4 text-[var(--primary-color)] focus:ring-[var(--primary-color)] border-gray-300 rounded"
+                            />
+                            <label htmlFor="preferences.newsletter" className="ml-2 block text-sm text-gray-900">
+                                Subscribe to Newsletter
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="flex justify-end space-x-4">
+                    {isEditing ? (
+                        <>
+                            <button
+                                type="button"
+                                onClick={() => setIsEditing(false)}
+                                className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--primary-color)]"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[var(--primary-color)] hover:bg-[#8b6b4b] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--primary-color)] disabled:opacity-50"
+                            >
+                                {loading ? 'Saving...' : 'Save Changes'}
+                            </button>
+                        </>
+                    ) : (
+                        <button
+                            type="button"
+                            onClick={() => setIsEditing(true)}
+                            className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[var(--primary-color)] hover:bg-[#8b6b4b] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--primary-color)]"
+                        >
+                            Edit Profile
+                        </button>
+                    )}
+                </div>
+            </form>
+        );
+    };
+
     return (
         <div className="min-h-screen flex flex-col">
             <NavBar />
             <div className="flex-grow bg-gray-50 py-8">
-                <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="bg-white shadow rounded-lg overflow-hidden">
                         {/* Profile Header */}
                         <div className="bg-[var(--primary-color)] px-4 py-5 sm:px-6">
@@ -191,7 +491,7 @@ const Profile = () => {
                                             </svg>
                                         </div>
                                     )}
-                                    {isEditing && (
+                                    {isEditing && activeTab === 'profile' && (
                                         <label
                                             htmlFor="profile-image"
                                             className="absolute bottom-0 right-0 bg-white rounded-full p-1 shadow-lg cursor-pointer hover:bg-gray-100 transition-colors duration-200"
@@ -218,6 +518,30 @@ const Profile = () => {
                             </div>
                         </div>
 
+                        {/* Tab Navigation */}
+                        <div className="border-b border-gray-200">
+                            <nav className="flex -mb-px">
+                                {tabs.filter(tab => showTab(tab.id)).map(tab => (
+                                    <button
+                                        key={tab.id}
+                                        onClick={() => setActiveTab(tab.id)}
+                                        className={`${activeTab === tab.id
+                                                ? 'border-[var(--primary-color)] text-[var(--primary-color)]'
+                                                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                            } flex items-center px-4 py-4 border-b-2 font-medium text-sm`}
+                                    >
+                                        {tab.icon && <span className="mr-2">{tab.icon}</span>}
+                                        {tab.label}
+                                        {tab.id === 'notifications' && user?.notifications?.filter(n => !n.read).length > 0 && (
+                                            <span className="ml-2 bg-red-100 text-red-600 text-xs px-2 py-0.5 rounded-full">
+                                                {user.notifications.filter(n => !n.read).length}
+                                            </span>
+                                        )}
+                                    </button>
+                                ))}
+                            </nav>
+                        </div>
+
                         {/* Profile Content */}
                         <div className="px-4 py-5 sm:p-6">
                             {error && (
@@ -231,196 +555,7 @@ const Profile = () => {
                                 </div>
                             )}
 
-                            <form onSubmit={handleSubmit} className="space-y-6">
-                                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                                    <FormInput
-                                        id="name"
-                                        label="Full Name"
-                                        type="text"
-                                        value={formData.name}
-                                        onChange={handleChange}
-                                        disabled={!isEditing}
-                                        required
-                                    />
-                                    <FormInput
-                                        id="phone"
-                                        label="Phone Number"
-                                        type="tel"
-                                        value={formData.phone}
-                                        onChange={handleChange}
-                                        disabled={!isEditing}
-                                        required
-                                    />
-                                </div>
-
-                                {/* Address Section */}
-                                <div className="border-t pt-6">
-                                    <h3 className="text-lg font-medium mb-4">Address</h3>
-                                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                                        <FormInput
-                                            id="address.addressLine1"
-                                            label="Address Line 1"
-                                            type="text"
-                                            value={formData.address.addressLine1}
-                                            onChange={handleChange}
-                                            disabled={!isEditing}
-                                        />
-                                        <FormInput
-                                            id="address.addressLine2"
-                                            label="Address Line 2"
-                                            type="text"
-                                            value={formData.address.addressLine2}
-                                            onChange={handleChange}
-                                            disabled={!isEditing}
-                                        />
-                                        <FormInput
-                                            id="address.city"
-                                            label="City"
-                                            type="text"
-                                            value={formData.address.city}
-                                            onChange={handleChange}
-                                            disabled={!isEditing}
-                                        />
-                                        <FormInput
-                                            id="address.district"
-                                            label="District"
-                                            type="text"
-                                            value={formData.address.district}
-                                            onChange={handleChange}
-                                            disabled={!isEditing}
-                                        />
-                                        <FormInput
-                                            id="address.state"
-                                            label="State"
-                                            type="text"
-                                            value={formData.address.state}
-                                            onChange={handleChange}
-                                            disabled={!isEditing}
-                                        />
-                                        <FormInput
-                                            id="address.pinCode"
-                                            label="PIN Code"
-                                            type="text"
-                                            value={formData.address.pinCode}
-                                            onChange={handleChange}
-                                            disabled={!isEditing}
-                                        />
-                                    </div>
-                                </div>
-
-                                {/* Social Profiles Section */}
-                                <div className="border-t pt-6">
-                                    <h3 className="text-lg font-medium mb-4">Social Profiles</h3>
-                                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                                        <FormInput
-                                            id="socialProfiles.website"
-                                            label="Website"
-                                            type="url"
-                                            value={formData.socialProfiles.website}
-                                            onChange={handleChange}
-                                            disabled={!isEditing}
-                                        />
-                                        <FormInput
-                                            id="socialProfiles.github"
-                                            label="GitHub"
-                                            type="url"
-                                            value={formData.socialProfiles.github}
-                                            onChange={handleChange}
-                                            disabled={!isEditing}
-                                        />
-                                        <FormInput
-                                            id="socialProfiles.linkedin"
-                                            label="LinkedIn"
-                                            type="url"
-                                            value={formData.socialProfiles.linkedin}
-                                            onChange={handleChange}
-                                            disabled={!isEditing}
-                                        />
-                                        <FormInput
-                                            id="socialProfiles.twitter"
-                                            label="Twitter"
-                                            type="url"
-                                            value={formData.socialProfiles.twitter}
-                                            onChange={handleChange}
-                                            disabled={!isEditing}
-                                        />
-                                    </div>
-                                </div>
-
-                                {/* Preferences Section */}
-                                <div className="border-t pt-6">
-                                    <h3 className="text-lg font-medium mb-4">Preferences</h3>
-                                    <div className="space-y-4">
-                                        <div className="flex items-center">
-                                            <input
-                                                id="preferences.emailNotifications"
-                                                name="preferences.emailNotifications"
-                                                type="checkbox"
-                                                checked={formData.preferences.emailNotifications}
-                                                onChange={(e) => handleChange({
-                                                    target: {
-                                                        name: 'preferences.emailNotifications',
-                                                        value: e.target.checked
-                                                    }
-                                                })}
-                                                disabled={!isEditing}
-                                                className="h-4 w-4 text-[var(--primary-color)] focus:ring-[var(--primary-color)] border-gray-300 rounded"
-                                            />
-                                            <label htmlFor="preferences.emailNotifications" className="ml-2 block text-sm text-gray-900">
-                                                Receive Email Notifications
-                                            </label>
-                                        </div>
-                                        <div className="flex items-center">
-                                            <input
-                                                id="preferences.newsletter"
-                                                name="preferences.newsletter"
-                                                type="checkbox"
-                                                checked={formData.preferences.newsletter}
-                                                onChange={(e) => handleChange({
-                                                    target: {
-                                                        name: 'preferences.newsletter',
-                                                        value: e.target.checked
-                                                    }
-                                                })}
-                                                disabled={!isEditing}
-                                                className="h-4 w-4 text-[var(--primary-color)] focus:ring-[var(--primary-color)] border-gray-300 rounded"
-                                            />
-                                            <label htmlFor="preferences.newsletter" className="ml-2 block text-sm text-gray-900">
-                                                Subscribe to Newsletter
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="flex justify-end space-x-4">
-                                    {isEditing ? (
-                                        <>
-                                            <button
-                                                type="button"
-                                                onClick={() => setIsEditing(false)}
-                                                className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--primary-color)]"
-                                            >
-                                                Cancel
-                                            </button>
-                                            <button
-                                                type="submit"
-                                                disabled={loading}
-                                                className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[var(--primary-color)] hover:bg-[#8b6b4b] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--primary-color)] disabled:opacity-50"
-                                            >
-                                                {loading ? 'Saving...' : 'Save Changes'}
-                                            </button>
-                                        </>
-                                    ) : (
-                                        <button
-                                            type="button"
-                                            onClick={() => setIsEditing(true)}
-                                            className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[var(--primary-color)] hover:bg-[#8b6b4b] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--primary-color)]"
-                                        >
-                                            Edit Profile
-                                        </button>
-                                    )}
-                                </div>
-                            </form>
+                            {renderTabContent()}
                         </div>
                     </div>
                 </div>

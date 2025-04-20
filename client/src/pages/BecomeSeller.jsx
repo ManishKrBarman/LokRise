@@ -146,7 +146,7 @@ const BecomeSeller = () => {
         try {
             // Check if UPI ID is included
             if (!formData.upiId) {
-                setError('UPI ID is required');
+                setError('UPI ID is required for seller registration');
                 setIsSubmitting(false);
                 return;
             }
@@ -157,57 +157,24 @@ const BecomeSeller = () => {
                 return;
             }
 
-            // Create a FormData object (don't use new FormData() as it's not working properly)
-            // Instead we'll use a plain object and convert it to JSON
-            const submitData = {
-                fullName: user.name || formData.fullName || '',
-                email: user.email || formData.email || '',
-                phone: user.phone || formData.phone || '',
-
-                businessName: formData.businessName || '',
-                gstin: formData.gstin || '',
-                businessType: formData.businessType || 'individual',
-                businessCategory: formData.businessCategory || '',
-                businessDescription: formData.businessDescription || '',
-                establishedYear: formData.establishedYear || '',
-
-                addressLine1: formData.addressLine1 || '',
-                addressLine2: formData.addressLine2 || '',
-                city: formData.city || '',
-                district: formData.district || '',
-                state: formData.state || '',
-                pinCode: formData.pinCode || '',
-
-                accountHolderName: formData.accountHolderName || '',
-                accountNumber: formData.accountNumber || '',
-                ifscCode: formData.ifscCode || '',
-                bankName: formData.bankName || '',
-                branchName: formData.branchName || '',
-                upiId: formData.upiId,
-
-                panNumber: formData.panNumber || '',
-                aadharNumber: formData.aadharNumber || '',
-            };
-
-            console.log("Submitting seller registration data:", submitData);
-            const response = await registerAsSeller(submitData);
+            // Submit seller application
+            const response = await registerAsSeller(formData);
 
             if (response.success) {
-                setSuccess('Your seller application has been submitted successfully! We will review it and get back to you shortly.');
+                setSuccess('Your seller application has been submitted successfully!');
 
-                // Clear any saved form data
-                sessionStorage.removeItem('sellerFormData');
-
-                // Redirect after a short delay
+                // Navigate to the application status page after a short delay
                 setTimeout(() => {
-                    navigate('/seller/pending');
-                }, 3000);
+                    navigate('/seller/application-status');
+                }, 2000);
             } else {
-                setError(response.error || 'Failed to register as seller. Please try again later.');
+                setError(response.error || 'Failed to submit seller application. Please try again.');
+                window.scrollTo(0, 0);
             }
         } catch (err) {
-            console.error('Registration error:', err);
-            setError(err.response?.data?.message || 'Failed to register. Please try again later.');
+            console.error("Error submitting seller application:", err);
+            setError('An unexpected error occurred. Please try again later.');
+            window.scrollTo(0, 0);
         } finally {
             setIsSubmitting(false);
         }

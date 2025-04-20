@@ -338,40 +338,43 @@ const getCurrentUser = async (req, res) => {
 const getProfileImage = async (req, res) => {
     try {
         const userId = req.params.userId;
-        console.log(`Fetching profile image for user: ${userId}`);
 
-        const user = await UserModel.findById(userId);
-        if (!user) {
-            console.log(`User not found: ${userId}`);
-            return res.status(404).json({ message: 'User not found' });
-        }
-
-        if (!user.profileImage) {
-            console.log(`No profile image for user: ${userId}`);
-            return res.status(404).json({ message: 'No profile image found' });
-        }
-
-        if (!user.profileImage.data) {
-            console.log(`Profile image data missing for user: ${userId}`);
-            return res.status(404).json({ message: 'Profile image data is missing' });
-        }
-
-        // Add cache control and CORS headers
+        // Add cache control header to prevent frequent requests
         res.set({
-            'Content-Type': user.profileImage.contentType,
-            'Cache-Control': 'no-cache, no-store, must-revalidate',
-            'Pragma': 'no-cache',
-            'Expires': '0',
+            'Cache-Control': 'public, max-age=86400', // Cache for 24 hours
             'Access-Control-Allow-Origin': '*',
             'Access-Control-Allow-Methods': 'GET',
             'Access-Control-Allow-Headers': 'Content-Type, Authorization'
         });
 
-        console.log(`Successfully sending profile image for user: ${userId}`);
-        res.send(user.profileImage.data);
+        // Try to get user from database
+        const user = await UserModel.findById(userId);
+        if (!user) {
+            // Instead of logging (which causes console spam), just return a 404 with proper caching
+            return res.status(404).redirect(`https://ui-avatars.com/api/?name=U&background=8B6B4B&color=fff`);
+        }
+
+        // Check if user has a profile image
+        if (!user.profileImage || !user.profileImage.data) {
+            // Use user's first initial or 'U' as fallback, but don't log this
+            const defaultName = user.name ? encodeURIComponent(user.name[0]) : 'U';
+
+            // Redirect to default avatar with proper cache headers
+            return res.redirect(`https://ui-avatars.com/api/?name=${defaultName}&background=8B6B4B&color=fff`);
+        }
+
+        // Set proper headers for image response
+        res.set({
+            'Content-Type': user.profileImage.contentType
+            // Cache headers already set above
+        });
+
+        // Send the image data
+        return res.send(user.profileImage.data);
     } catch (error) {
         console.error('Get profile image error:', error);
-        res.status(500).json({ message: 'Failed to fetch profile image' });
+        // In case of error, redirect to default avatar instead of returning error
+        return res.redirect(`https://ui-avatars.com/api/?name=U&background=8B6B4B&color=fff`);
     }
 };
 
@@ -539,6 +542,7 @@ const registerSeller = async (req, res, next) => {
             ifscCode,
             bankName,
             branchName,
+            upiId
         };
 
         // Create business details object
@@ -557,14 +561,28 @@ const registerSeller = async (req, res, next) => {
             aadharNumber,
         };
 
-        // Update user with seller information
-        user.role = "seller";
+        // Create the seller application in the new schema structure
+        user.sellerApplication = {
+            status: 'pending',
+            businessDetails,
+            address,
+            bankDetails,
+            identityDetails,
+            submittedAt: new Date()
+        };
+
+        // Set UPI ID at root level (required for seller role once approved)
         user.upiId = upiId;
+
+        // Store old format fields for backward compatibility
         user.address = address;
         user.bankDetails = bankDetails;
         user.businessDetails = businessDetails;
         user.identityDetails = identityDetails;
-        user.sellerStatus = "pending";
+
+        // Note: we don't change the role to seller until the application is approved
+        // The role will remain as "buyer" until an admin approves the application
+
         user.updatedAt = new Date();
 
         // If fullName is provided, update the name
@@ -577,11 +595,20 @@ const registerSeller = async (req, res, next) => {
             user.phone = phone;
         }
 
+        // Add a notification to the user
+        user.notifications.push({
+            message: 'Your seller application has been submitted successfully! We will review it and get back to you shortly.',
+            type: 'system',
+            read: false,
+            link: '/seller/application-status',
+            createdAt: new Date()
+        });
+
         // Save the updated user
         await user.save();
-        console.log(`User ${user.email} updated to seller role successfully`);
+        console.log(`User ${user.email} seller application saved successfully`);
 
-        // Generate new token with updated role
+        // Generate new token with updated data
         const token = jwt.sign(
             { id: user._id, email: user.email, role: user.role },
             process.env.JWT_SECRET || 'fallbacksecretkey',
@@ -591,13 +618,16 @@ const registerSeller = async (req, res, next) => {
         return res.status(200).json({
             success: true,
             message: "Your seller application has been submitted successfully! We will review it and get back to you shortly.",
-            token, // Send new token with updated role
+            token, // Send new token with updated data
             user: {
                 id: user._id,
                 name: user.name,
                 email: user.email,
                 role: user.role,
-                sellerStatus: user.sellerStatus
+                sellerApplication: {
+                    status: user.sellerApplication.status,
+                    submittedAt: user.sellerApplication.submittedAt
+                }
             }
         });
     } catch (err) {

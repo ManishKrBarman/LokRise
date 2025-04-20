@@ -12,185 +12,37 @@ const Products = () => {
     const [category, setCategory] = useState('all');
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [categories, setCategories] = useState([]);
 
     // Fetch products with pagination
     useEffect(() => {
         const fetchProducts = async () => {
             setLoading(true);
             try {
+                // Use a higher limit to get more products at once
                 const response = await adminAPI.getAllProducts({
                     page: currentPage,
-                    limit: 10,
+                    limit: 50, // Show more products per page
                     search,
                     category: category !== 'all' ? category : undefined
                 });
 
-                // Using mock data for now since API isn't fully implemented
-                const mockProducts = [
-                    {
-                        _id: 'p1',
-                        name: 'Wireless Bluetooth Headphones',
-                        description: 'High-quality wireless headphones with noise cancellation',
-                        price: 1299,
-                        quantityAvailable: 45,
-                        category: 'electronics',
-                        images: ['headphones.jpg'],
-                        seller: {
-                            _id: 's1',
-                            name: 'TechWorld',
-                            rating: 4.5
-                        },
-                        rating: 4.2,
-                        reviews: 28,
-                        createdAt: '2023-02-15',
-                        isActive: true
-                    },
-                    {
-                        _id: 'p2',
-                        name: 'Cotton T-Shirt (Blue)',
-                        description: 'Comfortable cotton t-shirt in sky blue color',
-                        price: 499,
-                        quantityAvailable: 120,
-                        category: 'fashion',
-                        images: ['tshirt.jpg'],
-                        seller: {
-                            _id: 's2',
-                            name: 'Fashion Hub',
-                            rating: 4.3
-                        },
-                        rating: 4.0,
-                        reviews: 56,
-                        createdAt: '2023-03-10',
-                        isActive: true
-                    },
-                    {
-                        _id: 'p3',
-                        name: 'Stainless Steel Water Bottle',
-                        description: 'Eco-friendly water bottle, keeps drinks hot/cold for 24 hours',
-                        price: 799,
-                        quantityAvailable: 0,
-                        category: 'home',
-                        images: ['bottle.jpg'],
-                        seller: {
-                            _id: 's3',
-                            name: 'HomeGoods',
-                            rating: 4.7
-                        },
-                        rating: 4.8,
-                        reviews: 42,
-                        createdAt: '2023-01-20',
-                        isActive: true
-                    },
-                    {
-                        _id: 'p4',
-                        name: 'Yoga Mat',
-                        description: 'Non-slip yoga mat with carrying strap',
-                        price: 899,
-                        quantityAvailable: 35,
-                        category: 'sports',
-                        images: ['yogamat.jpg'],
-                        seller: {
-                            _id: 's4',
-                            name: 'FitLife',
-                            rating: 4.6
-                        },
-                        rating: 4.5,
-                        reviews: 31,
-                        createdAt: '2023-02-28',
-                        isActive: false
-                    },
-                    {
-                        _id: 'p5',
-                        name: 'Bestseller Fiction Novel',
-                        description: 'Award-winning fiction novel, hardcover edition',
-                        price: 349,
-                        quantityAvailable: 80,
-                        category: 'books',
-                        images: ['book.jpg'],
-                        seller: {
-                            _id: 's5',
-                            name: 'BookWorld',
-                            rating: 4.9
-                        },
-                        rating: 4.7,
-                        reviews: 64,
-                        createdAt: '2023-04-05',
-                        isActive: true
-                    },
-                    {
-                        _id: 'p6',
-                        name: 'Smart Watch',
-                        description: 'Fitness tracker with heart rate monitor and notifications',
-                        price: 2499,
-                        quantityAvailable: 25,
-                        category: 'electronics',
-                        images: ['smartwatch.jpg'],
-                        seller: {
-                            _id: 's1',
-                            name: 'TechWorld',
-                            rating: 4.5
-                        },
-                        rating: 4.3,
-                        reviews: 19,
-                        createdAt: '2023-03-22',
-                        isActive: true
-                    },
-                    {
-                        _id: 'p7',
-                        name: 'Portable Blender',
-                        description: 'USB rechargeable personal blender for smoothies',
-                        price: 1199,
-                        quantityAvailable: 0,
-                        category: 'home',
-                        images: ['blender.jpg'],
-                        seller: {
-                            _id: 's3',
-                            name: 'HomeGoods',
-                            rating: 4.7
-                        },
-                        rating: 3.9,
-                        reviews: 27,
-                        createdAt: '2023-03-05',
-                        isActive: true
-                    },
-                    {
-                        _id: 'p8',
-                        name: 'Leather Wallet',
-                        description: 'Genuine leather wallet with multiple card slots',
-                        price: 699,
-                        quantityAvailable: 60,
-                        category: 'fashion',
-                        images: ['wallet.jpg'],
-                        seller: {
-                            _id: 's2',
-                            name: 'Fashion Hub',
-                            rating: 4.3
-                        },
-                        rating: 4.4,
-                        reviews: 38,
-                        createdAt: '2023-01-15',
-                        isActive: true
+                console.log('Products response:', response.data); // For debugging
+
+                // Use real data from the API response
+                if (response.data && response.data.products) {
+                    setProducts(response.data.products);
+                    // Fix pagination to match server structure
+                    if (response.data.pagination) {
+                        setTotalPages(response.data.pagination.pages || 1);
+                    } else {
+                        setTotalPages(1);
                     }
-                ];
-
-                // Filter mock products based on search and category
-                let filtered = mockProducts;
-                if (search) {
-                    const searchLower = search.toLowerCase();
-                    filtered = filtered.filter(product =>
-                        product.name.toLowerCase().includes(searchLower) ||
-                        product.description.toLowerCase().includes(searchLower) ||
-                        product.seller.name.toLowerCase().includes(searchLower)
-                    );
+                    setError(null);
+                } else {
+                    setProducts([]);
+                    setTotalPages(1);
                 }
-
-                if (category !== 'all') {
-                    filtered = filtered.filter(product => product.category === category);
-                }
-
-                setProducts(filtered);
-                setTotalPages(Math.ceil(filtered.length / 10));
-                setError(null);
             } catch (err) {
                 setError('Failed to load products');
                 console.error('Products fetch error:', err);
@@ -201,6 +53,31 @@ const Products = () => {
 
         fetchProducts();
     }, [currentPage, search, category]);
+
+    // Fetch categories for filter dropdown
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                // You might need to implement this API endpoint
+                const response = await adminAPI.getCategories();
+                if (response.data && response.data.categories) {
+                    setCategories(response.data.categories);
+                }
+            } catch (err) {
+                console.error('Categories fetch error:', err);
+                // Fallback to default categories if API fails
+                setCategories([
+                    { _id: 'electronics', name: 'Electronics' },
+                    { _id: 'fashion', name: 'Fashion' },
+                    { _id: 'home', name: 'Home' },
+                    { _id: 'sports', name: 'Sports' },
+                    { _id: 'books', name: 'Books' }
+                ]);
+            }
+        };
+
+        fetchCategories();
+    }, []);
 
     const handlePageChange = (page) => {
         setCurrentPage(page);
@@ -278,11 +155,9 @@ const Products = () => {
                             className="px-3 py-2 border rounded"
                         >
                             <option value="all">All Categories</option>
-                            <option value="electronics">Electronics</option>
-                            <option value="fashion">Fashion</option>
-                            <option value="home">Home</option>
-                            <option value="sports">Sports</option>
-                            <option value="books">Books</option>
+                            {categories.map(cat => (
+                                <option key={cat._id} value={cat._id}>{cat.name}</option>
+                            ))}
                         </select>
                     </div>
 
@@ -312,87 +187,105 @@ const Products = () => {
                 </div>
             )}
 
-            <div className="overflow-x-auto shadow rounded-lg">
-                <table className="admin-table">
-                    <thead>
-                        <tr>
-                            <th>Product</th>
-                            <th>Price</th>
-                            <th>Stock</th>
-                            <th>Category</th>
-                            <th>Seller</th>
-                            <th>Status</th>
-                            <th className="text-center">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {products.map(product => (
-                            <tr key={product._id} className={!product.isActive ? 'bg-red-50' : (product.quantityAvailable === 0 ? 'bg-yellow-50' : '')}>
-                                <td>
-                                    <div className="flex items-center space-x-3">
-                                        <div className="w-10 h-10 bg-gray-200 rounded flex-shrink-0"></div>
-                                        <div>
-                                            <div className="font-medium">{product.name}</div>
-                                            <div className="text-xs text-gray-500 truncate max-w-xs">{product.description}</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td className="font-medium">{formatPrice(product.price)}</td>
-                                <td>
-                                    {product.quantityAvailable > 0 ? (
-                                        product.quantityAvailable
-                                    ) : (
-                                        <span className="text-red-600">Out of stock</span>
-                                    )}
-                                </td>
-                                <td className="capitalize">{product.category}</td>
-                                <td>
-                                    <div>{product.seller.name}</div>
-                                    <div className="text-xs text-gray-500">Rating: {product.seller.rating}/5</div>
-                                </td>
-                                <td>
-                                    {product.isActive ? (
-                                        <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                            Active
-                                        </span>
-                                    ) : (
-                                        <span className="px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                            Inactive
-                                        </span>
-                                    )}
-                                </td>
-                                <td>
-                                    <div className="flex justify-center space-x-2">
-                                        <button
-                                            onClick={() => openProductModal(product)}
-                                            className="p-1 text-blue-600 hover:text-blue-800"
-                                            title="View Details"
-                                        >
-                                            <FiEye size={18} />
-                                        </button>
-
-                                        <button
-                                            onClick={() => openProductModal(product)}
-                                            className="p-1 text-green-600 hover:text-green-800"
-                                            title="Edit Product"
-                                        >
-                                            <FiEdit size={18} />
-                                        </button>
-
-                                        <button
-                                            onClick={() => handleDeleteProduct(product._id)}
-                                            className="p-1 text-red-600 hover:text-red-800"
-                                            title="Delete Product"
-                                        >
-                                            <FiTrash2 size={18} />
-                                        </button>
-                                    </div>
-                                </td>
+            {products.length === 0 && !loading ? (
+                <div className="bg-white rounded-lg shadow p-6 text-center">
+                    <p className="text-gray-500">No products found matching your criteria.</p>
+                </div>
+            ) : (
+                <div className="overflow-x-auto shadow rounded-lg">
+                    <table className="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Price</th>
+                                <th>Stock</th>
+                                <th>Category</th>
+                                <th>Seller</th>
+                                <th>Status</th>
+                                <th className="text-center">Actions</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+                        </thead>
+                        <tbody>
+                            {products.map(product => (
+                                <tr key={product._id} className={!product.isActive ? 'bg-red-50' : (product.quantityAvailable === 0 ? 'bg-yellow-50' : '')}>
+                                    <td>
+                                        <div className="flex items-center space-x-3">
+                                            <div className="w-10 h-10 bg-gray-200 rounded flex-shrink-0">
+                                                {product.images && product.images.length > 0 && (
+                                                    <img
+                                                        src={product.images[0].startsWith('http') ? product.images[0] : `/product-images/${product.images[0]}`}
+                                                        alt={product.name}
+                                                        className="w-full h-full object-cover rounded"
+                                                        onError={(e) => {
+                                                            e.target.onerror = null;
+                                                            e.target.src = 'https://placehold.co/100x100?text=No+Image';
+                                                        }}
+                                                    />
+                                                )}
+                                            </div>
+                                            <div>
+                                                <div className="font-medium">{product.name}</div>
+                                                <div className="text-xs text-gray-500 truncate max-w-xs">{product.description}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td className="font-medium">{formatPrice(product.price)}</td>
+                                    <td>
+                                        {product.quantityAvailable > 0 ? (
+                                            product.quantityAvailable
+                                        ) : (
+                                            <span className="text-red-600">Out of stock</span>
+                                        )}
+                                    </td>
+                                    <td className="capitalize">{product.category?.name || product.category}</td>
+                                    <td>
+                                        <div>{product.seller?.name || 'Unknown Seller'}</div>
+                                        <div className="text-xs text-gray-500">Rating: {product.seller?.rating || 'N/A'}</div>
+                                    </td>
+                                    <td>
+                                        {product.isActive ? (
+                                            <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                Active
+                                            </span>
+                                        ) : (
+                                            <span className="px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                                Inactive
+                                            </span>
+                                        )}
+                                    </td>
+                                    <td>
+                                        <div className="flex justify-center space-x-2">
+                                            <button
+                                                onClick={() => openProductModal(product)}
+                                                className="p-1 text-blue-600 hover:text-blue-800"
+                                                title="View Details"
+                                            >
+                                                <FiEye size={18} />
+                                            </button>
+
+                                            <button
+                                                onClick={() => openProductModal(product)}
+                                                className="p-1 text-green-600 hover:text-green-800"
+                                                title="Edit Product"
+                                            >
+                                                <FiEdit size={18} />
+                                            </button>
+
+                                            <button
+                                                onClick={() => handleDeleteProduct(product._id)}
+                                                className="p-1 text-red-600 hover:text-red-800"
+                                                title="Delete Product"
+                                            >
+                                                <FiTrash2 size={18} />
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            )}
 
             {/* Pagination */}
             {totalPages > 1 && (
@@ -435,7 +328,19 @@ const Products = () => {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {/* Product Image */}
                             <div className="bg-gray-100 rounded-lg h-64 flex items-center justify-center">
-                                <p className="text-gray-500">Product Image</p>
+                                {selectedProduct.images && selectedProduct.images.length > 0 ? (
+                                    <img
+                                        src={selectedProduct.images[0].startsWith('http') ? selectedProduct.images[0] : `/product-images/${selectedProduct.images[0]}`}
+                                        alt={selectedProduct.name}
+                                        className="h-full object-contain"
+                                        onError={(e) => {
+                                            e.target.onerror = null;
+                                            e.target.src = 'https://placehold.co/300x300?text=No+Image';
+                                        }}
+                                    />
+                                ) : (
+                                    <p className="text-gray-500">No image available</p>
+                                )}
                             </div>
 
                             {/* Product Details */}
@@ -447,7 +352,7 @@ const Products = () => {
                                         <div className="font-medium">{formatPrice(selectedProduct.price)}</div>
 
                                         <div className="text-sm text-gray-500">Category:</div>
-                                        <div className="capitalize">{selectedProduct.category}</div>
+                                        <div className="capitalize">{selectedProduct.category?.name || selectedProduct.category}</div>
 
                                         <div className="text-sm text-gray-500">Stock:</div>
                                         <div className={selectedProduct.quantityAvailable === 0 ? 'text-red-600' : ''}>
@@ -455,7 +360,7 @@ const Products = () => {
                                         </div>
 
                                         <div className="text-sm text-gray-500">Rating:</div>
-                                        <div>{selectedProduct.rating}/5 ({selectedProduct.reviews} reviews)</div>
+                                        <div>{selectedProduct.rating || 'N/A'}/5 ({selectedProduct.reviews?.length || 0} reviews)</div>
 
                                         <div className="text-sm text-gray-500">Status:</div>
                                         <div>
@@ -471,7 +376,7 @@ const Products = () => {
                                         </div>
 
                                         <div className="text-sm text-gray-500">Seller:</div>
-                                        <div>{selectedProduct.seller.name}</div>
+                                        <div>{selectedProduct.seller?.name || 'Unknown Seller'}</div>
 
                                         <div className="text-sm text-gray-500">Added On:</div>
                                         <div>{formatDate(selectedProduct.createdAt)}</div>

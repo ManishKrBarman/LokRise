@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { authAPI, setAuthState, clearAuthState, getAuthState, BASE_URL } from '../services/api';
+import { authAPI, BASE_URL } from '../services/api';
 
 // Helper to check if running in mobile browser
 const isMobileDevice = () => {
@@ -13,6 +13,36 @@ const getProfileImageUrl = (userId) => {
     // Remove any trailing slashes from the API URL
     const baseUrl = apiUrl.replace(/\/$/, '');
     return `${baseUrl}/auth/profile-image/${userId}?t=${Date.now()}`;
+};
+
+// Local implementation of auth state management functions to avoid import issues
+const clearAuthState = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+};
+
+const setAuthState = (token, user) => {
+    localStorage.setItem("token", token);
+    localStorage.setItem("user", JSON.stringify(user));
+};
+
+const getAuthState = () => {
+    const token = localStorage.getItem("token");
+    const userJson = localStorage.getItem("user");
+
+    if (!token || !userJson) {
+        return { isAuthenticated: false, user: null };
+    }
+
+    try {
+        const user = JSON.parse(userJson);
+        return { isAuthenticated: true, user };
+    } catch (error) {
+        console.error("Error parsing user data:", error);
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        return { isAuthenticated: false, user: null };
+    }
 };
 
 const AuthContext = createContext();
@@ -35,7 +65,7 @@ export const AuthProvider = ({ children }) => {
                     try {
                         const response = await authAPI.getCurrentUser();
                         const currentUser = response.data.user;
-                        
+
                         // Update user with proper image URL
                         setUser({
                             ...currentUser,
@@ -64,6 +94,41 @@ export const AuthProvider = ({ children }) => {
 
         initializeAuth();
     }, []);
+
+    // Get current user function
+    const getCurrentUser = async () => {
+        try {
+            const response = await authAPI.getCurrentUser();
+            const currentUser = response.data.user;
+
+            // Update user in state
+            const userWithImage = {
+                ...currentUser,
+                profileImage: currentUser._id ? getProfileImageUrl(currentUser._id) : null
+            };
+
+            setUser(userWithImage);
+
+            // Update stored user data
+            const authState = getAuthState();
+            if (authState.isAuthenticated) {
+                setAuthState(localStorage.getItem("token"), userWithImage);
+            }
+
+            return userWithImage;
+        } catch (error) {
+            console.error("Error getting current user:", error);
+
+            // Handle authentication errors
+            if (error.response?.status === 401) {
+                clearAuthState();
+                setUser(null);
+                setIsAuthenticated(false);
+            }
+
+            throw error;
+        }
+    };
 
     // Login function
     const login = async (email, password) => {
@@ -154,14 +219,14 @@ export const AuthProvider = ({ children }) => {
         try {
             const response = await authAPI.updateProfile(formData);
             const updatedUser = response.data.user;
-            
+
             // Update local user state with proper image URL
             setUser(prev => ({
                 ...prev,
                 ...updatedUser,
                 profileImage: updatedUser.id ? getProfileImageUrl(updatedUser.id) : null
             }));
-            
+
             // Update stored user data
             const authState = getAuthState();
             if (authState.isAuthenticated) {
@@ -171,7 +236,7 @@ export const AuthProvider = ({ children }) => {
                     profileImage: updatedUser.id ? getProfileImageUrl(updatedUser.id) : null
                 });
             }
-            
+
             return { success: true, user: updatedUser };
         } catch (error) {
             console.error("Profile update error:", error);
@@ -257,6 +322,7 @@ export const AuthProvider = ({ children }) => {
         forgotPassword,
         resetPassword,
         registerAsSeller,
+        getCurrentUser,
         getProfileImageUrl // Export the helper function
     };
 
