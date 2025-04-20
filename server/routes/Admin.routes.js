@@ -63,7 +63,7 @@ router.get('/auth/admin/me', authMiddleware, authorizeRoles('admin'), async (req
 });
 
 // User management
-router.get('/admin/users', authMiddleware, authorizeRoles('admin'), async (req, res) => {
+router.get('/users', authMiddleware, authorizeRoles('admin'), async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
@@ -92,7 +92,7 @@ router.get('/admin/users', authMiddleware, authorizeRoles('admin'), async (req, 
 });
 
 // Get user by ID
-router.get('/admin/users/:userId', authMiddleware, authorizeRoles('admin'), async (req, res) => {
+router.get('/users/:userId', authMiddleware, authorizeRoles('admin'), async (req, res) => {
     try {
         const user = await User.findById(req.params.userId).select('-password');
         if (!user) {
@@ -106,7 +106,7 @@ router.get('/admin/users/:userId', authMiddleware, authorizeRoles('admin'), asyn
 });
 
 // Update user
-router.put('/admin/users/:userId', authMiddleware, authorizeRoles('admin'), async (req, res) => {
+router.put('/users/:userId', authMiddleware, authorizeRoles('admin'), async (req, res) => {
     try {
         const { name, email, role } = req.body;
 
@@ -129,7 +129,7 @@ router.put('/admin/users/:userId', authMiddleware, authorizeRoles('admin'), asyn
 });
 
 // Delete user
-router.delete('/admin/users/:userId', authMiddleware, authorizeRoles('admin'), async (req, res) => {
+router.delete('/users/:userId', authMiddleware, authorizeRoles('admin'), async (req, res) => {
     try {
         const user = await User.findByIdAndDelete(req.params.userId);
         if (!user) {
@@ -144,7 +144,7 @@ router.delete('/admin/users/:userId', authMiddleware, authorizeRoles('admin'), a
 });
 
 // Ban user
-router.post('/admin/users/:userId/ban', authMiddleware, authorizeRoles('admin'), async (req, res) => {
+router.post('/users/:userId/ban', authMiddleware, authorizeRoles('admin'), async (req, res) => {
     try {
         const user = await User.findById(req.params.userId);
         if (!user) {
@@ -162,7 +162,7 @@ router.post('/admin/users/:userId/ban', authMiddleware, authorizeRoles('admin'),
 });
 
 // Unban user
-router.post('/admin/users/:userId/unban', authMiddleware, authorizeRoles('admin'), async (req, res) => {
+router.post('/users/:userId/unban', authMiddleware, authorizeRoles('admin'), async (req, res) => {
     try {
         const user = await User.findById(req.params.userId);
         if (!user) {
@@ -180,7 +180,7 @@ router.post('/admin/users/:userId/unban', authMiddleware, authorizeRoles('admin'
 });
 
 // Product management routes
-router.get('/admin/products', authMiddleware, authorizeRoles('admin'), async (req, res) => {
+router.get('/products', authMiddleware, authorizeRoles('admin'), async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
@@ -210,7 +210,7 @@ router.get('/admin/products', authMiddleware, authorizeRoles('admin'), async (re
 });
 
 // Get product by ID
-router.get('/admin/products/:productId', authMiddleware, authorizeRoles('admin'), async (req, res) => {
+router.get('/products/:productId', authMiddleware, authorizeRoles('admin'), async (req, res) => {
     try {
         const product = await Product.findById(req.params.productId)
             .populate('category')
@@ -228,7 +228,7 @@ router.get('/admin/products/:productId', authMiddleware, authorizeRoles('admin')
 });
 
 // Update product
-router.put('/admin/products/:productId', authMiddleware, authorizeRoles('admin'), async (req, res) => {
+router.put('/products/:productId', authMiddleware, authorizeRoles('admin'), async (req, res) => {
     try {
         const product = await Product.findByIdAndUpdate(
             req.params.productId,
@@ -248,7 +248,7 @@ router.put('/admin/products/:productId', authMiddleware, authorizeRoles('admin')
 });
 
 // Delete product
-router.delete('/admin/products/:productId', authMiddleware, authorizeRoles('admin'), async (req, res) => {
+router.delete('/products/:productId', authMiddleware, authorizeRoles('admin'), async (req, res) => {
     try {
         const product = await Product.findByIdAndDelete(req.params.productId);
 
@@ -264,7 +264,7 @@ router.delete('/admin/products/:productId', authMiddleware, authorizeRoles('admi
 });
 
 // Order management routes
-router.get('/admin/orders', authMiddleware, authorizeRoles('admin'), async (req, res) => {
+router.get('/orders', authMiddleware, authorizeRoles('admin'), async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
@@ -293,7 +293,7 @@ router.get('/admin/orders', authMiddleware, authorizeRoles('admin'), async (req,
 });
 
 // Get order by ID
-router.get('/admin/orders/:orderId', authMiddleware, authorizeRoles('admin'), async (req, res) => {
+router.get('/orders/:orderId', authMiddleware, authorizeRoles('admin'), async (req, res) => {
     try {
         const order = await Order.findById(req.params.orderId)
             .populate('user', 'name email')
@@ -311,7 +311,7 @@ router.get('/admin/orders/:orderId', authMiddleware, authorizeRoles('admin'), as
 });
 
 // Update order status
-router.put('/admin/orders/:orderId/status', authMiddleware, authorizeRoles('admin'), async (req, res) => {
+router.put('/orders/:orderId/status', authMiddleware, authorizeRoles('admin'), async (req, res) => {
     try {
         const { status } = req.body;
 
@@ -331,7 +331,7 @@ router.put('/admin/orders/:orderId/status', authMiddleware, authorizeRoles('admi
 });
 
 // Seller application management
-router.get('/admin/seller-applications', authMiddleware, authorizeRoles('admin'), async (req, res) => {
+router.get('/seller-applications', authMiddleware, authorizeRoles('admin'), async (req, res) => {
     try {
         // Find users with pending seller applications
         const applications = await User.find({
@@ -346,7 +346,7 @@ router.get('/admin/seller-applications', authMiddleware, authorizeRoles('admin')
 });
 
 // Approve seller application
-router.post('/admin/seller-applications/:userId/approve', authMiddleware, authorizeRoles('admin'), async (req, res) => {
+router.post('/seller-applications/:userId/approve', authMiddleware, authorizeRoles('admin'), async (req, res) => {
     try {
         const user = await User.findById(req.params.userId);
         if (!user) {
@@ -384,7 +384,7 @@ router.post('/admin/seller-applications/:userId/approve', authMiddleware, author
 });
 
 // Reject seller application
-router.post('/admin/seller-applications/:userId/reject', authMiddleware, authorizeRoles('admin'), async (req, res) => {
+router.post('/seller-applications/:userId/reject', authMiddleware, authorizeRoles('admin'), async (req, res) => {
     try {
         const { reason } = req.body;
 
@@ -423,7 +423,7 @@ router.post('/admin/seller-applications/:userId/reject', authMiddleware, authori
 });
 
 // Analytics endpoints
-router.get('/admin/analytics/dashboard', authMiddleware, authorizeRoles('admin'), async (req, res) => {
+router.get('/analytics/dashboard', authMiddleware, authorizeRoles('admin'), async (req, res) => {
     try {
         const now = new Date();
         const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -489,7 +489,7 @@ router.get('/admin/analytics/dashboard', authMiddleware, authorizeRoles('admin')
 });
 
 // More detailed analytics for sales
-router.get('/admin/analytics/sales', authMiddleware, authorizeRoles('admin'), async (req, res) => {
+router.get('/analytics/sales', authMiddleware, authorizeRoles('admin'), async (req, res) => {
     try {
         const { period = 'weekly' } = req.query;
         const now = new Date();
@@ -550,7 +550,7 @@ router.get('/admin/analytics/sales', authMiddleware, authorizeRoles('admin'), as
 });
 
 // User stats analytics
-router.get('/admin/analytics/users', authMiddleware, authorizeRoles('admin'), async (req, res) => {
+router.get('/analytics/users', authMiddleware, authorizeRoles('admin'), async (req, res) => {
     try {
         const now = new Date();
         const pastYear = new Date(now);
@@ -596,7 +596,7 @@ router.get('/admin/analytics/users', authMiddleware, authorizeRoles('admin'), as
 });
 
 // Product stats analytics
-router.get('/admin/analytics/products', authMiddleware, authorizeRoles('admin'), async (req, res) => {
+router.get('/analytics/products', authMiddleware, authorizeRoles('admin'), async (req, res) => {
     try {
         // Product category distribution
         const categoryDistribution = await Product.aggregate([
