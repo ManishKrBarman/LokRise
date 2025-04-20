@@ -30,7 +30,7 @@ const ChatbotButton = () => {
         setInput('');
 
         try {
-            const response = await fetch('http://localhost:3000/chat', {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/chat`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ message: input }),
@@ -40,6 +40,7 @@ const ChatbotButton = () => {
             const botReply = data.reply || 'Sorry, I didn’t understand that.';
             setMessages(prev => [...prev, { role: 'bot', content: botReply }]);
         } catch (err) {
+            console.error('Chat error:', err);
             setMessages(prev => [...prev, { role: 'bot', content: 'Error connecting to server.' }]);
         }
     };
