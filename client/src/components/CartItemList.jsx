@@ -8,29 +8,29 @@ const CartItemList = ({ items, removeItem, updateQuantity }) => {
 
             <div className="divide-y divide-gray-200">
                 {items.map((item) => (
-                    <div key={item.id} className="py-4 flex flex-col sm:flex-row">
+                    <div key={item.product._id} className="py-6 flex flex-col sm:flex-row">
                         <div className="flex-shrink-0 mb-4 sm:mb-0">
                             <img
-                                src={item.image}
-                                alt={item.name}
+                                src={item.product.images?.[0] || '/placeholder-image.jpg'}
+                                alt={item.product.name}
                                 className="w-24 h-24 object-cover rounded-md"
                             />
                         </div>
 
                         <div className="flex-grow sm:ml-6">
                             <div className="flex justify-between mb-2">
-                                <h3 className="font-medium">{item.name}</h3>
-                                <span className="font-semibold">${(item.price * item.quantity).toFixed(2)}</span>
+                                <h3 className="font-medium">{item.product.name}</h3>
+                                <span className="font-semibold">₹{(item.product.price * item.quantity).toFixed(2)}</span>
                             </div>
 
-                            <div className="text-sm text-gray-500 mb-3">
-                                Type: {item.type === 'course' ? 'Online Course' : 'Physical Product'}
-                            </div>
+                            <p className="text-sm text-gray-500 mb-3">
+                                Type: {item.product.type === 'course' ? 'Online Course' : 'Physical Product'}
+                            </p>
 
                             <div className="flex justify-between items-center">
                                 <div className="flex items-center">
                                     <button
-                                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                        onClick={() => updateQuantity(item.product._id, item.quantity - 1)}
                                         className="p-1 rounded-full border border-gray-300 hover:bg-gray-100"
                                     >
                                         <FiMinus size={16} />
@@ -39,7 +39,7 @@ const CartItemList = ({ items, removeItem, updateQuantity }) => {
                                     <span className="mx-3 w-6 text-center">{item.quantity}</span>
 
                                     <button
-                                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                        onClick={() => updateQuantity(item.product._id, item.quantity + 1)}
                                         className="p-1 rounded-full border border-gray-300 hover:bg-gray-100"
                                     >
                                         <FiPlus size={16} />
@@ -47,7 +47,7 @@ const CartItemList = ({ items, removeItem, updateQuantity }) => {
                                 </div>
 
                                 <button
-                                    onClick={() => removeItem(item.id)}
+                                    onClick={() => removeItem(item.product._id)}
                                     className="flex items-center text-red-500 hover:text-red-700"
                                 >
                                     <FiTrash2 size={16} className="mr-1" />

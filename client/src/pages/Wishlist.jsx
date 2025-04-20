@@ -1,47 +1,61 @@
-import React, { useState } from 'react';
+import React from 'react';
 import NavBar from '../components/NavBar';
 import Footer from '../components/Footer';
 import WishlistItems from '../components/WishlistItems';
+import { useWishlist } from '../context/WishlistContext';
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const Wishlist = () => {
-    // This would come from an API or global state in a real app
-    const [wishlistItems, setWishlistItems] = useState([
-        {
-            id: 1,
-            name: "Advanced Web Development Course",
-            price: 79.99,
-            image: "https://placehold.co/100x100",
-            type: "course",
-            inStock: true
-        },
-        {
-            id: 2,
-            name: "Digital Study Notebook",
-            price: 34.99,
-            image: "https://placehold.co/100x100",
-            type: "product",
-            inStock: true
-        },
-        {
-            id: 3,
-            name: "Professional Certification Course",
-            price: 199.99,
-            image: "https://placehold.co/100x100",
-            type: "course",
-            inStock: false
+    const navigate = useNavigate();
+    const { isAuthenticated } = useAuth();
+    const { wishlistItems, removeFromWishlist, loading, error } = useWishlist();
+
+    // Redirect to login if not authenticated
+    React.useEffect(() => {
+        if (!isAuthenticated) {
+            navigate('/login', { state: { returnUrl: '/wishlist' } });
         }
-    ]);
+    }, [isAuthenticated, navigate]);
 
-    const removeItem = (id) => {
-        setWishlistItems(wishlistItems.filter(item => item.id !== id));
+    const handleRemoveItem = async (productId) => {
+        await removeFromWishlist(productId);
     };
 
-    const moveToCart = (id) => {
-        // In a real app, this would call an API or update global state
-        console.log(`Moving item ${id} to cart`);
-        // Then remove from wishlist
-        removeItem(id);
-    };
+    if (loading) {
+        return (
+            <>
+                <NavBar fixed={true} cartBtn={true} />
+                <div className="max-w-7xl mx-auto px-4 py-8">
+                    <div className="flex justify-center items-center min-h-[400px]">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--primary-color)]"></div>
+                    </div>
+                </div>
+                <Footer />
+            </>
+        );
+    }
+
+    if (error) {
+        return (
+            <>
+                <NavBar fixed={true} cartBtn={true} />
+                <div className="max-w-7xl mx-auto px-4 py-8">
+                    <div className="text-center py-12">
+                        <h2 className="text-2xl font-semibold mb-4 text-red-600">Oops! Something went wrong</h2>
+                        <p className="text-gray-600 mb-8">{error}</p>
+                        <button
+                            onClick={() => window.location.reload()}
+                            className="bg-[var(--primary-color)] text-white py-3 px-6 rounded-lg hover:bg-opacity-90 transition duration-300"
+                        >
+                            Try Again
+                        </button>
+                    </div>
+                </div>
+                <Footer />
+            </>
+        );
+    }
 
     return (
         <>
@@ -52,8 +66,7 @@ const Wishlist = () => {
                 {wishlistItems.length > 0 ? (
                     <WishlistItems
                         items={wishlistItems}
-                        removeItem={removeItem}
-                        moveToCart={moveToCart}
+                        removeItem={handleRemoveItem}
                     />
                 ) : (
                     <div className="text-center py-12">

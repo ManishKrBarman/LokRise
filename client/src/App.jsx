@@ -11,6 +11,7 @@ import ResetPassword from './pages/ResetPassword';
 import Cart from './pages/Cart';
 import Wishlist from './pages/Wishlist';
 import Orders from './pages/Orders';
+import OrderSuccess from './pages/OrderSuccess';
 import Forum from './pages/Forum';
 import QandA from './pages/QandA';
 import BecomeSeller from './pages/BecomeSeller';
@@ -38,6 +39,7 @@ function App() {
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/wishlist" element={<Wishlist />} />
                 <Route path="/orders" element={<Orders />} />
+                <Route path="/order-success" element={<OrderSuccess />} />
                 <Route path="/forum" element={<Forum />} />
                 <Route path="/qna" element={<QandA />} />
                 <Route path="/profile" element={<Profile />} />
