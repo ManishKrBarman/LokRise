@@ -195,9 +195,19 @@ const Profile = () => {
         { id: 'profile', label: 'Profile', icon: <FiUser /> },
         { id: 'orders', label: 'Orders', icon: <FiPackage /> },
         { id: 'notifications', label: 'Notifications', icon: <FiBell /> },
-        { id: 'seller', label: 'Seller Application', icon: <FiShoppingBag /> },
+        { id: 'seller', label: 'Seller', icon: <FiShoppingBag /> },
         { id: 'settings', label: 'Settings', icon: <FiSettings /> }
     ];
+
+    // Show tab function
+    const showTab = (tabId) => {
+        if (tabId === 'seller') {
+            // Show seller tab if user is a seller or has a seller application
+            return user?.role === 'seller' || user?.sellerApplication;
+        }
+        // Show all other tabs by default
+        return true;
+    };
 
     const renderTabContent = () => {
         switch (activeTab) {
@@ -519,8 +529,8 @@ const Profile = () => {
                         </div>
 
                         {/* Tab Navigation */}
-                        <div className="border-b border-gray-200">
-                            <nav className="flex -mb-px">
+                        <div className="border-b border-gray-200 overflow-x-auto">
+                            <nav className="flex -mb-px min-w-full">
                                 {tabs.filter(tab => showTab(tab.id)).map(tab => (
                                     <button
                                         key={tab.id}
