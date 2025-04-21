@@ -374,7 +374,7 @@ router.post('/seller-applications/:userId/approve', authMiddleware, authorizeRol
             message: 'Congratulations! Your seller application has been approved. You can now start selling on LokRise.',
             type: 'system',
             read: false,
-            link: '/seller/dashboard',
+            link: '/dashboard',
             createdAt: new Date()
         });
 

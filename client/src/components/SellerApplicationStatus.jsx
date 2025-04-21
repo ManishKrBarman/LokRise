@@ -140,7 +140,7 @@ const SellerApplicationStatus = ({ user, refreshUser }) => {
                                     Your seller application has been approved.
                                     You can now start selling products on Lokrise.
                                 </p>
-                                <Link to="/seller/dashboard" className="inline-flex items-center text-sm font-medium text-green-700 hover:text-green-900">
+                                <Link to="/dashboard" className="inline-flex items-center text-sm font-medium text-green-700 hover:text-green-900">
                                     Go to Seller Dashboard <FiArrowRight className="ml-1" />
                                 </Link>
                             </div>

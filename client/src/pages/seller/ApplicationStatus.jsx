@@ -137,7 +137,7 @@ const ApplicationStatus = () => {
                                 You can now start selling products on LokRise.
                             </p>
                             <div className="mt-6">
-                                <Link to="/seller/dashboard" className="inline-block bg-[var(--primary-color)] text-white py-2 px-6 rounded-lg hover:bg-opacity-90 transition duration-300">
+                                <Link to="/dashboard" className="inline-block bg-[var(--primary-color)] text-white py-2 px-6 rounded-lg hover:bg-opacity-90 transition duration-300">
                                     Go to Seller Dashboard <FiArrowRight className="inline ml-1" />
                                 </Link>
                             </div>

@@ -324,7 +324,7 @@ const Navbar = (props) => {
                                                     Wishlist {wishlistItems.length > 0 && `(${wishlistItems.length})`}
                                                 </Link>
                                                 {user?.role === 'seller' && (
-                                                    <Link to="/seller/dashboard" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                    <Link to="/dashboard" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                                         Seller Dashboard
                                                     </Link>
                                                 )}
@@ -441,7 +441,7 @@ const Navbar = (props) => {
 
                                             {user?.role === 'seller' && (
                                                 <Link
-                                                    to="/seller/dashboard"
+                                                    to="/dashboard"
                                                     className="flex items-center px-4 py-3 hover:bg-gray-100"
                                                     onClick={() => setShowMobileMenu(false)}
                                                 >
