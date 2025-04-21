@@ -330,25 +330,29 @@ const Payment = () => {
             setIsProcessing(false);
         }
     };
+    
 
+        // New improved barter submission function
     const processBarterProposal = async () => {
         try {
             setIsProcessing(true);
             setError('');
 
             // Validate required fields
-            if (!barterItem.title || !barterItem.category || !barterItem.description || !barterItem.estimatedValue) {
+            if (!barterItem.title || !barterItem.category || !barterItem.description || barterItem.estimatedValue <= 0) {
                 setError('Please fill in all required fields for your barter proposal');
                 setIsProcessing(false);
                 return;
             }
 
-            // Get the product ID from the first cart item - Extract ID properly
+            // Get the product ID from the first cart item
             const productItem = cartItems[0];
-            // Check if product is an object (with _id) or a direct ID string
-            const productId = typeof productItem.product === 'object'
-                ? productItem.product._id
-                : productItem.product;
+            // Safely extract the product ID
+            const productId = typeof productItem.product === 'object' && productItem.product._id 
+                ? productItem.product._id 
+                : typeof productItem.product === 'string' 
+                    ? productItem.product 
+                    : null;
 
             if (!productId) {
                 setError('Product information not found. Please try again.');
@@ -356,47 +360,141 @@ const Payment = () => {
                 return;
             }
 
-            // Create FormData for file upload
+            // Get seller information from the product
+            let sellerId = null;
+            try {
+                const productResponse = await api.get(`/products/${productId}`);
+                if (productResponse.data && productResponse.data.seller) {
+                    sellerId = typeof productResponse.data.seller === 'object' 
+                        ? productResponse.data.seller._id 
+                        : productResponse.data.seller;
+                }
+            } catch (err) {
+                console.warn('Could not fetch seller ID, proceeding without it:', err);
+            }
+
+            // Try direct API call using paymentAPI instead of generic api
+            try {
+                // First try with paymentAPI using structured data (not FormData)
+                const barterData = {
+                    orderId,
+                    productId,
+                    sellerId,
+                    barterItem: {
+                        title: barterItem.title,
+                        category: barterItem.category,
+                        description: barterItem.description,
+                        estimatedValue: Number(barterItem.estimatedValue),
+                        topUpAmount: Number(barterItem.topUpAmount || 0)
+                    }
+                };
+
+                // Try using the dedicated payment API first
+                const response = await paymentAPI.processBarter(barterData);
+                
+                if (response.data && response.data.success) {
+                    // Clear cart after successful barter proposal
+                    await clearCart();
+
+                    // Redirect to success page
+                    navigate('/order-success', {
+                        state: {
+                            orderDetails: response.data.order,
+                            paymentMethod: 'barter',
+                            barterDetails: response.data.barterProposal
+                        }
+                    });
+                    return;
+                }
+            } catch (firstErr) {
+                console.log('First barter approach failed, trying FormData approach:', firstErr);
+                // Continue to FormData approach
+            }
+
+            // Create FormData as a fallback approach
             const formData = new FormData();
             formData.append('orderId', orderId);
             formData.append('title', barterItem.title);
             formData.append('category', barterItem.category);
             formData.append('description', barterItem.description);
-            formData.append('estimatedValue', barterItem.estimatedValue);
-            formData.append('topUpAmount', barterItem.topUpAmount || 0);
+            formData.append('estimatedValue', barterItem.estimatedValue.toString());
+            formData.append('topUpAmount', (barterItem.topUpAmount || 0).toString());
+            
+            if (productId) {
+                formData.append('productId', productId);
+            }
+            
+            if (sellerId) {
+                formData.append('sellerId', sellerId);
+            }
 
-            // Append all photo files
+            // Append each photo if available
             if (barterItem.photos && barterItem.photos.length > 0) {
+                // Handle both File objects and strings (URLs)
                 for (let i = 0; i < barterItem.photos.length; i++) {
-                    formData.append('photos', barterItem.photos[i]);
+                    if (barterItem.photos[i] instanceof File) {
+                        formData.append('photos', barterItem.photos[i]);
+                    } else if (typeof barterItem.photos[i] === 'string') {
+                        // If it's a string URL, we can't upload directly
+                        // We could fetch the image and convert to File, but that's complex
+                        formData.append('photoUrls', barterItem.photos[i]);
+                    }
                 }
             }
 
-            // Process barter proposal with proper error handling
-            const response = await api.post('/payment/barter', formData, {
+            // Add debug logging
+            console.log('Submitting barter proposal with order ID:', orderId);
+            console.log('FormData keys:', [...formData.entries()].map(e => e[0]));
+
+            // Fallback: try direct API request with FormData
+            const formDataResponse = await api.post('/payment/barter', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
             });
 
-            if (response.data && response.data.success) {
+            if (formDataResponse.data && formDataResponse.data.success) {
                 // Clear cart after successful barter proposal
                 await clearCart();
 
                 // Redirect to success page
                 navigate('/order-success', {
                     state: {
-                        orderDetails: response.data.order,
+                        orderDetails: formDataResponse.data.order,
                         paymentMethod: 'barter',
-                        barterDetails: response.data.barterProposal
+                        barterDetails: formDataResponse.data.barterProposal
                     }
                 });
             } else {
                 setError('Barter proposal submission failed. Please try again.');
             }
         } catch (err) {
-            setError('Failed to submit barter proposal. ' + (err.response?.data?.message || err.message || ''));
             console.error('Barter proposal error:', err);
+            
+            // Enhanced error handling
+            let errorMessage = 'Failed to submit barter proposal. ';
+            
+            // Extract specific error details if available
+            if (err.response?.data?.message) {
+                errorMessage += err.response.data.message;
+            } else if (err.message) {
+                errorMessage += err.message;
+            } else {
+                errorMessage += 'Unknown error occurred.';
+            }
+            
+            setError(errorMessage);
+            
+            // Detailed logging for debugging
+            if (err.response) {
+                console.error('Error response data:', err.response.data);
+                console.error('Error response status:', err.response.status);
+                
+                // If it's a server error, provide a more user-friendly message
+                if (err.response.status >= 500) {
+                    setError('The server encountered an error while processing your barter proposal. Please try again later or contact support if the issue persists.');
+                }
+            }
         } finally {
             setIsProcessing(false);
         }
