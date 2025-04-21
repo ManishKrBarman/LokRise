@@ -37,6 +37,7 @@ const CategoryBar = () => {
     const mobileMenuRef = useRef(null);
     const mobileButtonRef = useRef(null);
 
+
     useEffect(() => {
         const handleClickOutside = (event) => {
             // Close mobile menu when clicking outside
@@ -145,7 +146,7 @@ const CategoryBar = () => {
                     {/* Scrollable container for navigation items */}
                     <div
                         ref={navContainerRef}
-                        className="flex items-center h-12 overflow-x-auto scrollbar-hide"
+                        className="flex items-center overflow-visible"
                         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                     >
                         <a href="/"
@@ -168,10 +169,9 @@ const CategoryBar = () => {
 
                                 {activeDropdown === index && (
                                     <div
-                                        className="absolute top-full left-0 mt-1 w-56 bg-white rounded-lg shadow-lg border border-gray-100 py-2 z-[999]"
+                                        className="absolute top-full left-0 mt-1 w-56 bg-white rounded-lg shadow-lg border border-gray-100 py-2 z-50"
                                         style={{
-                                            filter: 'drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1))',
-                                            transformOrigin: 'top'
+                                            minWidth: '14rem',
                                         }}
                                     >
                                         {category.subcategories.map((subcat, idx) => (
