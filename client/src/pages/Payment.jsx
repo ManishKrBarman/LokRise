@@ -75,17 +75,21 @@ const Payment = () => {
                     // Fetch product details to get the seller ID
                     try {
                         const productResponse = await api.get(`/products/${productId}`);
-                        const sellerId = productResponse.data.product.seller;
+                        const sellerId = productResponse.data.seller._id;
+                    
 
+                        console.log(cartItems.map(item => ({    
+                            product: item.product, // This is the product ID        
+                            quantity: item.quantity})));
                         // Use the orderAPI.placeOrder function to maintain consistent API usage
                         const response = await orderAPI.placeOrder({
                             seller: sellerId,
                             products: cartItems.map(item => ({
-                                product: item.product, // This is the product ID
+                                product: item.product._id, // Extract the product ID
                                 quantity: item.quantity,
-                                price: item.price,
-                                name: item.productName || 'Product', // Use productName instead of product.name
-                                productImage: item.productImage || '' // Use productImage directly
+                                price: item.product.price, // Get the price from the full product object
+                                name: item.product.name || 'Product', // Get the name from the product object
+                                productImage: item.product.images?.[0] || '' // Get the first image if available
                             })),
                             shippingAddress: {
                                 name: shippingDetails.name,
