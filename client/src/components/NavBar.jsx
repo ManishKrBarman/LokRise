@@ -325,7 +325,7 @@ const Navbar = (props) => {
                                                 </Link>
                                                 {user?.role === 'seller' && (
                                                     <Link to="/dashboard" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                                        Seller Dashboard
+                                                        Dashboard
                                                     </Link>
                                                 )}
                                                 {/* Add option to view seller application if pending or rejected */}
@@ -446,7 +446,7 @@ const Navbar = (props) => {
                                                     onClick={() => setShowMobileMenu(false)}
                                                 >
                                                     <FiShoppingCart size={18} className="mr-3" />
-                                                    <span>Seller Dashboard</span>
+                                                    <span>Dashboard</span>
                                                 </Link>
                                             )}
 
