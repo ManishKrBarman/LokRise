@@ -215,6 +215,9 @@ export const paymentAPI = {
     // COD
     processCOD: (data) => api.post("/payment/cod/process", data),
 
+    // Barter
+    processBarter: (data) => api.post("/payment/barter", data),
+
     // Receipt
     generatePaymentReceipt: (orderId) => api.get(`/payment/receipt/${orderId}`),
 

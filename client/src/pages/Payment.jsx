@@ -4,7 +4,7 @@ import NavBar from '../components/NavBar';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { FaCreditCard, FaMoneyBill, FaQrcode, FaExchangeAlt } from 'react-icons/fa';
-import api, { orderAPI } from '../services/api';
+import api, { orderAPI, paymentAPI } from '../services/api';
 
 const Payment = () => {
     const navigate = useNavigate();
@@ -78,9 +78,6 @@ const Payment = () => {
                         const sellerId = productResponse.data.seller._id;
                     
 
-                        console.log(cartItems.map(item => ({    
-                            product: item.product, // This is the product ID        
-                            quantity: item.quantity})));
                         // Use the orderAPI.placeOrder function to maintain consistent API usage
                         const response = await orderAPI.placeOrder({
                             seller: sellerId,
@@ -150,11 +147,12 @@ const Payment = () => {
                         setIsProcessing(false);
                         return;
                     }
+                    
 
                     // Fetch the product to get its seller
                     try {
                         const productResponse = await api.get(`/products/${productId}`);
-                        const sellerId = productResponse.data.product.seller;
+                        const sellerId = productResponse.data.seller._id;
 
                         if (!sellerId) {
                             setError('Seller information not found. Please try again.');
