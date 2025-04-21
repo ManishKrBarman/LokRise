@@ -1,18 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import NavBar from '../components/NavBar';
-import Footer from '../components/Footer';
 import CartItemList from '../components/CartItemList';
 import CartSummary from '../components/CartSummary';
-import Checkout from '../components/Checkout';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 
 const Cart = () => {
     const navigate = useNavigate();
-    const { isAuthenticated } = useAuth();
+    const { isAuthenticated, user, updateProfile } = useAuth();
     const { cartItems, removeFromCart, updateCartItemQuantity, getCartTotals } = useCart();
-    const [checkoutStep, setCheckoutStep] = useState('cart'); // 'cart', 'shipping', 'payment'
+    const [checkoutStep, setCheckoutStep] = useState('cart'); // 'cart', 'shipping'
     const [shippingDetails, setShippingDetails] = useState({
         name: '',
         email: '',
@@ -22,7 +20,28 @@ const Cart = () => {
         city: '',
         state: '',
         pinCode: '',
+        saveAddress: true // New field to track if user wants to save this address
     });
+    const [addressSaving, setAddressSaving] = useState(false);
+    const [addressError, setAddressError] = useState('');
+    const [addressSuccess, setAddressSuccess] = useState('');
+
+    // Pre-populate shipping details from user data when available
+    useEffect(() => {
+        if (user) {
+            setShippingDetails(prev => ({
+                ...prev,
+                name: user.name || '',
+                email: user.email || '',
+                phone: user.phone || '',
+                addressLine1: user.address?.addressLine1 || '',
+                addressLine2: user.address?.addressLine2 || '',
+                city: user.address?.city || '',
+                state: user.address?.state || '',
+                pinCode: user.address?.pinCode || ''
+            }));
+        }
+    }, [user]);
 
     const handleRemoveItem = async (productId) => {
         await removeFromCart(productId);
@@ -41,9 +60,58 @@ const Cart = () => {
         setCheckoutStep('shipping');
     };
 
-    const handleShippingSubmit = (e) => {
+    const handleShippingSubmit = async (e) => {
         e.preventDefault();
-        setCheckoutStep('payment');
+
+        // If user checked to save address, update their profile
+        if (isAuthenticated && shippingDetails.saveAddress) {
+            try {
+                setAddressSaving(true);
+                setAddressError('');
+                setAddressSuccess('');
+
+                // Create address object in format expected by the API
+                const addressData = {
+                    address: {
+                        addressLine1: shippingDetails.addressLine1,
+                        addressLine2: shippingDetails.addressLine2,
+                        city: shippingDetails.city,
+                        state: shippingDetails.state,
+                        pinCode: shippingDetails.pinCode
+                    }
+                };
+
+                // Update user profile with new address
+                const result = await updateProfile(addressData);
+
+                if (result.success) {
+                    setAddressSuccess('Shipping address saved to your profile');
+
+                    // Navigate to payment page with shipping details
+                    navigate('/payment', {
+                        state: {
+                            shippingDetails,
+                            cartTotal: getCartTotals().total
+                        }
+                    });
+                } else {
+                    setAddressError(result.error || 'Failed to save address');
+                }
+            } catch (error) {
+                console.error('Error saving address:', error);
+                setAddressError('An unexpected error occurred while saving your address');
+            } finally {
+                setAddressSaving(false);
+            }
+        } else {
+            // Navigate to payment page without saving address
+            navigate('/payment', {
+                state: {
+                    shippingDetails,
+                    cartTotal: getCartTotals().total
+                }
+            });
+        }
     };
 
     const handleShippingInputChange = (e) => {
@@ -54,9 +122,28 @@ const Cart = () => {
         }));
     };
 
+    const handleSaveAddressChange = (e) => {
+        setShippingDetails(prev => ({
+            ...prev,
+            saveAddress: e.target.checked
+        }));
+    };
+
     const renderShippingForm = () => (
         <form onSubmit={handleShippingSubmit} className="max-w-2xl mx-auto">
             <h2 className="text-2xl font-semibold mb-6">Shipping Details</h2>
+
+            {addressSuccess && (
+                <div className="mb-4 bg-green-50 border-l-4 border-green-400 p-4">
+                    <p className="text-green-700">{addressSuccess}</p>
+                </div>
+            )}
+
+            {addressError && (
+                <div className="mb-4 bg-red-50 border-l-4 border-red-400 p-4">
+                    <p className="text-red-700">{addressError}</p>
+                </div>
+            )}
 
             <div className="grid gap-6 mb-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -164,6 +251,26 @@ const Cart = () => {
                         />
                     </div>
                 </div>
+
+                {isAuthenticated && (
+                    <div className="flex items-start mt-2">
+                        <div className="flex items-center h-5">
+                            <input
+                                id="saveAddress"
+                                name="saveAddress"
+                                type="checkbox"
+                                checked={shippingDetails.saveAddress}
+                                onChange={handleSaveAddressChange}
+                                className="h-4 w-4 text-[var(--primary-color)] focus:ring-[var(--primary-color)] border-gray-300 rounded"
+                            />
+                        </div>
+                        <div className="ml-3 text-sm">
+                            <label htmlFor="saveAddress" className="font-medium text-gray-700">
+                                Save this address to my profile
+                            </label>
+                        </div>
+                    </div>
+                )}
             </div>
 
             <div className="flex justify-between mt-8">
@@ -177,8 +284,17 @@ const Cart = () => {
                 <button
                     type="submit"
                     className="px-6 py-2 bg-[var(--primary-color)] text-white rounded-lg hover:bg-opacity-90"
+                    disabled={addressSaving}
                 >
-                    Continue to Payment
+                    {addressSaving ? (
+                        <span className="flex items-center">
+                            <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Processing...
+                        </span>
+                    ) : 'Continue to Payment'}
                 </button>
             </div>
         </form>
@@ -188,13 +304,6 @@ const Cart = () => {
         switch (checkoutStep) {
             case 'shipping':
                 return renderShippingForm();
-            case 'payment':
-                return (
-                    <Checkout
-                        shippingDetails={shippingDetails}
-                        onBack={() => setCheckoutStep('shipping')}
-                    />
-                );
             default:
                 return cartItems.length > 0 ? (
                     <div className="flex flex-col lg:flex-row gap-8">
@@ -232,13 +341,10 @@ const Cart = () => {
             <NavBar fixed={true} cartBtn={true} />
             <main className="flex-grow max-w-7xl mx-auto px-4 py-8 w-full">
                 <h1 className="text-3xl font-bold mb-8">
-                    {checkoutStep === 'cart' ? 'Shopping Cart' :
-                        checkoutStep === 'shipping' ? 'Shipping Information' :
-                            'Payment'}
+                    {checkoutStep === 'cart' ? 'Shopping Cart' : 'Shipping Information'}
                 </h1>
                 {renderContent()}
             </main>
-            <Footer />
         </div>
     );
 };

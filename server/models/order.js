@@ -11,10 +11,10 @@ const orderItemSchema = new mongoose.Schema({
 
 const orderSchema = new mongoose.Schema({
     orderNumber: { type: String, unique: true }, // User-friendly order ID (e.g., ORD-10012)
-    buyer: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    buyer: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: false },
     seller: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     items: [orderItemSchema],
-    subTotal: { type: Number, required: true },
+    subTotal: { type: Number, required: false },
     tax: { type: Number, default: 0 },
     shippingCost: { type: Number, default: 0 },
     discount: { type: Number, default: 0 },

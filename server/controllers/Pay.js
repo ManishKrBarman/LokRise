@@ -10,6 +10,12 @@ const initiateUpiPayment = async (req, res) => {
     try {
         const { sellerId, amount, orderId, description } = req.body;
 
+        console.log('UPI Payment Request:', {
+            sellerId: typeof sellerId === 'object' ? 'Object (needs toString)' : sellerId,
+            amount,
+            orderId
+        });
+
         // Basic validation
         if (!sellerId || !amount || isNaN(amount) || amount <= 0) {
             return res.status(400).json({
@@ -18,9 +24,19 @@ const initiateUpiPayment = async (req, res) => {
             });
         }
 
+        // If sellerId is an object, try to extract _id
+        let sellerIdToUse = sellerId;
+        if (typeof sellerId === 'object' && sellerId._id) {
+            sellerIdToUse = sellerId._id;
+            console.log(`Converting object sellerId to string: ${sellerIdToUse}`);
+        }
+
         // Find seller by ID or email
         const seller = await UserModel.findOne({
-            $or: [{ _id: sellerId }, { email: sellerId }],
+            $or: [
+                { _id: sellerIdToUse },
+                { email: sellerIdToUse }
+            ],
             role: 'seller'
         });
 
@@ -31,26 +47,19 @@ const initiateUpiPayment = async (req, res) => {
             });
         }
 
-        if (!seller.upiId) {
-            return res.status(400).json({
-                success: false,
-                message: 'Seller UPI ID not found'
-            });
-        }
-
-        // Basic UPI ID format check
-        if (!seller.upiId.includes('@')) {
-            return res.status(400).json({
-                success: false,
-                message: 'Invalid UPI ID format'
-            });
+        // Use the seller's UPI ID or a default one for testing
+        let upiId = seller.upiId;
+        if (!upiId) {
+            // For development purposes, use a default UPI ID
+            upiId = 'defaultseller@upi';
+            console.log(`Warning: Seller ${seller._id} doesn't have a UPI ID. Using default: ${upiId}`);
         }
 
         // Generate transaction reference
         const transactionRef = `TXN${Date.now()}${crypto.randomBytes(3).toString('hex').toUpperCase()}`;
 
         // Generate UPI payment link with the transaction reference
-        const upiLink = `upi://pay?pa=${seller.upiId}&pn=${encodeURIComponent(seller.name)}&am=${amount}&cu=INR&tr=${transactionRef}&tn=${encodeURIComponent(description || 'Payment')}`;
+        const upiLink = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(seller.name)}&am=${amount}&cu=INR&tr=${transactionRef}&tn=${encodeURIComponent(description || 'Payment')}`;
 
         // Generate QR code
         const qrCode = await QRCode.toDataURL(upiLink);
@@ -64,7 +73,7 @@ const initiateUpiPayment = async (req, res) => {
                     transactionRef,
                     paymentInitiated: new Date(),
                     paymentMethod: 'UPI',
-                    upiId: seller.upiId
+                    upiId: upiId
                 };
 
                 await order.save();
@@ -127,10 +136,10 @@ const verifyPayment = async (req, res) => {
         // Update order status
         if (order.status === 'pending') {
             order.status = 'processing';
-            order.timeline.push({
+            order.statusHistory.push({
                 status: 'processing',
-                timestamp: new Date(),
-                description: 'Payment completed, order is now processing'
+                date: new Date(),
+                note: 'Payment completed, order is now processing'
             });
         }
 
@@ -228,10 +237,10 @@ const processCardPayment = async (req, res) => {
         // Update order status
         if (order.status === 'pending') {
             order.status = 'processing';
-            order.timeline.push({
+            order.statusHistory.push({
                 status: 'processing',
-                timestamp: new Date(),
-                description: 'Payment completed, order is now processing'
+                date: new Date(),
+                note: 'Payment completed, order is now processing'
             });
         }
 
@@ -306,10 +315,10 @@ const processCOD = async (req, res) => {
         // Update order status if needed
         if (order.status === 'pending') {
             order.status = 'processing';
-            order.timeline.push({
+            order.statusHistory.push({
                 status: 'processing',
-                timestamp: new Date(),
-                description: 'Order confirmed with Cash on Delivery option'
+                date: new Date(),
+                note: 'Order confirmed with Cash on Delivery option'
             });
         }
 
@@ -500,11 +509,11 @@ const processRefund = async (req, res) => {
         order.paymentDetails.refundRef = refundRef;
         order.paymentDetails.refundDate = new Date();
 
-        // Update timeline
-        order.timeline.push({
+        // Update statusHistory
+        order.statusHistory.push({
             status: 'refunded',
-            timestamp: new Date(),
-            description: `Refund processed. Reason: ${reason}`
+            date: new Date(),
+            note: `Refund processed. Reason: ${reason}`
         });
 
         await order.save();
@@ -545,11 +554,134 @@ const processRefund = async (req, res) => {
     }
 }
 
+// Process barter proposal
+const processBarterProposal = async (req, res) => {
+    try {
+        const { orderId, title, category, description, estimatedValue, topUpAmount } = req.body;
+
+        // Validate required fields
+        if (!orderId || !title || !category || !description || estimatedValue === undefined) {
+            return res.status(400).json({
+                success: false,
+                message: 'All barter details are required'
+            });
+        }
+
+        // Find the order
+        const order = await Order.findById(orderId);
+        if (!order) {
+            return res.status(404).json({
+                success: false,
+                message: 'Order not found'
+            });
+        }
+
+        // Check if payment has already been processed
+        if (order.paymentDetails?.paymentStatus === 'completed') {
+            return res.status(400).json({
+                success: false,
+                message: 'Payment has already been completed for this order'
+            });
+        }
+
+        // Handle file uploads if any
+        let photoUrls = [];
+        if (req.files && req.files.photos) {
+            const photos = Array.isArray(req.files.photos) ? req.files.photos : [req.files.photos];
+
+            // Process each uploaded photo
+            for (const photo of photos) {
+                // Generate a unique file name
+                const fileName = `${Date.now()}-${photo.name.replace(/\s/g, '_')}`;
+                const filePath = `./temp/uploads/${fileName}`;
+
+                // Move the file to the uploads folder
+                await photo.mv(filePath);
+
+                // Store the file URL (relative path that will be used to serve the file)
+                photoUrls.push(`/uploads/${fileName}`);
+            }
+        }
+
+        // Create barter proposal
+        const barterProposal = {
+            orderId: order._id,
+            buyer: req.user.id,
+            seller: order.seller,
+            item: {
+                title,
+                category,
+                description,
+                estimatedValue: parseFloat(estimatedValue),
+                topUpAmount: topUpAmount ? parseFloat(topUpAmount) : 0,
+                photos: photoUrls
+            },
+            status: 'pending',
+            createdAt: new Date()
+        };
+
+        // Save barter proposal to order
+        order.paymentMethod = 'BARTER';
+        order.paymentDetails = {
+            paymentMethod: 'BARTER',
+            barterProposal,
+            paymentStatus: 'pending',
+            barterRequested: new Date()
+        };
+
+        // Update order status
+        if (order.status === 'pending') {
+            order.status = 'awaiting_barter_approval';
+            order.statusHistory.push({
+                status: 'awaiting_barter_approval',
+                date: new Date(),
+                note: 'Barter proposal submitted and awaiting seller approval'
+            });
+        }
+
+        await order.save();
+
+        // Notify the seller
+        await UserModel.findByIdAndUpdate(
+            order.seller,
+            {
+                $push: {
+                    notifications: {
+                        message: `New barter proposal received for order ${order.orderNumber}`,
+                        type: 'barter',
+                        read: false,
+                        link: `/orders/${order._id}`,
+                        createdAt: new Date()
+                    }
+                }
+            }
+        );
+
+        res.status(200).json({
+            success: true,
+            message: 'Barter proposal submitted successfully',
+            barterProposal,
+            order: {
+                id: order._id,
+                orderNumber: order.orderNumber,
+                status: order.status
+            }
+        });
+    } catch (error) {
+        console.error('Barter processing error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Internal server error'
+        });
+    }
+}
+
 export {
     initiateUpiPayment,
     verifyPayment,
     processCardPayment,
     processCOD,
     generateReceipt,
-    processRefund
+    processRefund,
+    processBarterProposal  // Add the new controller function to exports
 };

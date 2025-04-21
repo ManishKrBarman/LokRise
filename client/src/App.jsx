@@ -9,6 +9,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import ResetPassword from './pages/ResetPassword';
 import Cart from './pages/Cart';
+import Payment from './pages/Payment';
 import Wishlist from './pages/Wishlist';
 import Orders from './pages/Orders';
 import OrderSuccess from './pages/OrderSuccess';
@@ -39,6 +40,7 @@ function App() {
                 <Route path="/register" element={<Register />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/cart" element={<Cart />} />
+                <Route path="/payment" element={<Payment />} />
                 <Route path="/wishlist" element={<Wishlist />} />
                 <Route path="/orders" element={<Orders />} />
                 <Route path="/order-success" element={<OrderSuccess />} />

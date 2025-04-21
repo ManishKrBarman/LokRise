@@ -18,6 +18,16 @@ export const placeOrder = async (req, res) => {
             couponApplied
         } = req.body;
 
+        // Validate products array exists
+        if (!products || !Array.isArray(products) || products.length === 0) {
+            await session.abortTransaction();
+            session.endSession();
+            return res.status(400).json({
+                message: 'Products array is required and cannot be empty',
+                received: JSON.stringify(req.body)
+            });
+        }
+
         // Validate products exist and have sufficient inventory
         const productIds = products.map(item => item.product);
         const productsInDb = await Product.find({ _id: { $in: productIds } }).session(session);
@@ -93,7 +103,8 @@ export const placeOrder = async (req, res) => {
                 orderNumber: `ORD-${Date.now()}-${sellerId.substr(0, 5)}`,
                 buyer: req.user.id,
                 seller: sellerId,
-                products: sellerOrders[sellerId].products,
+                items: sellerOrders[sellerId].products, // Fixed: changed 'products' to 'items' to match schema
+                subTotal: sellerOrders[sellerId].totalAmount, // Add the required subTotal field
                 shippingAddress,
                 paymentMethod,
                 paymentDetails,
@@ -102,10 +113,10 @@ export const placeOrder = async (req, res) => {
                 status: 'pending',
                 createdAt: new Date(),
                 updatedAt: new Date(),
-                timeline: [{
+                statusHistory: [{
                     status: 'pending',
-                    timestamp: new Date(),
-                    description: 'Order placed successfully'
+                    date: new Date(),
+                    note: 'Order placed successfully'
                 }]
             });
 
@@ -118,7 +129,7 @@ export const placeOrder = async (req, res) => {
                 sellerId,
                 {
                     $inc: {
-                        'metrics.totalSales': sellerOrder.products.reduce((total, item) => total + item.quantity, 0),
+                        'metrics.totalSales': sellerOrder.items.reduce((total, item) => total + item.quantity, 0), // Fixed: use items instead of products
                         'metrics.totalRevenue': sellerOrder.totalAmount
                     }
                 },
@@ -394,11 +405,11 @@ export const updateOrderStatus = async (req, res) => {
         order.status = status;
         order.updatedAt = new Date();
 
-        // Add to timeline
-        order.timeline.push({
+        // Add to statusHistory
+        order.statusHistory.push({
             status,
-            timestamp: new Date(),
-            description: description || `Order status updated to ${status}`
+            date: new Date(),
+            note: description || `Order status updated to ${status}`
         });
 
         await order.save();
@@ -430,7 +441,7 @@ export const updateOrderStatus = async (req, res) => {
                 id: order._id,
                 orderNumber: order.orderNumber,
                 status: order.status,
-                timeline: order.timeline
+                statusHistory: order.statusHistory
             }
         });
     } catch (err) {
@@ -538,11 +549,11 @@ export const cancelOrder = async (req, res) => {
         order.cancellationReason = reason;
         order.updatedAt = new Date();
 
-        // Add to timeline
-        order.timeline.push({
+        // Add to statusHistory
+        order.statusHistory.push({
             status: 'cancelled',
-            timestamp: new Date(),
-            description: `Order cancelled: ${reason || 'No reason provided'}`
+            date: new Date(),
+            note: `Order cancelled: ${reason || 'No reason provided'}`
         });
 
         await order.save();
@@ -589,7 +600,7 @@ export const cancelOrder = async (req, res) => {
                 id: order._id,
                 orderNumber: order.orderNumber,
                 status: order.status,
-                timeline: order.timeline
+                statusHistory: order.statusHistory
             }
         });
     } catch (err) {
