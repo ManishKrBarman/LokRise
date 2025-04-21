@@ -1,70 +1,39 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import ProductCard from './ProductCard';
+import { productAPI } from '../services/api';
 
 const ProductsSection = () => {
-    // Sample product data
-    const products = [
-        {
-            id: 1,
-            name: "Premium Wireless Headphones",
-            price: 159.99,
-            originalPrice: 199.99,
-            discount: 20,
-            rating: 4.8,
-            reviewCount: 342,
-            imageUrl: "/api/placeholder/300/200",
-            seller: { name: "AudioGear", avatar: "/api/placeholder/40/40" }
-        },
-        {
-            id: 2,
-            name: "Handcrafted Leather Wallet",
-            price: 49.99,
-            rating: 4.5,
-            reviewCount: 187,
-            imageUrl: "/api/placeholder/300/200",
-            seller: { name: "LeatherCraft", avatar: "/api/placeholder/40/40" }
-        },
-        {
-            id: 3,
-            name: "Organic Cotton T-Shirt",
-            price: 24.99,
-            originalPrice: 34.99,
-            discount: 28,
-            rating: 4.3,
-            reviewCount: 256,
-            imageUrl: "/api/placeholder/300/200",
-            seller: { name: "EcoClothing", avatar: "/api/placeholder/40/40" }
-        },
-        {
-            id: 4,
-            name: "Smart Home Security Camera",
-            price: 129.99,
-            rating: 4.7,
-            reviewCount: 132,
-            imageUrl: "/api/placeholder/300/200",
-            seller: { name: "TechSmart", avatar: "/api/placeholder/40/40" }
-        }
-    ];
+    const [products, setProducts] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-    // Sample famous sellers
-    const famousSellers = [
-        {
-            id: 1,
-            name: "TechSmart",
-            avatar: "https://placehold.co/10?text=T",
-            followers: 12500,
-            rating: 4.9,
-            category: "Electronics"
-        },
-        {
-            id: 2,
-            name: "FashionHub",
-            avatar: "https://placehold.co/10?text=F",
-            followers: 9800,
-            rating: 4.7,
-            category: "Fashion"
-        }
-    ];
+    useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                setLoading(true);
+                // Following the same pattern as Search.jsx, use productAPI.getProducts
+                const response = await productAPI.getProducts({
+                    limit: 8, // Show 8 products
+                    sort: 'popularity' // Sort by popularity
+                });
+
+                // Check if response.data.products exists (similar to Search.jsx)
+                if (response.data && response.data.products) {
+                    setProducts(response.data.products);
+                } else {
+                    setProducts([]);
+                }
+                setError(null);
+            } catch (err) {
+                console.error('Error fetching products:', err);
+                setError('Failed to load products');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchProducts();
+    }, []);
 
     return (
         <section className="py-8 bg-white">
@@ -74,12 +43,25 @@ const ProductsSection = () => {
                 <div className="flex flex-col md:flex-row gap-6">
                     {/* Products Grid */}
                     <div className="flex-grow grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {products.map(product => (
-                            <ProductCard key={product.id} product={product} />
-                        ))}
+                        {loading ? (
+                            // Show skeleton loaders while loading
+                            [...Array(4)].map((_, i) => (
+                                <div key={i} className="bg-white rounded-lg shadow-md p-4 animate-pulse">
+                                    <div className="w-full h-48 bg-gray-200 rounded-lg mb-4"></div>
+                                    <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                                    <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                                </div>
+                            ))
+                        ) : error ? (
+                            <div className="col-span-full text-center text-red-500">{error}</div>
+                        ) : products.length === 0 ? (
+                            <div className="col-span-full text-center text-gray-500">No products available</div>
+                        ) : (
+                            products.map(product => (
+                                <ProductCard key={product._id} product={product} />
+                            ))
+                        )}
                     </div>
-
-
                 </div>
             </div>
         </section>

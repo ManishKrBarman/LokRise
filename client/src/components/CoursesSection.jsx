@@ -1,57 +1,46 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import CourseCard from './CourseCard';
+import { productAPI } from '../services/api';
 
 const CoursesSection = () => {
-    // Sample course data
-    const courses = [
-        {
-            id: 1,
-            title: "Complete Web Development Bootcamp",
-            price: 89.99,
-            originalPrice: 129.99,
-            rating: 4.8,
-            reviewCount: 2734,
-            studentsCount: 12500,
-            level: "All Levels",
-            imageUrl: "/api/placeholder/400/230",
-            instructor: { name: "CodeMaster", avatar: "/api/placeholder/40/40" }
-        },
-        {
-            id: 2,
-            title: "Digital Marketing Masterclass",
-            price: 69.99,
-            originalPrice: 99.99,
-            rating: 4.6,
-            reviewCount: 1856,
-            studentsCount: 8700,
-            level: "Beginner",
-            imageUrl: "/api/placeholder/400/230",
-            instructor: { name: "MarketPro", avatar: "/api/placeholder/40/40" }
-        },
-        {
-            id: 3,
-            title: "Photography Fundamentals",
-            price: 49.99,
-            rating: 4.7,
-            reviewCount: 1245,
-            studentsCount: 6300,
-            level: "Beginner",
-            imageUrl: "/api/placeholder/400/230",
-            instructor: { name: "PhotoArt", avatar: "/api/placeholder/40/40" }
-        },
-        {
-            id: 4,
-            title: "Financial Analysis & Investment",
-            price: 119.99,
-            originalPrice: 149.99,
-            rating: 4.9,
-            reviewCount: 978,
-            studentsCount: 4200,
-            level: "Intermediate",
-            imageUrl: "/api/placeholder/400/230",
-            instructor: { name: "FinanceGuru", avatar: "/api/placeholder/40/40" }
-        }
-    ];
+    const [courses, setCourses] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        const fetchCourses = async () => {
+            try {
+                setLoading(true);
+
+                // Use a larger limit initially but only with exact course type filter
+                const response = await productAPI.getProducts({
+                    productType: 'course',
+                    limit: 54, // Fetch more than needed to ensure we get enough courses
+                    sort: 'popularity'
+                });
+
+                if (response.data && response.data.products) {
+                    // Double check to confirm we only have courses
+                    const coursesOnly = response.data.products.filter(
+                        product => product.productType === 'course'
+                    );
+
+                    // Only take the first 4 courses
+                    setCourses(coursesOnly.slice(0, 4));
+                } else {
+                    setCourses([]);
+                }
+                setError(null);
+            } catch (err) {
+                console.error('Error fetching courses:', err);
+                setError('Failed to load courses');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchCourses();
+    }, []);
 
     return (
         <section className="py-8 bg-gray-50">
@@ -64,9 +53,23 @@ const CoursesSection = () => {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {courses.map(course => (
-                        <CourseCard key={course.id} course={course} />
-                    ))}
+                    {loading ? (
+                        [...Array(4)].map((_, i) => (
+                            <div key={i} className="bg-white rounded-lg shadow-md p-4 animate-pulse">
+                                <div className="w-full h-48 bg-gray-200 rounded-lg mb-4"></div>
+                                <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                                <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                            </div>
+                        ))
+                    ) : error ? (
+                        <div className="col-span-full text-center text-red-500">{error}</div>
+                    ) : courses.length === 0 ? (
+                        <div className="col-span-full text-center text-gray-500">No courses available</div>
+                    ) : (
+                        courses.map(course => (
+                            <CourseCard key={course._id} course={course} />
+                        ))
+                    )}
                 </div>
             </div>
         </section>

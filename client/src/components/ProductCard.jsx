@@ -73,7 +73,8 @@ const ProductCard = ({ product }) => {
                 onClick={handleProductClick}
             >
                 <img
-                    src={product.images?.[0] || "/placeholder-image.jpg"}
+                    // src={product.images?.[0]}
+                    src={"https://placehold.co/600x400?text=Product+Image"} // Placeholder image for demo
                     alt={product.name}
                     className="w-full h-full object-cover rounded-t-lg"
                 />
