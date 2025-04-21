@@ -44,16 +44,27 @@ const Dashboard = () => {
     const [loading, setLoading] = useState(true);
     const [showProductForm, setShowProductForm] = useState(false);
     const [sellerProducts, setSellerProducts] = useState([]);
-    // Initialize seller status as null - don't set to 'pending' until we know for sure
+    // Initialize seller status as null
     const [sellerStatus, setSellerStatus] = useState(null);
-    const isSeller = user?.role === 'seller';
-
-    // Effect to immediately update seller status when user data changes
+    // Only set isSeller if user exists and has role property set to 'seller'
+    const isSeller = user && user.role === 'seller';
+    
+    // Safe console log that won't throw errors
     useEffect(() => {
-        if (user && user.sellerApplication && user.sellerApplication.status) {
-            setSellerStatus(user.sellerApplication.status);
+        if (user) {
+            console.log("User data:", user);
+            console.log("User role:", user.role);
+        } else {
+            console.log("User data not loaded yet");
         }
     }, [user]);
+
+    // Effect to immediately update seller status when user data changes - only if user is a seller
+    useEffect(() => {
+        if (user && isSeller && user.sellerApplication && user.sellerApplication.status) {
+            setSellerStatus(user.sellerApplication.status);
+        }
+    }, [user, isSeller]);
 
     useEffect(() => {
         const loadDashboardData = async () => {
@@ -77,7 +88,7 @@ const Dashboard = () => {
                     // Load recent orders
                     setRecentOrders([]); // Would be populated from API
 
-                    // Load seller's products if user is a seller
+                    // Only load seller's products if user is a seller
                     if (isSeller) {
                         try {
                             // Check seller approval status from API
@@ -105,7 +116,7 @@ const Dashboard = () => {
                             }
                         }
                     } else {
-                        // User is not a seller, so we don't need seller status
+                        // User is not a seller, so we don't need seller status - explicitly set to null
                         setSellerStatus(null);
                     }
                 } catch (error) {
@@ -113,18 +124,28 @@ const Dashboard = () => {
                 } finally {
                     setLoading(false);
                 }
+            } else {
+                // If user data isn't available yet, keep loading
+                // We don't set loading to false here because we're still waiting for user data
             }
         };
 
-        loadDashboardData();
-    }, [user, isSeller]);
+        if (user) {
+            loadDashboardData();
+        }
+    }, [user, isSeller, sellerStatus]);
 
     // Display actual status in console for debugging
     useEffect(() => {
-        console.log("Final Seller Status:", sellerStatus);
-        console.log("User has role:", user?.role);
-        console.log("User sellerApplication status:", user?.sellerApplication?.status);
-    }, [sellerStatus, user]);
+        if (user) {
+            console.log("Final Seller Status:", sellerStatus);
+            console.log("User has role:", user.role);
+            console.log("Is user a seller?", isSeller);
+            if (isSeller) {
+                console.log("User sellerApplication status:", user?.sellerApplication?.status);
+            }
+        }
+    }, [sellerStatus, user, isSeller]);
 
     const handleProductCreationSuccess = (newProduct) => {
         setSellerProducts([newProduct, ...sellerProducts]);
@@ -137,6 +158,7 @@ const Dashboard = () => {
     };
 
     const renderSellerApprovalMessage = () => {
+        // Only show seller approval message if user is actually a seller
         if (!isSeller || sellerStatus === 'approved') return null;
 
         return (
@@ -159,7 +181,8 @@ const Dashboard = () => {
         );
     };
 
-    if (loading) {
+    // Show loading state while waiting for user data
+    if (!user || loading) {
         return (
             <div className="min-h-screen flex flex-col">
                 <NavBar />
@@ -179,11 +202,12 @@ const Dashboard = () => {
                     {/* Welcome Section */}
                     <div className="mb-8 flex justify-between items-center">
                         <div>
-                            <h1 className="text-2xl font-bold text-gray-900">Welcome back, {user?.name}!</h1>
+                            <h1 className="text-2xl font-bold text-gray-900">Welcome back, {user.name}!</h1>
                             <p className="mt-1 text-sm text-gray-600">
                                 Here's what's happening with your {isSeller ? "business" : "account"} today.
                             </p>
                         </div>
+                        {/* Only show Add Product button for approved sellers */}
                         {isSeller && sellerStatus === 'approved' && (
                             <button
                                 onClick={() => setShowProductForm(true)}
@@ -195,7 +219,7 @@ const Dashboard = () => {
                         )}
                     </div>
 
-                    {/* Seller Approval Status Message */}
+                    {/* Seller Approval Status Message - only shown to sellers */}
                     {renderSellerApprovalMessage()}
 
                     {/* Metrics Grid */}
@@ -214,7 +238,7 @@ const Dashboard = () => {
                             footer={`${metrics.rating.toFixed(1)} average rating`}
                         />
 
-                        {/* Seller-specific metrics */}
+                        {/* Seller-specific metrics - only shown to approved sellers */}
                         {isSeller && sellerStatus === 'approved' && (
                             <>
                                 <MetricCard
@@ -245,8 +269,8 @@ const Dashboard = () => {
                         )}
                     </div>
 
-                    {/* Product Form Modal for Sellers */}
-                    {showProductForm && sellerStatus === 'approved' && (
+                    {/* Product Form Modal for Sellers - only shown to approved sellers */}
+                    {showProductForm && isSeller && sellerStatus === 'approved' && (
                         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
                             <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
                                 <div className="flex justify-between items-center mb-4">
@@ -302,6 +326,8 @@ const Dashboard = () => {
                                     <FiCreditCard className="text-[var(--primary-color)]" size={24} />
                                     <span className="ml-3 font-medium text-gray-900">Payment Methods</span>
                                 </Link>
+                                
+                                {/* Analytics link - only shown to approved sellers */}
                                 {isSeller && sellerStatus === 'approved' && (
                                     <Link
                                         to="/analytics"
@@ -315,7 +341,7 @@ const Dashboard = () => {
                         </div>
                     </div>
 
-                    {/* Seller Products Section */}
+                    {/* Seller Products Section - only shown to approved sellers */}
                     {isSeller && sellerStatus === 'approved' && (
                         <div className="bg-white rounded-lg shadow mb-8">
                             <div className="px-6 py-5 border-b border-gray-200 flex justify-between items-center">
