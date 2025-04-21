@@ -328,7 +328,7 @@ const Analytics = () => {
     return (
         <div>
             <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-semibold">Analytics Dashboard</h1>
+                <h1 className="text-2xl font-semibold"></h1>
 
                 <div className="flex space-x-4">
                     <div>

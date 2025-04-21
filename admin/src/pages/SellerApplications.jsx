@@ -131,7 +131,7 @@ const SellerApplications = () => {
     return (
         <div>
             <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-semibold">Seller Applications</h1>
+                <h1 className="text-2xl font-semibold"></h1>
 
                 <div className="flex space-x-4">
                     <button
