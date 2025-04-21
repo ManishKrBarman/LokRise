@@ -271,7 +271,8 @@ router.get('/orders', authMiddleware, authorizeRoles('admin'), async (req, res) 
         const skip = (page - 1) * limit;
 
         const orders = await Order.find()
-            .populate('user', 'name email')
+            .populate('buyer', 'name email')
+            .populate('seller', 'name email')
             .sort({ createdAt: -1 })
             .skip(skip)
             .limit(limit);
@@ -296,7 +297,8 @@ router.get('/orders', authMiddleware, authorizeRoles('admin'), async (req, res) 
 router.get('/orders/:orderId', authMiddleware, authorizeRoles('admin'), async (req, res) => {
     try {
         const order = await Order.findById(req.params.orderId)
-            .populate('user', 'name email')
+            .populate('buyer', 'name email')
+            .populate('seller', 'name email')
             .populate('items.product');
 
         if (!order) {

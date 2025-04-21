@@ -217,8 +217,8 @@ const Orders = () => {
                                 >
                                     <td className="font-medium">{order._id}</td>
                                     <td>
-                                        <div>{order.user?.name || 'Unknown User'}</div>
-                                        <div className="text-xs text-gray-500">{order.user?.email || 'No email'}</div>
+                                        <div>{order.buyer?.name || 'Unknown User'}</div>
+                                        <div className="text-xs text-gray-500">{order.buyer?.email || 'No email'}</div>
                                     </td>
                                     <td>{formatDate(order.createdAt)}</td>
                                     <td>
@@ -315,13 +315,24 @@ const Orders = () => {
                                     <h3 className="font-semibold text-lg border-b pb-1">Customer Information</h3>
                                     <div className="grid grid-cols-2 gap-2 mt-2">
                                         <div className="text-sm text-gray-500">Name:</div>
-                                        <div>{selectedOrder.user?.name || 'Unknown User'}</div>
+                                        <div>{selectedOrder.buyer?.name || 'Unknown User'}</div>
 
                                         <div className="text-sm text-gray-500">Email:</div>
-                                        <div>{selectedOrder.user?.email || 'No email'}</div>
+                                        <div>{selectedOrder.buyer?.email || 'No email'}</div>
 
                                         <div className="text-sm text-gray-500">Phone:</div>
-                                        <div>{selectedOrder.user?.phone || 'No phone'}</div>
+                                        <div>{selectedOrder.buyer?.phone || 'No phone'}</div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <h3 className="font-semibold text-lg border-b pb-1">Seller Information</h3>
+                                    <div className="grid grid-cols-2 gap-2 mt-2">
+                                        <div className="text-sm text-gray-500">Name:</div>
+                                        <div>{selectedOrder.seller?.name || 'Unknown Seller'}</div>
+
+                                        <div className="text-sm text-gray-500">Email:</div>
+                                        <div>{selectedOrder.seller?.email || 'No email'}</div>
                                     </div>
                                 </div>
 
@@ -329,16 +340,16 @@ const Orders = () => {
                                     <h3 className="font-semibold text-lg border-b pb-1">Shipping Address</h3>
                                     <div className="grid grid-cols-2 gap-2 mt-2">
                                         <div className="text-sm text-gray-500">Address:</div>
-                                        <div>{selectedOrder.address?.addressLine1 || 'No address'}</div>
+                                        <div>{selectedOrder.shippingAddress?.addressLine1 || 'No address'}</div>
 
                                         <div className="text-sm text-gray-500">City:</div>
-                                        <div>{selectedOrder.address?.city || 'No city'}</div>
+                                        <div>{selectedOrder.shippingAddress?.city || 'No city'}</div>
 
                                         <div className="text-sm text-gray-500">State:</div>
-                                        <div>{selectedOrder.address?.state || 'No state'}</div>
+                                        <div>{selectedOrder.shippingAddress?.state || 'No state'}</div>
 
                                         <div className="text-sm text-gray-500">PIN Code:</div>
-                                        <div>{selectedOrder.address?.pinCode || 'No PIN code'}</div>
+                                        <div>{selectedOrder.shippingAddress?.pinCode || 'No PIN code'}</div>
                                     </div>
                                 </div>
                             </div>
