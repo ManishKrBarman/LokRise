@@ -84,7 +84,7 @@ export const sendPasswordResetEmail = async (email, resetToken) => {
         console.log(`[EMAIL] Sending password reset email to: ${email}`);
 
         // Create simple HTML content for reset password email
-        const resetUrl = `http://localhost:5173/reset-password?token=${resetToken}&email=${encodeURIComponent(email)}`;
+        const resetUrl = `https://lokrise-front.netlify.app/reset-password?token=${resetToken}&email=${encodeURIComponent(email)}`;
 
         const htmlContent = `
             <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: 0 auto;">
