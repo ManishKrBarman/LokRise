@@ -82,7 +82,7 @@ const AboutPage = () => {
             name: "Manish",
             role: "Full Stack Developer",
             specialty: "Backend Architecture",
-            quote: "Code is like humor. When you have to explain it, it's bad.",
+            quote: "I build with purpose, learn with fire, and dream in code.",
             github: "https://github.com/ManishKrBarman"
         },
         {
@@ -97,45 +97,45 @@ const AboutPage = () => {
             role: "UI/UX Designer & Counsellor",
             specialty: "User Experience",
             quote: "Design is not just what it looks like, it's how it works.",
-            github: "https://github.com/raghav"
+            github: "https://github.com/raghavo2"
         },
         {
             name: "Himanshi",
             role: "UI/UX Designer",
             specialty: "Visual Design",
             quote: "Simplicity is the ultimate sophistication.",
-            github: "https://github.com/himanshi"
+            github: "https://github.com/notCreatedYetAcct"
         }
     ];
 
-    // Testimonials for horizontal scrolling
     const testimonials = [
-        {
-            name: "Prof. Anand Kumar",
-            position: "Hackathon Judge",
-            text: "The Lokrise team has created something revolutionary for rural artisans. They absolutely deserve to win Hackazards 2025!"
-        },
-        {
-            name: "Neha Sharma",
-            position: "Tech Reviewer",
-            text: "I've seen many marketplace apps, but Lokrise's focus on rural entrepreneurs sets it apart. Their innovative approach to local languages and QR payments is impressive!"
-        },
-        {
-            name: "Rajesh Patel",
-            position: "Previous Hackazards Winner",
-            text: "The attention to detail and user experience in Lokrise is outstanding. The team has clearly put their hearts into this project!"
-        },
-        {
-            name: "Dr. Sangeeta Mishra",
-            position: "Digital India Foundation",
-            text: "Lokrise addresses a real gap in rural e-commerce. Their platform could truly transform livelihoods across India's villages."
-        },
-        {
-            name: "Vikram Singh",
-            position: "Startup Mentor",
-            text: "The technical execution by this team is flawless. Their backend architecture and mobile-first approach shows exemplary skill. Hackazards grand prize material!"
-        }
-    ];
+    {
+        name: "Aryan Verma",
+        position: "Teammate from another squad",
+        text: "Bro, what you all built with Lokrise is insane! The QR payment + OTP login for rural sellers? Genius. Total game-changer at Hackazards!"
+    },
+    {
+        name: "Megha Jain",
+        position: "Fellow Hacker",
+        text: "Lokrise literally felt like a finished product. I loved how clean the UI was and the way you thought about farmers using the app — mad respect!"
+    },
+    {
+        name: "Ankit Deshmukh",
+        position: "Dev Squad Buddy",
+        text: "Man, your Groq chatbot on the site was next-level. Lokrise wasn't just a project — it felt like something that could launch tomorrow. 🔥"
+    },
+    {
+        name: "Shruti Kapoor",
+        position: "Hackazards Volunteer",
+        text: "Watching your demo gave me goosebumps! You made rural empowerment tech feel so real and accessible. You guys totally raised the bar!"
+    },
+    {
+        name: "Karan Bhatt",
+        position: "UI/UX Enthusiast",
+        text: "I still can't believe how smooth your interface was — even the dynamic seller cards adapting on mobile was so clean. Lokrise is hackathon gold!"
+    }
+];
+
 
     return (
         <div className="min-h-screen flex flex-col bg-white text-gray-800">
@@ -174,7 +174,6 @@ const AboutPage = () => {
             </section>
 
             <main className="flex-grow px-4 md:px-16 lg:px-32 space-y-24 py-16">
-                {/* Why Lokrise Section */}
                 <section id="mission" className="pt-10">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
@@ -249,7 +248,6 @@ const AboutPage = () => {
                     </motion.div>
                 </section>
 
-                {/* Meet the Team Section */}
                 <section ref={teamRef} className="py-10">
                     <motion.div
                         variants={{
@@ -260,10 +258,11 @@ const AboutPage = () => {
                         animate={teamControls}
                         className="text-center mb-10"
                     >
-                        <h2 className="text-3xl md:text-4xl font-bold text-[#9B7653] mb-2">Meet the Creators</h2>
+                        <h2 className="text-3xl md:text-4xl font-bold text-[#9B7653] mb-2">Meet Us</h2>
                         <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-                            The brilliant minds behind Lokrise who are competing in Hackazards 2025
+                            Team <span className="font-bold text-[#9B7653]">Creons</span> behind Lokrise who are competing in Hackazards 2025
                         </p>
+                        <h4 className="text-lg text-gray-500">Faces are hidden for privacy concerns</h4>
                     </motion.div>
 
                     <div className="flex flex-wrap justify-center gap-8">
@@ -274,7 +273,8 @@ const AboutPage = () => {
                                     hidden: { opacity: 0, y: 50 },
                                     visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
                                 }}
-                                className="relative group"
+                                className="relative group cursor-pointer"
+                                onClick={() => window.open(member.github, '_blank')}
                             >
                                 <div className="w-64 h-80 bg-gray-100 rounded-2xl shadow-lg overflow-hidden group-hover:-translate-y-2 transition-transform duration-300">
                                     <div className="h-40 bg-gradient-to-br from-[#9B7653] to-[#D4B996] flex items-center justify-center overflow-hidden">
@@ -296,17 +296,14 @@ const AboutPage = () => {
                                         <div className="mt-3 p-2 bg-[#9B7653]/10 rounded-lg">
                                             <p className="italic text-sm text-gray-700">"{member.quote}"</p>
                                         </div>
-                                        <a
-                                            href={member.github}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
+                                        <div
                                             className="mt-3 inline-flex items-center text-[#9B7653] hover:underline"
                                         >
                                             <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 24 24">
                                                 <path fillRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clipRule="evenodd" />
                                             </svg>
                                             GitHub
-                                        </a>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -337,7 +334,7 @@ const AboutPage = () => {
                     >
                         <span className="inline-block bg-[#9B7653]/10 px-4 py-2 rounded-full text-[#9B7653] font-medium mb-2">Hackazards 2025</span>
                         <h2 className="text-3xl md:text-4xl font-bold mb-3">What People Are Saying</h2>
-                        <p className="text-gray-600 max-w-xl mx-auto">Feedback from industry experts on our Hackazards 2025 submission</p>
+                        <p className="text-gray-600 max-w-xl mx-auto">Feedback from friends on our Hackazards 2025 project</p>
                     </motion.div>
 
                     <div className="relative overflow-hidden">
@@ -388,37 +385,6 @@ const AboutPage = () => {
                             ))}
                         </div>
                     </div>
-
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        whileInView={{ opacity: 1 }}
-                        transition={{ delay: 0.5 }}
-                        viewport={{ once: true }}
-                        className="mt-16 text-center"
-                    >
-                        <div className="inline-block border border-[#9B7653]/30 p-6 rounded-xl bg-[#9B7653]/5">
-                            <h3 className="text-2xl font-bold text-gray-800 mb-2">Support Our Hackazards Journey!</h3>
-                            <p className="text-gray-600 mb-6">
-                                We're aiming to win Hackazards 2025 and transform rural e-commerce across India.
-                            </p>
-                            <a
-                                href="#vote"
-                                className="bg-[#9B7653] hover:bg-[#8A684A] text-white font-medium py-3 px-8 rounded-full transition-colors inline-flex items-center"
-                            >
-                                <span>Vote For Us</span>
-                                <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                                </svg>
-                            </a>
-                        </div>
-                    </motion.div>
-                </section>
-
-                {/* Backend Message (kept for compatibility) */}
-                <section className="mt-10 text-center">
-                    <p className="text-sm text-gray-500 italic">
-                        {message ? `Server says: "${message}"` : 'Connecting to backend...'}
-                    </p>
                 </section>
             </main>
             <Footer />

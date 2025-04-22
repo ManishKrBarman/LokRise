@@ -3,40 +3,40 @@ import React from 'react';
 const InstructorHighlights = () => {
     const instructors = [
         {
-            name: 'Dr. Sarah Johnson',
-            title: 'Data Science & AI Expert',
-            courses: 15,
-            students: 85600,
-            rating: 4.9,
-            image: 'https://placehold.co/150?text=SJ',
-            bio: 'Former ML researcher at Google with PhD in Computer Science. Specializes in machine learning and artificial intelligence.'
-        },
-        {
-            name: 'Mark Williams',
-            title: 'Web Development Instructor',
-            courses: 12,
-            students: 124000,
-            rating: 4.8,
-            image: 'https://placehold.co/150?text=MW',
-            bio: 'Full-stack developer with over 10 years of industry experience at top tech companies including Facebook and Airbnb.'
-        },
-        {
-            name: 'Emily Chen',
-            title: 'UX/UI Design Expert',
-            courses: 8,
-            students: 62400,
-            rating: 4.9,
-            image: 'https://placehold.co/150?text=EC',
-            bio: 'Award-winning designer with experience at major design firms. Teaches modern design principles and practical UI/UX workflows.'
-        },
-        {
-            name: 'Robert Taylor',
-            title: 'Business & Marketing Professor',
+            name: 'Dr. Priya Mehta',
+            title: 'Agricultural Innovation Expert',
             courses: 10,
-            students: 93200,
+            students: 12300,
+            rating: 4.8,
+            image: 'https://placehold.co/150?text=PM',
+            bio: 'Expert in sustainable farming practices and rural agricultural innovation. Advocates for technology integration to improve rural farming productivity.'
+        },
+        {
+            name: 'Arvind Kumar',
+            title: 'Farmers’ Empowerment Advocate',
+            courses: 8,
+            students: 9200,
             rating: 4.7,
-            image: 'https://placehold.co/150?text=RT',
-            bio: 'MBA from Harvard Business School with 15+ years of marketing leadership experience at Fortune 500 companies.'
+            image: 'https://placehold.co/150?text=AK',
+            bio: 'Specializes in business models for rural farmers. Works closely with grassroots organizations to improve the financial literacy of farmers.'
+        },
+        {
+            name: 'Anita Sharma',
+            title: 'Digital Tools for Rural Artisans',
+            courses: 6,
+            students: 7500,
+            rating: 4.9,
+            image: 'https://placehold.co/150?text=AS',
+            bio: 'Trains rural artisans in using digital tools to enhance their craft, marketing, and sales. Strong proponent of empowering artisans through tech.'
+        },
+        {
+            name: 'Ravi Deshmukh',
+            title: 'Sustainable Agriculture and Rural Development',
+            courses: 9,
+            students: 11000,
+            rating: 4.6,
+            image: 'https://placehold.co/150?text=RD',
+            bio: 'Development professional with expertise in sustainable agriculture and rural community projects. Helps communities develop eco-friendly farming techniques.'
         }
     ];
 
@@ -44,9 +44,9 @@ const InstructorHighlights = () => {
         <section className="py-16 bg-gray-50">
             <div className="max-w-7xl mx-auto px-4">
                 <div className="text-center mb-12">
-                    <h2 className="text-3xl font-bold text-gray-800 mb-4 font-museo">Learn from Top Instructors</h2>
+                    <h2 className="text-3xl font-bold text-gray-800 mb-4 font-museo">Learn from Rural Empowerment Experts</h2>
                     <p className="text-gray-600 max-w-2xl mx-auto">
-                        Get taught by industry experts who are passionate about sharing their knowledge and experience
+                        Get insights from professionals who are changing the landscape of rural farming, business, and technology.
                     </p>
                 </div>
 
@@ -107,18 +107,6 @@ const InstructorHighlights = () => {
                             </div>
                         </div>
                     ))}
-                </div>
-
-                <div className="mt-12 text-center">
-                    <a
-                        href="/instructors"
-                        className="inline-flex items-center text-blue-600 font-medium hover:text-blue-700"
-                    >
-                        Browse All Instructors
-                        <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                        </svg>
-                    </a>
                 </div>
             </div>
         </section>

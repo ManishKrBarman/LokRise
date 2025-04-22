@@ -17,7 +17,7 @@ const SellerLanding = () => {
             <div>
                 <div className="pt-12">
                     <SellerHero />
-                    <SellerStats />
+                    {/* <SellerStats /> */}
                     <SellerBenefits />
                     <SellerSteps />
                     <SellerTestimonials />

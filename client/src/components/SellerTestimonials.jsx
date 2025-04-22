@@ -5,28 +5,42 @@ const SellerTestimonials = () => {
     const [activeIndex, setActiveIndex] = useState(0);
 
     const testimonials = [
-        {
-            id: 1,
-            name: 'Amit Kumar',
-            business: 'Smartees Fashion, Delhi',
-            image: 'https://placehold.co/200x200/7D23E0/ffffff?text=A',
-            quote: 'Our business has grown beyond our imagination, getting up to 5,000 orders consistently during sale days. We are now constantly bringing new products thanks to Lokrise\'s insights.'
-        },
-        {
-            id: 2,
-            name: 'Priya Sharma',
-            business: 'Elegant Jewels, Mumbai',
-            image: 'https://placehold.co/200x200/7D23E0/ffffff?text=P',
-            quote: 'Lokrise made it extremely simple to transition to online business. Suddenly we were all over India to our surprise, seeing up to 3X growth on sale days.'
-        },
-        {
-            id: 3,
-            name: 'Rajesh Singh',
-            business: 'Tech Gadgets, Bangalore',
-            image: 'https://placehold.co/200x200/7D23E0/ffffff?text=R',
-            quote: 'I started selling on Lokrise with 4-5 orders on the very first day. In no time I was getting over 500 orders a day, like a dream come true.'
-        }
-    ];
+    {
+        id: 1,
+        name: 'Geeta Devi',
+        business: 'Madhubani Art Collective, Darbhanga (Bihar)',
+        image: 'https://placehold.co/200x200/7D23E0/ffffff?text=G',
+        quote: 'Earlier, I sold only in local fairs. With Lokrise, I now receive orders from cities like Pune and Chennai. The Hindi interface and QR payment made it easy even for my neighbors to join and earn.'
+    },
+    {
+        id: 2,
+        name: 'Ramesh Patel',
+        business: 'Organic Grains Co-op, Sabarkantha (Gujarat)',
+        image: 'https://placehold.co/200x200/7D23E0/ffffff?text=R',
+        quote: 'Thanks to Lokrise, our grains now reach customers in metros directly. We didn’t need a website or tech knowledge—just our phone. The platform handles everything from listing to payments.'
+    },
+    {
+        id: 3,
+        name: 'Kavita Joshi',
+        business: 'Pahadi Woolens, Chamoli (Uttarakhand)',
+        image: 'https://placehold.co/200x200/7D23E0/ffffff?text=K',
+        quote: 'My hand-knitted sweaters are now worn in cities like Delhi and Bengaluru! Lokrise’s support in Hindi and easy OTP login helped even my mother-in-law manage product listings.'
+    },
+    {
+        id: 4,
+        name: 'Ismail Sheikh',
+        business: 'Terracotta Creations, Bhavnagar (Gujarat)',
+        image: 'https://placehold.co/200x200/7D23E0/ffffff?text=I',
+        quote: 'Our handmade items used to be sold by middlemen. With Lokrise, I get full price and track every order. We even trained local youth to manage packaging and shipping through the app.'
+    },
+    {
+        id: 5,
+        name: 'Savita Kumari',
+        business: 'Chikankari Studio, Faizabad (U.P.)',
+        image: 'https://placehold.co/200x200/7D23E0/ffffff?text=S',
+        quote: 'I was scared of online selling, but Lokrise made it feel like home. With local language support and voice instructions, I listed my embroidery and got my first 100 orders in just a week.'
+    }
+];
 
     const nextTestimonial = () => {
         setActiveIndex((prevIndex) => (prevIndex + 1) % testimonials.length);

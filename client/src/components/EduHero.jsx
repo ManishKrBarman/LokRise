@@ -14,18 +14,6 @@ const EduHero = () => {
                             Gain skills that matter with our high-quality courses designed by rural & industry experts. Learn at your own pace and transform your career.
                         </p>
 
-                        <div className="relative max-w-md">
-                            <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-                            <input
-                                type="text"
-                                placeholder="What do you want to learn today?"
-                                className="bg-white rounded-full py-3 pl-10 pr-4 w-full text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
-                            <button className="absolute right-1 top-1/2 transform -translate-y-1/2 bg-blue-600 hover:bg-blue-700 text-white rounded-full px-5 py-2 text-sm font-medium transition duration-200">
-                                Search
-                            </button>
-                        </div>
-
                         <div className="mt-6 flex items-center text-sm">
                             <span className="text-blue-200">Popular Courses:</span>
                             <div className="ml-2 flex flex-wrap gap-2">

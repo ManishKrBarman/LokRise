@@ -1,5 +1,5 @@
 import React from 'react';
-import { FiPhone, FiMail, FiMessageSquare, FiBookOpen } from 'react-icons/fi';
+import { FiPhone, FiMail, FiBookOpen } from 'react-icons/fi';
 
 const SupportOptions = () => {
     const options = [
@@ -8,28 +8,14 @@ const SupportOptions = () => {
             title: 'Call Us',
             description: 'Speak directly with our customer service team',
             action: 'Call now',
-            link: 'tel:+18001234567'
+            link: `tel:${import.meta.env.VITE_PHONE}`
         },
         {
             icon: <FiMail className="w-10 h-10 text-[#9B7653]" />,
             title: 'Email Support',
             description: 'Send us an email and we\'ll respond within 24 hours',
             action: 'Email us',
-            link: 'mailto:support@lokrise.com'
-        },
-        {
-            icon: <FiMessageSquare className="w-10 h-10 text-[#9B7653]" />,
-            title: 'Live Chat',
-            description: 'Chat with a representative in real-time',
-            action: 'Start chat',
-            link: '#chat'
-        },
-        {
-            icon: <FiBookOpen className="w-10 h-10 text-[#9B7653]" />,
-            title: 'Help Center',
-            description: 'Browse our knowledge base for answers',
-            action: 'Visit help center',
-            link: '/help-center'
+            link: `mailto:${import.meta.env.VITE_MAIL}`
         }
     ];
 
@@ -37,15 +23,13 @@ const SupportOptions = () => {
         <div className="py-16 bg-gray-50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="text-center">
-                    <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
-                        Get Support
-                    </h2>
+                    <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">Get Support</h2>
                     <p className="mt-4 text-xl text-gray-600 max-w-2xl mx-auto">
                         Choose how you'd like to connect with our customer support team
                     </p>
                 </div>
 
-                <div className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+                <div className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-4" style={{display: 'flex', justifyContent: 'space-evenly'}}>
                     {options.map((option, index) => (
                         <div
                             key={index}

@@ -14,10 +14,8 @@ const Edu = () => {
     return (
         <div className="min-h-screen flex flex-col">
             <NavBar />
-            {/* <CategoryBar /> */}
             <main className="flex-grow">
                 <EduHero />
-                <PopularCourses />
                 <CourseCategories />
                 <LearningPaths />
                 <InstructorHighlights />

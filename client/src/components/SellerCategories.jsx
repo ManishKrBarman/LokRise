@@ -2,11 +2,27 @@ import React from 'react';
 
 const SellerCategories = () => {
     const categories = [
-        'Sarees', 'Jewellery', 'T-shirts', 'Shirts', 'Watches',
-        'Electronics', 'Clothes', 'Bags', 'Footwear', 'Lehengas',
-        'Sunglasses', 'Earrings', 'Makeup', 'Toys', 'Home Decor',
-        'Beauty Products', 'Women\'s Clothes', 'Suits', 'Smartwatches'
-    ];
+    'Handloom Sarees',
+    'Terracotta Items',
+    'Madhubani Paintings',
+    'Bamboo Crafts',
+    'Chikankari Kurtis',
+    'Jute Bags',
+    'Organic Spices',
+    'Clay Pottery',
+    'Handwoven Woolens',
+    'Lac Bangles',
+    'Tribal Jewellery',
+    'Khadi Clothing',
+    'Wicker Baskets',
+    'Natural Soaps',
+    'Aipan Art Decor',
+    'Brass Utensils',
+    'Wool Shawls',
+    'Cane Furniture',
+    'Embroidered Dupattas'
+];
+
 
     return (
         <section className="py-16 px-4 bg-gray-50">
@@ -33,18 +49,6 @@ const SellerCategories = () => {
                             </svg>
                         </a>
                     ))}
-                </div>
-
-                <div className="mt-8 text-center">
-                    <a
-                        href="/sell/all-categories"
-                        className="inline-flex items-center text-[var(--primary-color)] font-medium hover:underline"
-                    >
-                        View More Categories
-                        <svg className="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                        </svg>
-                    </a>
                 </div>
             </div>
         </section>

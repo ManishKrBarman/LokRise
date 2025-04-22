@@ -16,9 +16,6 @@ const SellerCTA = () => {
                     <Link to="/become-seller" className="bg-white text-[var(--primary-color)] py-4 px-8 rounded-full font-bold hover:bg-gray-100 transition duration-300 text-lg text-center">
                         Start Selling Now
                     </Link>
-                    <button className="bg-transparent border-2 border-white text-white py-4 px-8 rounded-full font-bold hover:bg-white/10 transition duration-300 text-lg">
-                        Contact Support
-                    </button>
                 </div>
 
                 <div className="mt-12 bg-white/10 rounded-lg p-6 max-w-2xl mx-auto">
@@ -30,7 +27,7 @@ const SellerCTA = () => {
                     </p>
                     <div className="mt-4 flex justify-center items-center gap-2">
                         <span className="text-white">Email us at: </span>
-                        <a href="mailto:sell@lokrise.com" className="text-white underline">sell@lokrise.com</a>
+                        <a href="mailto:thecreons@gmail.com" className="text-white underline">thecreons@gmail.com</a>
                     </div>
                 </div>
             </div>

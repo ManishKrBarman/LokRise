@@ -14,7 +14,7 @@ const CustomerService = () => {
                 <CustomerServiceHero />
                 <SupportOptions />
                 <FAQSection />
-                <ContactForm />
+                {/* <ContactForm /> */}
             </main>
             <Footer />
         </div>

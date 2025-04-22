@@ -3,19 +3,19 @@ import React from 'react';
 const SellerStats = () => {
     const stats = [
         {
-            value: '500K+',
+            value: '0',
             label: 'Trust Lokrise to sell online'
         },
         {
-            value: '5 Crore+',
+            value: '0',
             label: 'Customers buying across India'
         },
         {
-            value: '19000+',
+            value: '0',
             label: 'Pincode Supported for delivery'
         },
         {
-            value: '700+',
+            value: '0',
             label: 'Categories to sell online'
         }
     ];

@@ -74,7 +74,7 @@ const FAQSection = () => {
                     ))}
                 </div>
 
-                <div className="mt-10 text-center">
+                {/* <div className="mt-10 text-center">
                     <p className="text-gray-600">
                         Can't find what you're looking for?
                     </p>
@@ -84,7 +84,7 @@ const FAQSection = () => {
                     >
                         Contact our support team
                     </a>
-                </div>
+                </div> */}
             </div>
         </div>
     );

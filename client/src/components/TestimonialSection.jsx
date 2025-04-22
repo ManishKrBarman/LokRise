@@ -4,30 +4,30 @@ const TestimonialSection = () => {
     const testimonials = [
         {
             id: 1,
-            name: 'Michael Rodriguez',
-            role: 'Software Developer',
-            company: 'Tech Solutions Inc.',
-            image: 'https://placehold.co/100?text=MR',
-            quote: 'The web development courses completely transformed my career. I went from knowing basic HTML to building full-stack applications, which helped me land my dream job. The instructors are amazing and truly care about student success.',
-            course: 'Full Stack Web Development Bootcamp'
+            name: 'Suresh Kumar',
+            role: 'Farmer',
+            company: 'Suresh Agro Farms',
+            image: 'https://placehold.co/100?text=SK',
+            quote: 'The agriculture training I received helped me increase my crop yield and improve farm management. Now, I am able to market my products directly to buyers, and my business has grown significantly.',
+            course: 'Sustainable Farming Techniques'
         },
         {
             id: 2,
-            name: 'Jessica Chen',
-            role: 'UX Designer',
-            company: 'Creative Studio',
-            image: 'https://placehold.co/100?text=JC',
-            quote: 'As someone with no design background, I was nervous about learning UX/UI design. But the structured approach and real-world projects gave me the confidence I needed. Now I\'m working at a top creative agency!',
-            course: 'UX/UI Design Masterclass'
+            name: 'Radha Devi',
+            role: 'Handicraft Artisan',
+            company: 'Radha’s Handmade Creations',
+            image: 'https://placehold.co/100?text=RD',
+            quote: 'Learning the art of handicrafts through the course gave me the skills to expand my small business. I now create and sell beautiful handmade items, and I can reach customers worldwide with the help of digital platforms.',
+            course: 'Handicraft Business Management'
         },
         {
             id: 3,
-            name: 'David Thompson',
-            role: 'Marketing Director',
-            company: 'Global Brands',
-            image: 'https://placehold.co/100?text=DT',
-            quote: 'The digital marketing courses offered practical skills that I was able to implement immediately. Our company\'s online presence improved dramatically, and I attribute much of our recent growth to what I learned here.',
-            course: 'Digital Marketing Professional'
+            name: 'Vijay Singh',
+            role: 'Small Business Owner',
+            company: 'Vijay’s Organic Goods',
+            image: 'https://placehold.co/100?text=VS',
+            quote: 'The courses in digital marketing and e-commerce empowered me to bring my organic products online. I have a growing customer base and increased sales thanks to the skills I learned.',
+            course: 'Digital Marketing for Rural Entrepreneurs'
         }
     ];
 
@@ -53,9 +53,9 @@ const TestimonialSection = () => {
 
             <div className="max-w-6xl mx-auto px-4 relative z-10">
                 <div className="text-center mb-12">
-                    <h2 className="text-3xl font-bold text-gray-800 mb-4 font-museo">Student Success Stories</h2>
+                    <h2 className="text-3xl font-bold text-gray-800 mb-4 font-museo">Rural Empowerment Success Stories</h2>
                     <p className="text-gray-600 max-w-2xl mx-auto">
-                        See how our courses have helped thousands of students achieve their goals
+                        See how our courses are helping rural artisans, farmers, and entrepreneurs thrive in the modern economy
                     </p>
                 </div>
 
@@ -107,15 +107,6 @@ const TestimonialSection = () => {
                             />
                         ))}
                     </div>
-                </div>
-
-                <div className="mt-12 text-center">
-                    <a
-                        href="/success-stories"
-                        className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-                    >
-                        Read More Stories
-                    </a>
                 </div>
             </div>
         </section>
