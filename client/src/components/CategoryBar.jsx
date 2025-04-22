@@ -177,7 +177,7 @@ const CategoryBar = () => {
                                         {category.subcategories.map((subcat, idx) => (
                                             <a
                                                 key={idx}
-                                                href={`/category/${category.name.toLowerCase()}/${subcat.toLowerCase().replace(/\s+/g, '-')}`}
+                                                href={`/shop?category=${encodeURIComponent(category.name)}&subcategory=${encodeURIComponent(subcat)}`}
                                                 className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[var(--primary-color)] transition-colors"
                                             >
                                                 {subcat}
@@ -258,7 +258,7 @@ const CategoryBar = () => {
                                                 {category.subcategories.map((subcat, idx) => (
                                                     <a
                                                         key={idx}
-                                                        href={`/category/${category.name.toLowerCase()}/${subcat.toLowerCase().replace(/\s+/g, '-')}`}
+                                                        href={`/shop?category=${encodeURIComponent(category.name)}&subcategory=${encodeURIComponent(subcat)}`}
                                                         className="block px-8 py-2 text-sm text-gray-700 hover:text-[var(--primary-color)]"
                                                     >
                                                         {subcat}
@@ -270,11 +270,11 @@ const CategoryBar = () => {
                                 ))}
                                 <div className="border-t border-gray-200 mt-2 pt-2">
                                     <a href="/courses" className="block px-4 py-2 text-gray-700 hover:bg-gray-50">Courses</a>
-                                    <a href="/about" className="block px-4 py-2 text-gray-700 hover:bg-gray-50">About</a>
-                                    <a href="/forum" className="block px-4 py-2 text-gray-700 hover:bg-gray-50">Forum</a>
-                                    <a href="/qna" className="block px-4 py-2 text-gray-700 hover:bg-gray-50">Q&A</a>
-                                    <a href="/sell" className="block px-4 py-2 text-gray-700 hover:bg-gray-50">Sell on Lokrise</a>
+                                    {/* <a href="/forum" className="block px-4 py-2 text-gray-700 hover:bg-gray-50">Forum</a>
+                                    <a href="/qna" className="block px-4 py-2 text-gray-700 hover:bg-gray-50">Q&A</a> */}
+                                    <a href="/sell" className="block px-4 py-2 text-gray-700 hover:bg-gray-50">Become Seller</a>
                                     <a href="/customer-service" className="block px-4 py-2 text-gray-700 hover:bg-gray-50">Customer Service</a>
+                                    <a href="/about" className="block px-4 py-2 text-gray-700 hover:bg-gray-50">About</a>
                                 </div>
                             </nav>
                         </div>

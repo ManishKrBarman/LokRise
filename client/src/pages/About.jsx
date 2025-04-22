@@ -96,7 +96,7 @@ const AboutPage = () => {
             name: "Raghav",
             role: "UI/UX Designer & Counsellor",
             specialty: "User Experience",
-            quote: "Design is not just what it looks like, it's how it works.",
+            quote: "with knowledge as my loom, I wove the threads of fate into my will.",
             github: "https://github.com/raghavo2"
         },
         {

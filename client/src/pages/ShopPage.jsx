@@ -1,15 +1,20 @@
 import React from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Route, useLocation, useNavigate } from 'react-router-dom';
+import Navbar from '../components/NavBar';
 
 const ShopPage = () => {
     const { state } = useLocation();
     const navigate = useNavigate();
+    const query = new URLSearchParams(location.search);
+    const category = query.get('category');
+    const subcategory = query.get('subcategory');
+    
 
     if (!state) {
         return (
             <div className="flex flex-col items-center justify-center h-screen text-center px-4">
                 <h2 className="text-3xl font-bold mb-4">Oops! No data received 😅</h2>
-                <p className="text-gray-600 mb-6">Please go back and select a collection from the homepage.</p>
+                <p className="text-gray-600 mb-6">Please go back, there are still many interesting features for you to explore!. Working on this page.</p>
                 <button
                     className="bg-[var(--primary-color)] text-white px-6 py-2 rounded-full hover:bg-opacity-90 transition"
                     onClick={() => navigate('/')}
@@ -21,6 +26,8 @@ const ShopPage = () => {
     }
 
     return (
+        <div className="min-h-screen flex flex-col">
+            <Navbar fixed={true} cartBtn={true} />
         <section className="min-h-screen py-10 px-4 md:px-8">
             <div className="max-w-6xl mx-auto">
                 <h1 className="text-4xl font-bold mb-2 text-gray-800">{state.title}</h1>
@@ -48,6 +55,7 @@ const ShopPage = () => {
                 </div>
             </div>
         </section>
+        </div>
     );
 };
 
