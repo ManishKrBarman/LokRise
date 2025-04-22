@@ -20,3 +20,38 @@ Marketing,marketing,Digital and traditional marketing courses,Business & Managem
 Personal Development,personal-development,Self-improvement and soft skills courses,,fas fa-user-graduate,personal_dev_banner.jpg,true,course
 Communication Skills,communication-skills,Public speaking and effective communication courses,Personal Development,fas fa-comments,communication_banner.jpg,true,course
 Leadership,leadership,Leadership and team management courses,Personal Development,fas fa-users,leadership_banner.jpg,true,course
+Traditional Arts,traditional-arts,Discover India's rich artistic heritage through handcrafted products made using traditional techniques passed down through generations.,,PiPaintbrush,traditional_arts.jpg,true,physical
+Textile Arts,textile-arts,Beautiful handwoven and hand-printed textiles made using traditional techniques by skilled artisans.,Traditional Arts,PiScissors,textile_arts.jpg,true,physical
+Natural Materials,natural-materials,Eco-friendly products crafted from sustainable natural materials like bamboo jute and palm leaf.,Traditional Arts,PiLeaf,natural_materials.jpg,true,physical
+Pottery & Ceramics,pottery-ceramics,Handcrafted pottery items made using traditional techniques by skilled potters across India.,Traditional Arts,PiFlask,pottery_ceramics.jpg,true,physical
+Woodworking,woodworking,Beautiful wooden products handcrafted by skilled artisans using traditional carpentry and carving techniques.,Traditional Arts,PiTree,woodworking.jpg,true,physical
+Home & Living,home-living,Beautiful handcrafted products to enhance your living spaces while supporting traditional artisans.,,PiHouse,home_living.jpg,true,physical
+Home Decor,home-decor,Handcrafted decorative items for your home made by traditional artisans.,Home & Living,PiFrameCorners,home_decor.jpg,true,physical
+Kitchen & Dining,kitchen-dining,Traditional kitchen and dining items combining functionality with artisanal craftsmanship.,Home & Living,PiCookingPot,kitchen_dining.jpg,true,physical
+Garden & Outdoor,garden-outdoor,Handcrafted products for garden and outdoor spaces made using traditional techniques.,Home & Living,PiFlowerTulip,garden_outdoor.jpg,true,physical
+Religious & Festive,religious-festive,Traditional items for religious ceremonies and festivals made by skilled artisans.,Home & Living,PiStar,religious_festive.jpg,true,physical
+Storage Solutions,storage-solutions,Beautiful and functional storage solutions handcrafted by traditional artisans.,Home & Living,PiArchive,storage_solutions.jpg,true,physical
+Fashion,fashion-traditional,Handcrafted fashion items created using traditional techniques by skilled artisans.,,PiTShirt,fashion.jpg,true,physical
+Women's Accessories,womens-accessories,Beautiful handcrafted accessories for women made using traditional techniques.,Fashion,PiHandbag,womens_accessories.jpg,true,physical
+Women's Ethnic Wear,womens-ethnic-wear,Traditional handwoven and hand-printed ethnic clothing for women.,Fashion,PiDress,womens_ethnic_wear.jpg,true,physical
+Men's Accessories,mens-accessories,Handcrafted traditional accessories for men.,Fashion,PiTie,mens_accessories.jpg,true,physical
+Bags & Accessories,bags-accessories,Handcrafted bags and accessories made using traditional techniques with sustainable materials.,Fashion,PiBag,bags_accessories.jpg,true,physical
+Tech Accessories,tech-accessories,Modern tech accessories with traditional craftsmanship.,Fashion,PiDevice,tech_accessories.jpg,true,physical
+Food & Beverages,food-beverages,Traditional and organic food products made by rural producers using traditional methods.,,PiCookie,food_beverages.jpg,true,physical
+Honey & Preserves,honey-preserves,Pure and natural honey and preserves collected and made using traditional methods.,Food & Beverages,PiJar,honey_preserves.jpg,true,physical
+Snacks & Cookies,snacks-cookies,Healthy traditional snacks made with ancient grains and natural ingredients.,Food & Beverages,PiCookie,snacks_cookies.jpg,true,physical
+Breakfast Foods,breakfast-foods,Traditional breakfast items made with ancient grains and natural ingredients.,Food & Beverages,PiBowl,breakfast_foods.jpg,true,physical
+Gift Packs,gift-packs,Special gift collections of traditional food products perfect for gifting.,Food & Beverages,PiGift,gift_packs.jpg,true,physical
+Beauty & Personal Care,beauty-personal-care,Natural personal care products made using traditional ingredients and methods.,,PiSpa,beauty_personal_care.jpg,true,physical
+Bath Products,bath-products,Traditional bath products made with natural ingredients.,Beauty & Personal Care,PiShower,bath_products.jpg,true,physical
+Hair Care,hair-care,Natural hair care products made using traditional ingredients and techniques.,Beauty & Personal Care,PiHaircut,hair_care.jpg,true,physical
+Gift Sets,gift-sets,Beautiful gift sets of natural personal care products.,Beauty & Personal Care,PiGift,gift_sets.jpg,true,physical
+Men's Grooming,mens-grooming,Traditional men's grooming products made with natural ingredients.,Beauty & Personal Care,PiScissors,mens_grooming.jpg,true,physical
+Sustainable Living,sustainable-living,Courses on sustainable living practices from traditional wisdom.,,PiLeaf,sustainable_living.jpg,true,course
+Farming & Agriculture,farming-agriculture,Courses on traditional and organic farming methods.,Sustainable Living,PiPlant,farming_agriculture.jpg,true,course
+Natural Products,natural-products,Courses on making natural products using traditional methods.,Sustainable Living,PiFlower,natural_products.jpg,true,course
+Business Skills,business-skills,Courses to help rural artisans and farmers build sustainable businesses.,,PiBriefcase,business_skills.jpg,true,course
+Entrepreneurship,entrepreneurship,Business courses specifically designed for rural entrepreneurs.,Business Skills,PiChartLine,entrepreneurship.jpg,true,course
+Digital Skills,digital-skills,Digital marketing and technology skills for rural artisans.,Business Skills,PiDevices,digital_skills.jpg,true,course
+Culinary Arts,culinary-arts,Courses on traditional cooking methods and recipes.,,PiCookingPot,culinary_arts.jpg,true,course
+Traditional Cooking,traditional-cooking,Learn traditional cooking methods and recipes from across India.,Culinary Arts,PiBowl,traditional_cooking.jpg,true,course

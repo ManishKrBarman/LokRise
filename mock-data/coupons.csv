@@ -1,5 +1,4 @@
 code,type,value,minimumPurchase,maximumDiscount,startDate,endDate,maxUses,maxUsesPerUser,applicableTo,isFirstOrderOnly,isActive,description,createdByEmail
-WELCOME20,percentage,20,1000,500,2025-01-01,2025-12-31,1000,1,all,true,true,20% off on your first order (up to ₹500),neha.gupta@example.com
 SUMMER25,percentage,25,2000,1000,2025-04-01,2025-06-30,500,1,all,false,true,Summer sale! 25% off on all products (min order ₹2000),neha.gupta@example.com
 FREESHIP,free_shipping,0,1500,,2025-01-01,2025-12-31,,,all,false,true,Free shipping on orders above ₹1500,neha.gupta@example.com
 FLASH500,fixed,500,2500,,2025-04-15,2025-04-20,100,1,all,false,true,Flash sale! Flat ₹500 off on orders above ₹2500,neha.gupta@example.com
@@ -9,3 +8,18 @@ GADGET15,percentage,15,5000,2000,2025-01-01,2025-12-31,,,products,false,true,15%
 COURSE30,percentage,30,1000,1500,2025-01-01,2025-12-31,200,1,courses,false,true,30% off on all courses (up to ₹1500),neha.gupta@example.com
 FASHION20,percentage,20,1000,500,2025-01-01,2025-12-31,,,products,false,true,20% off on fashion items,neha.gupta@example.com
 WEEKEND15,percentage,15,1500,750,2025-01-01,2025-12-31,,,all,false,true,Weekend special! 15% off on everything,neha.gupta@example.com
+ARTISAN25,percentage,25,1200,800,2025-01-01,2025-12-31,300,2,products,false,true,25% off on all handcrafted artisanal products,neha.gupta@example.com
+LOKRISE10,percentage,10,500,200,2025-01-01,2025-12-31,,,all,false,true,10% off on all LokRise platform products,neha.gupta@example.com
+EARTHDAY20,percentage,20,1000,700,2025-04-22,2025-04-30,200,1,products,false,true,Earth Day special! 20% off on all sustainable products,neha.gupta@example.com
+HANDLOOM15,percentage,15,800,400,2025-01-01,2025-12-31,,,products,false,true,15% off on all handloom textiles and products,neha.gupta@example.com
+ECOFIRST,percentage,20,1500,600,2025-01-01,2025-12-31,500,1,products,true,true,20% off on eco-friendly products for first-time buyers,neha.gupta@example.com
+ORGANIC10,percentage,10,600,300,2025-01-01,2025-12-31,,,products,false,true,10% off on all organic food products,neha.gupta@example.com
+CRAFTSSHIP,free_shipping,0,1000,,2025-01-01,2025-12-31,,,products,false,true,Free shipping on all handicrafts and handloom products,neha.gupta@example.com
+DIWALI30,percentage,30,2000,1500,2025-10-20,2025-11-05,400,1,all,false,true,Diwali Festival Special! 30% off on all products,neha.gupta@example.com
+RURALPRO,percentage,15,1200,500,2025-01-01,2025-12-31,,,courses,false,true,15% off on all rural entrepreneurship courses,neha.gupta@example.com
+BAMBOO20,percentage,20,800,400,2025-03-01,2025-06-30,,,products,false,true,20% off on all bamboo crafts and products,neha.gupta@example.com
+POTTERY15,percentage,15,700,350,2025-01-01,2025-12-31,,,products,false,true,15% off on all handmade pottery and ceramics,neha.gupta@example.com
+ARTISANCOURSE,percentage,25,1500,800,2025-01-01,2025-12-31,200,1,courses,false,true,25% off on traditional crafts courses,neha.gupta@example.com
+HOLI25,percentage,25,1500,1000,2025-03-15,2025-03-25,300,1,all,false,true,Holi Festival Special! 25% off on all colorful handcrafted items,neha.gupta@example.com
+WEAVER20,percentage,20,1000,600,2025-08-01,2025-08-15,250,1,products,false,true,National Handloom Day Special! 20% off on all handwoven products,neha.gupta@example.com
+SKILLUP,fixed,300,1200,,2025-01-01,2025-12-31,400,1,courses,false,true,Flat ₹300 off on all traditional skills courses,neha.gupta@example.com
