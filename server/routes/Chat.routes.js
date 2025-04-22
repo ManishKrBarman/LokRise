@@ -2,6 +2,8 @@
 import express from 'express';
 import { Groq } from 'groq-sdk';
 import dotenv from 'dotenv';
+import { siteKnowledgeData } from '../data/siteRef.js';
+
 
 dotenv.config();
 
@@ -19,12 +21,7 @@ router.post('/', async (req, res) => {
     }
 
     try {
-        const websiteKnowledge = `
-            LokRise is an e-commerce platform that offers:
-            - Online shopping with multiple categories
-            - Seller marketplace for vendors
-            - Educational courses and learning paths
-            - Customer support and community forums`;
+        const websiteKnowledge = `${siteKnowledgeData}`.slice(0, 6000); // Ensure the context is within the token limit
 
         const response = await groq.chat.completions.create({
             model: 'mistral-saba-24b',
@@ -35,8 +32,8 @@ router.post('/', async (req, res) => {
                 },
                 { role: 'user', content: message },
             ],
-            temperature: 0.8,
-            max_tokens: 150,
+            temperature: 0.7,
+            max_tokens: 100,
             top_p: 1,
         });
 

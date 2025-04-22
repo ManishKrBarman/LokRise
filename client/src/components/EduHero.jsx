@@ -8,10 +8,10 @@ const EduHero = () => {
                 <div className="flex flex-col lg:flex-row items-center">
                     <div className="lg:w-1/2 mb-10 lg:mb-0">
                         <h1 className="text-4xl md:text-5xl font-bold mb-6 font-museo leading-tight">
-                            Unlock Your Potential with Expert-Led Courses
+                            Unlock Your Potential with Experience & Expert-Led Courses
                         </h1>
                         <p className="text-lg mb-8 text-blue-100 max-w-xl">
-                            Gain skills that matter with our high-quality courses designed by industry experts. Learn at your own pace and transform your career.
+                            Gain skills that matter with our high-quality courses designed by rural & industry experts. Learn at your own pace and transform your career.
                         </p>
 
                         <div className="relative max-w-md">
@@ -27,9 +27,9 @@ const EduHero = () => {
                         </div>
 
                         <div className="mt-6 flex items-center text-sm">
-                            <span className="text-blue-200">Popular:</span>
+                            <span className="text-blue-200">Popular Courses:</span>
                             <div className="ml-2 flex flex-wrap gap-2">
-                                {['Web Development', 'Data Science', 'Digital Marketing', 'Design'].map((topic, i) => (
+                                {['Pottery','Textile dyeing','Ayurvedic','Organic farming techniques', 'Animal husbandry', 'Crop rotation', 'Fish farming'].map((topic, i) => (
                                     <a key={i} href={`/courses/${topic.toLowerCase().replace(/\s+/g, '-')}`} className="bg-white bg-opacity-20 hover:bg-opacity-30 px-3 py-1 rounded-full transition">
                                         {topic}
                                     </a>
@@ -41,7 +41,7 @@ const EduHero = () => {
                     <div className="lg:w-1/2 lg:pl-10">
                         <div className="relative">
                             <img
-                                src="https://placehold.co/600x400?text=Learning+Platform"
+                                src="https://i.ibb.co/BVgkLX89/learning-platform-banner-photo-for-showcasing-with-illustrations-without-background.jpg"
                                 alt="Learning Platform"
                                 className="rounded-lg shadow-2xl"
                             />
@@ -53,7 +53,7 @@ const EduHero = () => {
                                         </svg>
                                     </div>
                                     <div className="ml-4">
-                                        <div className="text-gray-800 font-medium">10,000+ Courses</div>
+                                        <div className="text-gray-800 font-medium">10+ Courses</div>
                                         <div className="text-gray-500 text-sm">From leading experts</div>
                                     </div>
                                 </div>

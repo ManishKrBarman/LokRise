@@ -69,6 +69,22 @@ export const createProduct = async (req, res) => {
     }
 };
 
+export const getCoursesBySearch = async (req, res) => {
+    try {
+        const { query } = req.query;
+
+        const courses = await Product.find({
+            productType: 'course',
+            name: { $regex: query, $options: 'i' }
+        });
+
+        res.status(200).json(courses);
+    } catch (error) {
+        res.status(500).json({ message: 'Search failed', error });
+    }
+};
+
+
 // Get all products with filtering, sorting, and pagination
 export const getProducts = async (req, res) => {
     try {

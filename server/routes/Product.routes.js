@@ -9,7 +9,8 @@ import {
     getSellerProducts,
     getProductStats,
     getRelatedProducts,
-    getFeaturedProducts
+    getFeaturedProducts,
+    getCoursesBySearch,
 } from '../controllers/Product.js';
 import { authMiddleware, requireApprovedSeller, authorizeRoles } from '../middlewares/auth.js';
 
@@ -17,6 +18,7 @@ const ProductRoutes = express.Router();
 
 // Public routes
 ProductRoutes.get('/', getProducts);
+ProductRoutes.get('/search/courses', getCoursesBySearch);
 ProductRoutes.get('/featured', getFeaturedProducts);
 ProductRoutes.get('/:id', getProductById);
 ProductRoutes.get('/:id/related', getRelatedProducts);
