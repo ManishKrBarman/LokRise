@@ -15,7 +15,7 @@ const CoursesSection = () => {
                 // Use a larger limit initially but only with exact course type filter
                 const response = await productAPI.getProducts({
                     productType: 'course',
-                    limit: 165, // Fetch more than needed to ensure we get enough courses
+                    limit: 188, // Fetch more than needed to ensure we get enough courses
                     sort: 'popularity'
                 });
 
