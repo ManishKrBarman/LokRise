@@ -74,7 +74,8 @@ const ProductCard = ({ product }) => {
             >
                 <img
                     // src={product.images?.[0]}
-                    src={"https://placehold.co/600x400?text=Product+Image"} // Placeholder image for demo
+                    // src={"https://placehold.co/600x400?text=Product"} // Placeholder image for demo
+                    src={product.images?.[0] || "https://placehold.co/600x400?text=Product+Image"}
                     alt={product.name}
                     className="w-full h-full object-cover rounded-t-lg"
                 />
@@ -142,7 +143,7 @@ const ProductCard = ({ product }) => {
                                 ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
                                 : addedToCart
                                     ? 'bg-green-600 text-white'
-                                    : 'bg-[var(--secondary-color)] hover:bg-green-600 text-white'}`}
+                                    : 'bg-amber-900 hover:bg-orange-500 text-white'}`}
                     >
                         {addedToCart ? (
                             <>

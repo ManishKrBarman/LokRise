@@ -1,13 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { FiPause, FiPlay } from 'react-icons/fi';
+import { useNavigate } from 'react-router-dom';
 
 const HeroSection = () => {
     const [isScrolling, setIsScrolling] = useState(true);
     const scrollRef = useRef(null);
     const scrollAmountRef = useRef(0);
-    // const lastTimeRef = useRef(performance.now());
     const animationIdRef = useRef(null);
-    const clonedRef = useRef(false); // Prevent re-cloning
+    const clonedRef = useRef(false);
+    const navigate = useNavigate();
 
     const banners = [
         {
@@ -15,21 +16,24 @@ const HeroSection = () => {
             title: "Summer Collection 2025",
             description: "Discover the latest trends for the season",
             bgColor: "bg-gradient-to-r from-[var(--tertiary-color)] to-blue-400",
-            imageUrl: "https://placehold.co/600x300?text=Summer+Collection+2025"
+            imageUrl: "https://placehold.co/600x300?text=Summer+Collection+2025",
+            category: "summer"
         },
         {
             id: 2,
             title: "Tech Gadgets Sale",
             description: "Up to 40% off on premium electronics",
             bgColor: "bg-gradient-to-r from-[var(--primary-color)] to-amber-400",
-            imageUrl: "https://placehold.co/600x300?text=Tech+Gadgets+Sale"
+            imageUrl: "https://placehold.co/600x300?text=Tech+Gadgets+Sale",
+            category: "electronics"
         },
         {
             id: 3,
             title: "Home Decor Collection",
             description: "Transform your space with our exclusive items",
             bgColor: "bg-gradient-to-r from-[var(--secondary-color)] to-green-300",
-            imageUrl: "https://placehold.co/600x300?text=Home+Decor+Collection"
+            imageUrl: "https://placehold.co/600x300?text=Home+Decor+Collection",
+            category: "homedecor"
         }
     ];
 
@@ -37,7 +41,6 @@ const HeroSection = () => {
         const scrollContainer = scrollRef.current;
         if (!scrollContainer || clonedRef.current) return;
 
-        // Clone banners only once
         const scrollContent = Array.from(scrollContainer.children);
         scrollContent.forEach(item => {
             const clone = item.cloneNode(true);
@@ -50,7 +53,7 @@ const HeroSection = () => {
         const scrollContainer = scrollRef.current;
         if (!scrollContainer) return;
 
-        const distance = 0.5; // smoother scroll
+        const distance = 0.5;
         let lastTime = performance.now();
 
         const scroll = (timestamp) => {
@@ -59,7 +62,7 @@ const HeroSection = () => {
             const deltaTime = timestamp - lastTime;
             lastTime = timestamp;
 
-            scrollAmountRef.current += distance * (deltaTime / 16); // normalize
+            scrollAmountRef.current += distance * (deltaTime / 16);
             scrollContainer.scrollLeft = scrollAmountRef.current;
 
             if (scrollAmountRef.current >= scrollContainer.scrollWidth / 2) {
@@ -79,18 +82,18 @@ const HeroSection = () => {
         };
     }, [isScrolling]);
 
+    const handleShopNow = (banner) => {
+        navigate('/shop', { state: banner });
+    };
+
     return (
         <section className="py-8 bg-gray-50">
             <div className="max-w-7xl mx-auto px-4">
                 <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-2xl font-bold text-gray-800">Trending Now</h2>
-                    {/* <button
-                        onClick={() => setIsScrolling(!isScrolling)}
-                        className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-full transition-colors"
-                    >
-                        {isScrolling ? <FiPause size={16} /> : <FiPlay size={16} />}
-                        {isScrolling ? 'Pause' : 'Play'} Scroll
-                    </button> */}
+                    <div>
+                        <h2 className="text-3xl font-bold text-gray-800 mb-1">Trending Now 🔥 </h2>
+                        <p className="text-gray-600 text-sm md:text-base">Explore what's hot and happening across fashion, gadgets, and home trends.</p>
+                    </div>
                 </div>
 
                 <div className="overflow-hidden" style={{ borderRadius: '10px' }}>
@@ -104,7 +107,7 @@ const HeroSection = () => {
                         {banners.map((banner) => (
                             <div
                                 key={banner.id}
-                                className="min-w-[300px] md:min-w-[500px] rounded-lg overflow-hidden shadow-md flex-shrink-0"
+                                className="min-w-[300px] md:min-w-[500px] rounded-lg overflow-hidden shadow-md flex-shrink-0 transition-transform duration-500"
                             >
                                 <div className={`${banner.bgColor} p-6 h-full flex flex-col justify-between`}>
                                     <div>
@@ -117,7 +120,10 @@ const HeroSection = () => {
                                             alt={banner.title}
                                             className="w-full h-40 opacity-50 object-cover rounded"
                                         />
-                                        <button className="mt-4 bg-white text-[var(--primary-color)] py-2 px-6 rounded-full font-medium hover:bg-gray-100 transition duration-300">
+                                        <button
+                                            onClick={() => handleShopNow(banner)}
+                                            className="mt-4 bg-white text-[var(--primary-color)] py-2 px-6 rounded-full font-medium hover:bg-gray-100 transition duration-300"
+                                        >
                                             Shop Now
                                         </button>
                                     </div>

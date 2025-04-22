@@ -97,7 +97,7 @@ const NotificationsPanel = ({
             {/* Panel Content */}
             <div className="flex-1 overflow-y-auto">
                 {notifications.length > 0 ? (
-                    notifications.map(notification => {
+                    notifications.reverse().slice(0, 2).map(notification => {
                         const isSellerApplication = notification.message.includes("seller application");
                         return (
                             <div

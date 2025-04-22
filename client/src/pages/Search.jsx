@@ -47,6 +47,7 @@ const Search = () => {
                     limit: 12
                 });
 
+
                 setResults({
                     products: productsRes.data.products || [],
                     courses: [], // Will be implemented when course search is ready
@@ -54,7 +55,7 @@ const Search = () => {
                     error: null
                 });
                 setTotalPages(productsRes.data.totalPages || 1);
-                setTotalResults(productsRes.data.total || 0);
+                setTotalResults(productsRes.data.totalProducts || 0);
             } catch (error) {
                 setResults(prev => ({
                     ...prev,
