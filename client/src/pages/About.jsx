@@ -289,11 +289,11 @@ const AboutPage = () => {
                                             className="h-full w-full object-cover"
                                         />
                                     </div>
-                                    <div className="p-5 text-center">
+                                    <div className="p-2 text-center">
                                         <h3 className="text-xl font-bold text-gray-800">{member.name}</h3>
                                         <p className="text-[#9B7653] font-medium">{member.role}</p>
                                         <p className="text-gray-600 text-sm mt-1">{member.specialty}</p>
-                                        <div className="mt-3 p-2 bg-[#9B7653]/10 rounded-lg">
+                                        <div className="mt-4 p-2 bg-[#9B7653]/10 rounded-lg">
                                             <p className="italic text-sm text-gray-700">"{member.quote}"</p>
                                         </div>
                                         <div
