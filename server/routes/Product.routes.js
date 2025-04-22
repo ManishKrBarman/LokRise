@@ -12,22 +12,57 @@ import {
     getFeaturedProducts,
     getCoursesBySearch,
 } from '../controllers/Product.js';
-import { authMiddleware, requireApprovedSeller, authorizeRoles } from '../middlewares/auth.js';
 
-const ProductRoutes = express.Router();
+import {
+    authMiddleware,
+    requireApprovedSeller,
+    authorizeRoles,
+} from '../middlewares/auth.js';
 
-// Public routes
-ProductRoutes.get('/', getProducts);
-ProductRoutes.get('/search/courses', getCoursesBySearch);
-ProductRoutes.get('/featured', getFeaturedProducts);
-ProductRoutes.get('/:id', getProductById);
-ProductRoutes.get('/:id/related', getRelatedProducts);
+const router = express.Router();
 
-// Protected routes - sellers only
-ProductRoutes.post('/', authMiddleware, requireApprovedSeller, createProduct);
-ProductRoutes.put('/:id', authMiddleware, requireApprovedSeller, updateProduct);
-ProductRoutes.delete('/:id', authMiddleware, authorizeRoles('seller', 'admin'), deleteProduct);
-ProductRoutes.get('/seller/products', authMiddleware, authorizeRoles('seller'), getSellerProducts);
-ProductRoutes.get('/:id/stats', authMiddleware, authorizeRoles('seller', 'admin'), getProductStats);
+// ----------- PUBLIC ROUTES -----------
+router.get('/', getProducts); // All products
+router.get('/search/courses', getCoursesBySearch); // Search courses
+router.get('/featured', getFeaturedProducts); // Featured products
+router.get('/:id/related', getRelatedProducts); // Related products by product ID
+router.get('/:id', getProductById); // Get product by ID
 
-export default ProductRoutes;
+// ----------- PROTECTED ROUTES -----------
+
+// Seller-only: Get all their products
+router.get('/seller/products',
+    authMiddleware,
+    authorizeRoles('seller'),
+    getSellerProducts
+);
+
+// Seller or Admin: Product statistics
+router.get('/:id/stats',
+    authMiddleware,
+    authorizeRoles('seller', 'admin'),
+    getProductStats
+);
+
+// Seller-only: Create new product
+router.post('/',
+    authMiddleware,
+    requireApprovedSeller,
+    createProduct
+);
+
+// Seller-only: Update product
+router.patch('/:id',
+    authMiddleware,
+    requireApprovedSeller,
+    updateProduct
+);
+
+// Seller or Admin: Delete product
+router.delete('/:id',
+    authMiddleware,
+    authorizeRoles('seller', 'admin'),
+    deleteProduct
+);
+
+export default router;

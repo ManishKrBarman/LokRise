@@ -22,7 +22,8 @@ import Profile from './pages/Profile';
 import Dashboard from './pages/Dashboard';
 import Search from './pages/Search';
 import ChatbotButton from './components/ChatbotButton';
-import ShopPage from './pages/ShopPage'; 
+import ShopPage from './pages/ShopPage';
+import ProductPage from './pages/ProductPage';
 import NotFound from './pages/NotFound';
 import './App.css';
 
@@ -52,6 +53,7 @@ function App() {
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/search" element={<Search />} />
                 <Route path="/shop" element={<ShopPage />} />
+                <Route path="/product/:id" element={<ProductPage />} />
                 <Route path="*" element={<NotFound />} />
             </Routes>
             <ChatbotButton />
