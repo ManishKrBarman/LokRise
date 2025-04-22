@@ -131,12 +131,11 @@ const HeroSection = () => {
                                         <h3 className="text-2xl font-extrabold mb-1">{banner.title}</h3>
                                         <p className="text-sm">{banner.description}</p>
                                     </div>
-
-                                    {/* Shop Now Button */}
-                                    <div className="relative z-10 mt-4">
+                                    <div className="relative z-10 flex justify-center items-center h-full">
                                         <button
                                             onClick={() => handleShopNow(banner)}
-                                            className="bg-white text-[var(--primary-color)] py-2 px-6 rounded-full font-semibold hover:bg-opacity-90 transition duration-300 shadow-md"
+                                            className={`backdrop-blur-lg bg-white/30 font-semibold px-6 py-2 rounded-full shadow-md hover:scale-105 hover:bg-white/40 transition-all duration-300 animate-fade-in ${banner.textColor} ${banner.borderColor} border`}
+
                                         >
                                             Shop Now
                                         </button>
