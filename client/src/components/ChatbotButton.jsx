@@ -3,6 +3,7 @@ import '../styles/ChatbotButton.css';
 
 const ChatbotButton = () => {
     const [isOpen, setIsOpen] = useState(false);
+    const [isClosing, setIsClosing] = useState(false);
     const [position, setPosition] = useState({ x: window.innerWidth - 80, y: window.innerHeight - 80 });
     const [isDragging, setIsDragging] = useState(false);
     const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
@@ -13,6 +14,25 @@ const ChatbotButton = () => {
     const [input, setInput] = useState('');
     const buttonRef = useRef(null);
     const messagesEndRef = useRef(null);
+    const panelRef = useRef(null);
+
+    const handleClickOutside = (event) => {
+        if (panelRef.current && !panelRef.current.contains(event.target)) {
+            handleClosePanel();
+        }
+    };
+
+    useEffect(() => {
+        if (isOpen) {
+            document.addEventListener('mousedown', handleClickOutside);
+        } else {
+            document.removeEventListener('mousedown', handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [isOpen]);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -49,8 +69,22 @@ const ChatbotButton = () => {
         if (e.key === 'Enter') sendMessage();
     };
 
+    const handleClosePanel = () => {
+        setIsClosing(true);
+        setTimeout(() => {
+            setIsOpen(false);
+            setIsClosing(false);
+        }, 300);
+    };
+
     const toggleChat = () => {
-        if (!dragStarted) setIsOpen(!isOpen);
+        if (!dragStarted) {
+            if (isOpen) {
+                handleClosePanel();
+            } else {
+                setIsOpen(true);
+            }
+        }
         setDragStarted(false);
     };
 
@@ -134,11 +168,14 @@ const ChatbotButton = () => {
 
     return (
         <div className="chatbot-container" style={{ pointerEvents: isOpen ? 'all' : 'none' }}>
-            {isOpen && (
-                <div className="chatbot-panel">
+            {(isOpen || isClosing) && (
+                <div
+                    className={`chatbot-panel ${isClosing ? 'fade-out' : ''}`}
+                    ref={panelRef}
+                >
                     <div className="chatbot-header">
                         <h3>Chat Support</h3>
-                        <button className="close-button" onClick={() => setIsOpen(false)}>✕</button>
+                        <button className="close-button" onClick={handleClosePanel}>✕</button>
                     </div>
                     <div className="chatbot-messages">
                         {messages.map((msg, index) => (

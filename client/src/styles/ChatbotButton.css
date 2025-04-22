@@ -40,10 +40,10 @@
 }
 
 .chatbot-panel {
-    position: absolute;
-    bottom: 80px;
-    right: 20px;
+    position: fixed;
+    max-width: 90vw;
     width: 350px;
+    max-height: 90vh;
     height: 450px;
     background-color: white;
     border-radius: 12px;
@@ -52,6 +52,9 @@
     flex-direction: column;
     overflow: hidden;
     animation: chatbot-slide-in 0.3s ease-out;
+    z-index: 1001;
+    bottom: 100px;
+    right: 20px;
 }
 
 @keyframes chatbot-slide-in {
@@ -127,6 +130,7 @@
     display: flex;
     padding: 15px;
     border-top: 1px solid #eaeaea;
+    flex-wrap: nowrap;
 }
 
 .chatbot-input input {
@@ -158,9 +162,37 @@
     background-color: #3a5de5;
 }
 
-/* Adjust panel position when button is on left side */
+/* Responsive layout for small screens */
 @media (max-width: 480px) {
     .chatbot-panel {
-        width: 300px;
+        width: 95vw;
+        height: 80vh;
+        left: 2.5vw;
+        right: auto;
+        bottom: 100px;
     }
+
+    .chatbot-input {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .chatbot-input input {
+        width: 100%;
+        margin-bottom: 5px;
+    }
+
+    .chatbot-input button {
+        width: 100%;
+        margin-left: 0;
+    }
+}
+
+.chatbot-panel {
+    opacity: 1;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.chatbot-panel.fade-out {
+    opacity: 0;
 }
