@@ -23,6 +23,7 @@ import Dashboard from './pages/Dashboard';
 import Search from './pages/Search';
 import ChatbotButton from './components/ChatbotButton';
 import ShopPage from './pages/ShopPage'; 
+import NotFound from './pages/NotFound';
 import './App.css';
 
 function App() {
@@ -51,6 +52,7 @@ function App() {
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/search" element={<Search />} />
                 <Route path="/shop" element={<ShopPage />} />
+                <Route path="*" element={<NotFound />} />
             </Routes>
             <ChatbotButton />
         </>

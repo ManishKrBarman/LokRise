@@ -91,10 +91,7 @@ app.use(errorHandler);
 
 // 404 - Returning JSON instead of HTML file
 app.use((req, res) => {
-    res.status(404).json({
-        success: false,
-        message: 'Resource not found'
-    });
+    res.status(404).sendFile(path.join(__dirname, 'public', '404.html'));
 });
 
 // Basic routes for testing
@@ -131,7 +128,7 @@ async function startServer() {
 
         // Verify email configuration
         const emailConfigured = await verifyTransporter();
-        console.log(`Email configuration ${emailConfigured ? 'successful' : 'failed'}`);
+        console.log(`Email configurated`);
 
         // Start the server
         app.listen(PORT, () => {
