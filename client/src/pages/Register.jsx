@@ -298,6 +298,10 @@ const Register = () => {
                                 placeholder="6-digit OTP"
                             />
 
+                            <p className="text-sm text-gray-500 italic">
+                                Please check your Spam folder if you don't see the email in your inbox.
+                            </p>
+
                             <div>
                                 <button
                                     type="submit"
