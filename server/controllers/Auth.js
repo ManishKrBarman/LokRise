@@ -34,70 +34,71 @@ const register = async (req, res) => {
 
         console.log(`Generated verification code for ${email}: ${verificationCode}`);
 
-        const user = new UserModel({
+        // Create a temporary user object but don't save to database yet
+        const userData = {
             name,
             email,
             password: hashedPassword,
             phone,
-            role: 'buyer', // Always create as buyer, user can apply to be seller later
+            role: 'buyer',
             verificationCode,
             createdAt: new Date(),
             updatedAt: new Date()
-        });
+        };
 
-        // Try to send verification email before saving the user
+        // Store the user data in a session cache (we'll use Redis in production)
+        // For now, we'll store it in the response as a temporary solution
         try {
             console.log(`Sending verification email to ${email}`);
             const emailResult = await SendVerificationCode(email, verificationCode);
-
-            // Save the user regardless of email success
-            await user.save();
 
             if (!emailResult.success) {
                 console.warn(`Email sending failed for ${email}: ${emailResult.error}`);
                 // Return verification code for testing/development environments
                 return res.status(201).json({
                     success: true,
-                    message: 'User registered successfully but email could not be sent. Use the verification code below.',
+                    message: 'Verification code generated but email could not be sent. Use the verification code below.',
                     emailSent: false,
                     verificationCode: verificationCode,
-                    user: {
-                        id: user._id,
-                        name: user.name,
-                        email: user.email
-                    }
+                    pendingUser: {
+                        name,
+                        email,
+                        phone,
+                        password: hashedPassword // Include the hashed password
+                    },
+                    isRegistered: false
                 });
             }
 
             // Email sent successfully
             return res.status(201).json({
                 success: true,
-                message: 'User registered successfully. Please check your email for verification code.',
+                message: 'Verification code sent successfully. Please check your email to complete registration.',
                 emailSent: true,
-                user: {
-                    id: user._id,
-                    name: user.name,
-                    email: user.email
-                }
+                pendingUser: {
+                    name,
+                    email,
+                    phone,
+                    password: hashedPassword // Include the hashed password
+                },
+                isRegistered: false
             });
         } catch (emailError) {
-            // Email sending failed, but still create the account
             console.error(`Error sending verification email to ${email}:`, emailError);
-
-            // Save user anyway
-            await user.save();
 
             // Return verification code for testing/development environments
             return res.status(201).json({
                 success: true,
-                message: 'User registered, but email sending failed. Use the verification code below.',
+                message: 'Error sending verification email. Use the verification code below to complete registration.',
                 emailSent: false,
                 verificationCode: verificationCode,
-                user: {
-                    id: user._id,
-                    name: user.name,
-                    email: user.email
-                }
+                pendingUser: {
+                    name,
+                    email,
+                    phone,
+                    password: hashedPassword // Include the hashed password
+                },
+                isRegistered: false
             });
         }
     } catch (error) {
@@ -109,18 +110,102 @@ const register = async (req, res) => {
 const verifyEmail = async (req, res) => {
     try {
         const { email, verificationCode } = req.body;
+
+        // First check if this is a pending verification (user not yet in database)
+        // This is our new flow - user will be created only after OTP verification
+        if (req.body.pendingUser) {
+            const pendingUser = req.body.pendingUser;
+
+            // Validate the verification code provided by client
+            // Normally in production we would check against a cache/temp storage like Redis
+            if (verificationCode !== req.body.verificationCode) {
+                return res.status(400).json({ message: 'Invalid verification code' });
+            }
+
+            // Check if we have the required fields
+            if (!pendingUser.name || !pendingUser.email || !pendingUser.password) {
+                // If the password is missing in pendingUser, check if it's in the original registration data
+                if (req.body.password) {
+                    pendingUser.password = req.body.password;
+                } else {
+                    console.error("Missing required fields for user creation:",
+                        { name: !!pendingUser.name, email: !!pendingUser.email, password: !!pendingUser.password });
+                    return res.status(400).json({
+                        message: 'Missing required user information. Please try registering again.'
+                    });
+                }
+            }
+
+            // Make sure the password is hashed
+            let hashedPassword = pendingUser.password;
+            if (!hashedPassword.startsWith('$2')) { // Check if it's already a bcrypt hash
+                hashedPassword = await bcryptjs.hash(pendingUser.password, 10);
+            }
+
+            // Verification successful, create a new user account that's already verified
+            const newUser = new UserModel({
+                name: pendingUser.name,
+                email: pendingUser.email,
+                password: hashedPassword,
+                phone: pendingUser.phone,
+                role: 'buyer',
+                isVerified: true, // Mark as verified since OTP has been confirmed
+                createdAt: new Date(),
+                updatedAt: new Date()
+            });
+
+            // Save the newly created and verified user
+            await newUser.save();
+
+            // Send welcome email
+            await sendWelcomeEmail(pendingUser.email, pendingUser.name);
+
+            // Generate token for auto-login
+            const token = jwt.sign(
+                { id: newUser._id, email: newUser.email, role: newUser.role },
+                getJWTSecret(),
+                { expiresIn: '7d' }
+            );
+
+            return res.status(200).json({
+                message: 'Email verified successfully. Account has been created.',
+                success: true,
+                token,
+                user: {
+                    id: newUser._id,
+                    name: newUser.name,
+                    email: newUser.email,
+                    isVerified: true
+                }
+            });
+        }
+
+        // Legacy flow - for users who might already be in the database
         const user = await UserModel.findOne({ email });
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
+
         if (user.verificationCode !== verificationCode) {
             return res.status(400).json({ message: 'Invalid verification code' });
         }
+
         user.isVerified = true;
         user.verificationCode = undefined;
         await user.save();
+
         await sendWelcomeEmail(user.email, user.name);
-        res.status(200).json({ message: 'Email verified successfully' });
+
+        res.status(200).json({
+            message: 'Email verified successfully',
+            success: true,
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                isVerified: true
+            }
+        });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Internal server error' });

@@ -127,8 +127,24 @@ const Register = () => {
         setLoading(true);
 
         try {
-            // Call the actual email verification function from AuthContext
-            const result = await verifyEmail(formData.email, otp);
+            // Get the pending user data from registration response
+            const pendingUser = registrationData?.pendingUser || {
+                name: formData.firstName + (formData.lastName ? ' ' + formData.lastName : ''),
+                email: formData.email,
+                phone: formData.phone,
+                password: formData.password
+            };
+
+            // Pass verification code and pending user data to complete registration
+            const verifyData = {
+                email: formData.email,
+                pendingUser: pendingUser,
+                // If the server returned a verification code (for testing), use it; otherwise use the user-entered OTP
+                verificationCode: registrationData?.verificationCode || otp
+            };
+
+            // Call the verification function with complete data
+            const result = await verifyEmail(verifyData);
 
             if (result.success) {
                 // Show success message

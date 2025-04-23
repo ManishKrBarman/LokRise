@@ -197,12 +197,48 @@ export const AuthProvider = ({ children }) => {
     };
 
     // Verify email function
-    const verifyEmail = async (email, verificationCode) => {
+    const verifyEmail = async (verificationData, verificationCodeParam) => {
         setLoading(true);
         setError(null);
         try {
-            const response = await authAPI.verifyEmail({ email, verificationCode });
-            return { success: true, data: response.data };
+            // If verificationData is just email and code (old style), convert to object
+            let requestData;
+            if (typeof verificationData === 'string' || !verificationData.pendingUser) {
+                // Handle legacy format (just email and code)
+                const email = typeof verificationData === 'string' ? verificationData : verificationData.email;
+                const verificationCode = verificationCodeParam; // Use the explicit parameter
+                requestData = { email, verificationCode };
+            } else {
+                // New format with pendingUser data
+                requestData = verificationData;
+            }
+
+            const response = await authAPI.verifyEmail(requestData);
+
+            // If the response contains a user and this is the new flow, process the login
+            if (response.data.user && response.data.success) {
+                // Auto-login after successful verification
+                if (response.data.token) {
+                    const userData = response.data.user;
+                    const token = response.data.token;
+
+                    // Add profile image URL to user data if needed
+                    const userWithImage = {
+                        ...userData,
+                        profileImage: userData.id ? getProfileImageUrl(userData.id) : null
+                    };
+
+                    setAuthState(token, userWithImage);
+                    setUser(userWithImage);
+                    setIsAuthenticated(true);
+                }
+            }
+
+            return {
+                success: true,
+                data: response.data,
+                message: response.data.message || 'Email verification successful'
+            };
         } catch (error) {
             console.error("Email verification error:", error);
             setError(error.response?.data?.message || "Verification failed");
