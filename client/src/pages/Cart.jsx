@@ -25,6 +25,7 @@ const Cart = () => {
     const [addressSaving, setAddressSaving] = useState(false);
     const [addressError, setAddressError] = useState('');
     const [addressSuccess, setAddressSuccess] = useState('');
+    const totals = getCartTotals();
 
     // Pre-populate shipping details from user data when available
     useEffect(() => {

@@ -66,18 +66,18 @@ export const CartProvider = ({ children }) => {
                 const response = await userAPI.addToCart(product._id, quantity);
                 setCartItems(response.data.items);
             } else {
-                // Add to local cart if guest
+                // Check if the product is already in the local cart
                 const existingItem = cartItems.find(item => item.product._id === product._id);
                 
                 if (existingItem) {
-                    // Update quantity if item already exists
+                    // If the item exists, update the quantity
                     setCartItems(cartItems.map(item => 
                         item.product._id === product._id 
                             ? { ...item, quantity: item.quantity + quantity }
                             : item
                     ));
                 } else {
-                    // Add new item
+                    // If the item doesn't exist, add it as a new item
                     setCartItems([...cartItems, { 
                         product: {
                             _id: product._id,

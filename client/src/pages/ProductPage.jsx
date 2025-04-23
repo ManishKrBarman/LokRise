@@ -1,6 +1,10 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import Navbar from '../components/NavBar';
+import { useCart } from "../context/CartContext";
+import { useWishlist } from "../context/WishlistContext";
+
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/";
 // Simple SVG icon components to replace Lucide icons
@@ -62,7 +66,25 @@ const ProductPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedImage, setSelectedImage] = useState(0);
-  const [selectedColor, setSelectedColor] = useState("brown");
+  const [selectedColor, setSelectedColor] = useState("black");
+  const { addToCart, cartItems } = useCart();
+const [quantity, setQuantity] = useState(1);
+const { addToWishlist } = useWishlist();
+const navigate = useNavigate();
+
+
+const handleAddToCart = () => {
+    addToCart(product, quantity);
+};
+
+const handleBuyNow = () => {
+  addToCart(product);
+  navigate("/cart"); // or "/checkout" if you have a dedicated page
+};
+
+const handleAddToWishlist = () => {
+  addToWishlist(product);
+};
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -70,7 +92,9 @@ const ProductPage = () => {
         setLoading(true);
         const res = await axios.get(`${API_URL}/products/${productId}`); 
         setProduct(res.data); 
-        setSelectedColor(res.data.color || res.data.colors?.[0] || "brown"); 
+        const colorOptions = ["brown", "black", "red", "blue", "green", "purple", "pink", "navy", "tan"];
+        const randomColor = colorOptions[Math.floor(Math.random() * colorOptions.length)];
+        setSelectedColor( res.data.colors?.[0] || res.data.colors?.[0] || randomColor);
       } catch (err) {
         setError("Failed to load product"); 
       } finally {
@@ -240,6 +264,8 @@ const ProductPage = () => {
     };
 
     return (
+        <div className="min-h-screen flex flex-col">
+            <Navbar fixed={true} cartBtn={true} />
         <div className={`bg-gradient-to-br ${palette.gradient} min-h-screen py-12 transition-colors duration-300`}>
             <div className="max-w-6xl mx-auto px-4">
                 {/* Breadcrumb */}
@@ -366,15 +392,18 @@ const ProductPage = () => {
                             </div>
 
                             <div className="mt-8 space-y-4">
-                                <button className={`w-full py-3 px-8 ${palette.primary} ${palette.primaryHover} text-white font-medium rounded-lg flex items-center justify-center transition-colors`}>
+                                <button className={`w-full py-3 px-8 ${palette.primary} ${palette.primaryHover} text-white font-medium rounded-lg flex items-center justify-center transition-colors`} onClick={handleAddToCart}>
                                     <span className="mr-2"><IconShoppingCart /></span>
                                     Add to Cart
                                 </button>
                                 <div className="grid grid-cols-5 gap-2">
-                                    <button className={`col-span-4 py-3 px-8 border ${palette.border} ${palette.text} font-medium rounded-lg hover:${palette.secondary} transition-colors`}>
+                                    <button className={`col-span-4 py-3 px-8 border ${palette.border} ${palette.text} font-medium rounded-lg hover:${palette.secondary} transition-colors`} onClick={handleBuyNow}>
                                         Buy Now
                                     </button>
-                                    <button className={`flex items-center justify-center border ${palette.border} ${palette.text} rounded-lg hover:${palette.secondary} transition-colors`}>
+                                    <button
+                                        className={`flex items-center justify-center border ${palette.border} ${palette.text} rounded-lg hover:${palette.secondary} transition-colors`}
+                                        onClick={handleAddToWishlist}
+                                    >
                                         <IconHeart />
                                     </button>
                                 </div>
@@ -399,6 +428,7 @@ const ProductPage = () => {
                 </div>
             </div>
         </div>
+    </div>
     );
 };
 

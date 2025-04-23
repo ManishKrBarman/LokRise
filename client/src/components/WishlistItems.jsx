@@ -67,12 +67,12 @@ const WishlistItems = ({ items, removeItem }) => {
                             onClick={() => handleMoveToCart(item)}
                             disabled={item.product.quantityAvailable === 0}
                             className={`w-full py-2 rounded-md text-center text-sm ${
-                                item.product.quantityAvailable > 0
+                                item.product.quantityAvailable === undefined
                                     ? 'bg-[var(--primary-color)] text-white hover:bg-opacity-90'
                                     : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                             }`}
                         >
-                            {item.product.quantityAvailable > 0 ? 'Move to Cart' : 'Currently Unavailable'}
+                            {item.product.quantityAvailable === undefined ? 'Move to Cart' : 'Currently Unavailable'}
                         </button>
                     </div>
                 </div>
