@@ -15,6 +15,60 @@ const AboutPage = () => {
     const teamRef = useRef(null);
     const isTeamInView = useInView(teamRef, { once: false, margin: "-100px 0px" });
     const teamControls = useAnimation();
+    
+    // Create individual letter states
+    const [letterStyles, setLetterStyles] = useState([
+        { font: 'font-serif italic', color: 'text-[#7acdde]' },
+        { font: 'font-mono', color: 'text-[#28de28]' },
+        { font: 'font-sans font-black', color: 'text-[#e8091c]' },
+        { font: 'font-serif font-light', color: 'text-[#fff200]' },
+        { font: 'font-sans', color: 'text-[#fff200]' },
+        { font: 'font-mono font-extrabold', color: 'text-[#9B7653]' }
+    ]);
+
+    const fontOptions = [
+        'font-serif italic', 
+        'font-mono', 
+        'font-sans font-black', 
+        'font-serif font-light', 
+        'font-sans tracking-tight',
+        'font-mono font-extrabold',
+        'font-sans italic',
+        'font-serif'
+    ];
+    
+    const colorOptions = [
+        'text-[#9B7653]',
+        'text-[#8B4513]',
+        'text-[#A0522D]',
+        'text-[#CD853F]',
+        'text-[#D2B48C]',
+        'text-[#DEB887]'
+    ];
+
+    // Letter animation effect
+    useEffect(() => {
+        const intervals = [];
+        
+        // Create separate interval for each letter
+        for (let i = 0; i < 6; i++) {
+            const interval = setInterval(() => {
+                setLetterStyles(prev => {
+                    const newStyles = [...prev];
+                    // Random font and color for this specific letter
+                    newStyles[i] = {
+                        font: fontOptions[Math.floor(Math.random() * fontOptions.length)],
+                        color: colorOptions[Math.floor(Math.random() * colorOptions.length)]
+                    };
+                    return newStyles;
+                });
+            }, 150 + (i * 50)); // Slightly staggered timing for each letter
+            
+            intervals.push(interval);
+        }
+        
+        return () => intervals.forEach(interval => clearInterval(interval));
+    }, []);
 
     useEffect(() => {
         if (isTeamInView) {
@@ -136,6 +190,24 @@ const AboutPage = () => {
     }
 ];
 
+    // Function to render Creons with letter-by-letter styling
+    const renderCreons = () => {
+        const letters = "Creons".split('');
+        return (
+            // Fixed-height container to prevent layout shift
+            <span className="inline-block font-bold h-6">
+                {letters.map((letter, index) => (
+                    <span 
+                        key={index} 
+                        className={`inline-block ${letterStyles[index]?.font || 'font-bold'} ${letterStyles[index]?.color}`}
+                        style={{ lineHeight: '1' }}
+                    >
+                        {letter}
+                    </span>
+                ))}
+            </span>
+        );
+    };
 
     return (
         <div className="min-h-screen flex flex-col bg-white text-gray-800">
@@ -259,8 +331,8 @@ const AboutPage = () => {
                         className="text-center mb-10"
                     >
                         <h2 className="text-3xl md:text-4xl font-bold text-[#9B7653] mb-2">Meet Us</h2>
-                        <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-                            Team <span className="font-bold text-[#9B7653]">Creons</span> behind Lokrise who are competing in Hackazards 2025
+                        <p className="text-xl max-w-2xl mx-auto mb-2 text-orange-900 italic">
+                            The {renderCreons()} 
                         </p>
                         <h4 className="text-lg text-gray-500">Faces are hidden for privacy concerns</h4>
                     </motion.div>
