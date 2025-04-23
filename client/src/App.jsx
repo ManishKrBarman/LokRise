@@ -22,6 +22,7 @@ import Profile from './pages/Profile';
 import Dashboard from './pages/Dashboard';
 import Search from './pages/Search';
 import ChatbotButton from './components/ChatbotButton';
+import HackathonNotice from './components/HackathonNotice';
 import ShopPage from './pages/ShopPage';
 import ProductPage from './pages/ProductPage';
 import NotFound from './pages/NotFound';
@@ -57,6 +58,7 @@ function App() {
                 <Route path="*" element={<NotFound />} />
             </Routes>
             <ChatbotButton />
+            <HackathonNotice />
         </>
     );
 }
