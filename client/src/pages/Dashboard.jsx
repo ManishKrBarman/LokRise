@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { authAPI, sellerAPI } from '../services/api';
-import { FiPackage, FiHeart, FiShoppingCart, FiDollarSign, FiCreditCard, FiStar, FiPlus, FiTrendingUp, FiUsers, FiBarChart2, FiAlertCircle } from 'react-icons/fi';
+import { FiPackage, FiHeart, FiShoppingCart, FiDollarSign, FiCreditCard, FiStar, FiPlus, FiTrendingUp, FiUsers, FiBarChart2, FiAlertCircle, FiLock, FiUserX } from 'react-icons/fi';
 import NavBar from '../components/NavBar';
 import Footer from '../components/Footer';
 import ProductForm from '../components/ProductForm';
@@ -27,7 +27,8 @@ const MetricCard = ({ icon, title, value, footer }) => (
 );
 
 const Dashboard = () => {
-    const { user } = useAuth();
+    const navigate = useNavigate();
+    const { user, isAuthenticated, loading: authLoading } = useAuth();
     const [recentOrders, setRecentOrders] = useState([]);
     const [metrics, setMetrics] = useState({
         totalPurchases: 0,
@@ -48,7 +49,7 @@ const Dashboard = () => {
     const [sellerStatus, setSellerStatus] = useState(null);
     // Only set isSeller if user exists and has role property set to 'seller'
     const isSeller = user && user.role === 'seller';
-    
+
     // Safe console log that won't throw errors
     useEffect(() => {
         if (user) {
@@ -181,13 +182,116 @@ const Dashboard = () => {
         );
     };
 
-    // Show loading state while waiting for user data
-    if (!user || loading) {
+    // Render unauthorized access message when not logged in
+    const renderUnauthorizedMessage = () => {
+        return (
+            <div className="min-h-screen flex flex-col">
+                <NavBar />
+                <div className="flex-grow bg-gray-50 flex items-center justify-center px-4">
+                    <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
+                        <div className="flex justify-center mb-6">
+                            <div className="w-16 h-16 rounded-full bg-yellow-100 flex items-center justify-center">
+                                <FiLock className="h-8 w-8 text-yellow-500" />
+                            </div>
+                        </div>
+                        <h2 className="text-2xl font-bold text-gray-800 mb-4">Login Required</h2>
+                        <p className="text-gray-600 mb-6">
+                            You need to be logged in to access the dashboard. Please login to view your dashboard and manage your account.
+                        </p>
+                        <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3 justify-center">
+                            <Link
+                                to="/login?returnUrl=/dashboard"
+                                className="py-2 px-4 bg-[var(--primary-color)] text-white rounded-lg hover:bg-opacity-90 transition-all"
+                            >
+                                Login
+                            </Link>
+                            <Link
+                                to="/register"
+                                className="py-2 px-4 border border-gray-300 rounded-lg hover:bg-gray-50 transition-all"
+                            >
+                                Register
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+                <Footer />
+            </div>
+        );
+    };
+
+    // Render not-a-seller message when user doesn't have seller role
+    const renderNotSellerMessage = () => {
+        return (
+            <div className="min-h-screen flex flex-col">
+                <NavBar />
+                <div className="flex-grow bg-gray-50 flex items-center justify-center px-4">
+                    <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
+                        <div className="flex justify-center mb-6">
+                            <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center">
+                                <FiUserX className="h-8 w-8 text-blue-500" />
+                            </div>
+                        </div>
+                        <h2 className="text-2xl font-bold text-gray-800 mb-4">Seller Access Required</h2>
+                        <p className="text-gray-600 mb-6">
+                            The dashboard is available only to seller accounts. Would you like to become a seller on LokRise?
+                        </p>
+                        <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3 justify-center">
+                            <Link
+                                to="/become-seller"
+                                className="py-2 px-4 bg-[var(--primary-color)] text-white rounded-lg hover:bg-opacity-90 transition-all"
+                            >
+                                Become a Seller
+                            </Link>
+                            <Link
+                                to="/"
+                                className="py-2 px-4 border border-gray-300 rounded-lg hover:bg-gray-50 transition-all"
+                            >
+                                Go to Home
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+                <Footer />
+            </div>
+        );
+    };
+
+    // Show loading state only if we're in the process of checking auth status
+    if (authLoading) {
         return (
             <div className="min-h-screen flex flex-col">
                 <NavBar />
                 <div className="flex-grow bg-gray-50 flex items-center justify-center">
-                    <div className="text-center">Loading dashboard...</div>
+                    <div className="text-center">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--primary-color)] inline-block mb-2"></div>
+                        <p className="text-gray-600">Loading dashboard...</p>
+                    </div>
+                </div>
+                <Footer />
+            </div>
+        );
+    }
+
+    // If user is not authenticated, show login message
+    if (!isAuthenticated) {
+        return renderUnauthorizedMessage();
+    }
+
+    // If user is authenticated but not a seller, show not-seller message
+    if (!isSeller) {
+        return renderNotSellerMessage();
+    }
+
+    // Show dashboard loading state only if user is authenticated and we're loading dashboard data
+    if (loading) {
+        return (
+            <div className="min-h-screen flex flex-col">
+                <NavBar />
+                <div className="flex-grow bg-gray-50 flex items-center justify-center">
+                    <div className="text-center">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--primary-color)] inline-block mb-2"></div>
+                        <p className="text-gray-600">Loading dashboard data...</p>
+                    </div>
                 </div>
                 <Footer />
             </div>
@@ -204,11 +308,11 @@ const Dashboard = () => {
                         <div>
                             <h1 className="text-2xl font-bold text-gray-900">Welcome back, {user.name}!</h1>
                             <p className="mt-1 text-sm text-gray-600">
-                                Here's what's happening with your {isSeller ? "business" : "account"} today.
+                                Here's what's happening with your business today.
                             </p>
                         </div>
                         {/* Only show Add Product button for approved sellers */}
-                        {isSeller && sellerStatus === 'approved' && (
+                        {sellerStatus === 'approved' && (
                             <button
                                 onClick={() => setShowProductForm(true)}
                                 className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[var(--primary-color)] hover:bg-opacity-90"
@@ -326,7 +430,7 @@ const Dashboard = () => {
                                     <FiCreditCard className="text-[var(--primary-color)]" size={24} />
                                     <span className="ml-3 font-medium text-gray-900">Payment Methods</span>
                                 </Link>
-                                
+
                                 {/* Analytics link - only shown to approved sellers */}
                                 {isSeller && sellerStatus === 'approved' && (
                                     <Link
