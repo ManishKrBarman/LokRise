@@ -13,7 +13,8 @@ const CourseCard = ({ course }) => {
     const [addedToCart, setAddedToCart] = useState(false);
     const [error, setError] = useState(null);
 
-    const handleAddToCart = async () => {
+    const handleAddToCart = async (e) => {
+        e.stopPropagation(); // prevent card click
         if (!isAuthenticated) {
             navigate('/login', { state: { returnUrl: window.location.pathname } });
             return;
@@ -37,9 +38,15 @@ const CourseCard = ({ course }) => {
         }
     };
 
+    const handleCardClick = () => {
+        navigate(`/product/${course._id}`);
+    };
+
     return (
-        <div className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-100 hover:shadow-lg transition duration-300">
-            {/* Course Image */}
+        <div
+            onClick={handleCardClick}
+            className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-100 hover:shadow-lg transition duration-300 cursor-pointer"
+        >
             <div className="relative h-40">
                 <img
                     src={course.images?.[0] || "https://placehold.co/300x200?text=Course+Image"}
@@ -53,7 +60,6 @@ const CourseCard = ({ course }) => {
                 )}
             </div>
 
-            {/* Course Info */}
             <div className="p-4 flex flex-col">
                 <div className="mb-2 flex justify-between items-start">
                     <h3 className="font-medium text-gray-800 line-clamp-2 font-museo">{course.name}</h3>
@@ -101,10 +107,8 @@ const CourseCard = ({ course }) => {
                     )}
                 </div>
 
-                {/* Error Message */}
                 {error && <div className="text-xs text-red-500 mb-1">{error}</div>}
 
-                {/* Add to Cart Button */}
                 <button
                     onClick={handleAddToCart}
                     disabled={loading || addedToCart}

@@ -768,7 +768,7 @@ const Payment = () => {
                             <input
                                 type="number"
                                 name="estimatedValue"
-                                value={barterItem.estimatedValue}
+                                value={barterItem.estimatedValue.toFixed(2)}
                                 onChange={handleBarterItemChange}
                                 className="w-full px-3 py-2 border rounded-md"
                                 placeholder="1000"
@@ -946,8 +946,8 @@ const Payment = () => {
                 <div className="mb-8">
                     <h2 className="text-xl font-semibold mb-4">Payment Method</h2>
 
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-                        <button
+                    <div className="grid grid-cols-1 md:grid-cols-3 flex justify-center gap-4 mb-6">
+                        {/* <button
                             type="button"
                             onClick={() => setPaymentMethod('card')}
                             className={`flex flex-col items-center justify-center p-4 border rounded-lg transition ${paymentMethod === 'card' ? 'border-[var(--primary-color)] bg-[rgba(139,107,75,0.05)]' : 'hover:bg-gray-50'
@@ -955,7 +955,7 @@ const Payment = () => {
                         >
                             <FaCreditCard size={24} className={paymentMethod === 'card' ? 'text-[var(--primary-color)]' : 'text-gray-600'} />
                             <span className={`mt-2 text-sm ${paymentMethod === 'card' ? 'font-medium text-[var(--primary-color)]' : 'text-gray-700'}`}>Card</span>
-                        </button>
+                        </button> */}
 
                         <button
                             type="button"

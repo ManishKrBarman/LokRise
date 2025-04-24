@@ -25,6 +25,7 @@ import ChatbotButton from './components/ChatbotButton';
 import HackathonNotice from './components/HackathonNotice';
 import ShopPage from './pages/ShopPage';
 import ProductPage from './pages/ProductPage';
+import CourseDetailsPage from './pages/CourseDetailsPage';
 import NotFound from './pages/NotFound';
 import './App.css';
 
@@ -55,6 +56,7 @@ function App() {
                 <Route path="/search" element={<Search />} />
                 <Route path="/shop" element={<ShopPage />} />
                 <Route path="/product/:id" element={<ProductPage />} />
+                <Route path="/product/:id" element={<CourseDetailsPage />} />
                 <Route path="*" element={<NotFound />} />
             </Routes>
             <ChatbotButton />

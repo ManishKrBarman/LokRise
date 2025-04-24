@@ -334,7 +334,7 @@ const AboutPage = () => {
                         <p className="text-xl max-w-2xl mx-auto mb-2 text-orange-900 italic">
                             The {renderCreons()} 
                         </p>
-                        <h4 className="text-lg text-gray-500">Faces are hidden for privacy concerns</h4>
+                        <h4 className="text-lg text-gray-500">Faces are hidden for *privacy concerns 😁</h4>
                     </motion.div>
 
                     <div className="flex flex-wrap justify-center gap-8">
