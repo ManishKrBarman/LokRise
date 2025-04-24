@@ -251,7 +251,7 @@ const Payment = () => {
                 setError('Payment verification failed. Please try again.');
             }
         } catch (err) {
-            setError('Payment verification failed. Please check if payment was completed.');
+            setError('Verification will not work as we are not collaborating with any UPI provider yet. Please try again later.');
             console.error('Payment verification error:', err);
         } finally {
             setIsProcessing(false);
