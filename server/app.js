@@ -88,6 +88,15 @@ app.use((req, res) => {
     res.status(404).sendFile(path.join(__dirname, 'public', '404.html'));
 });
 
+app.use('/public', express.static(path.join(__dirname, 'public'), {
+    setHeaders: (res, path) => {
+        if (path.endsWith('.mp4')) {
+            res.set('Content-Type', 'video/mp4');
+        }
+    }
+}));
+
+
 app.get('/about', (req, res) => {
     res.json({ message: 'Welcome to the LokRise API' });
 });
