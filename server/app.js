@@ -1,4 +1,3 @@
-// app.js
 import express from 'express';
 import path from 'path';
 import cors from 'cors';
@@ -25,7 +24,6 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Validate required environment variables
 const validateEnv = () => {
     const required = [
         'MONGO_URI',
@@ -49,9 +47,8 @@ const validateEnv = () => {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Removed static files middleware - no longer serving files from public folder
 
-// CORS configuration
+// CORS
 const corsOptions = {
     origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
@@ -61,10 +58,8 @@ const corsOptions = {
     maxAge: 86400 // 24 hours
 };
 
-// Apply CORS middleware
 app.use(cors(corsOptions));
 
-// Additional CORS and cache headers for profile images
 app.use('/auth/profile-image/:userId', (req, res, next) => {
     res.set({
         'Access-Control-Allow-Origin': '*',
@@ -89,12 +84,10 @@ app.use('/wishlist', WishlistRoutes);
 
 app.use(errorHandler);
 
-// 404 - Returning JSON instead of HTML file
 app.use((req, res) => {
     res.status(404).sendFile(path.join(__dirname, 'public', '404.html'));
 });
 
-// Basic routes for testing
 app.get('/about', (req, res) => {
     res.json({ message: 'Welcome to the LokRise API' });
 });
@@ -116,21 +109,16 @@ app.get('/test-email', async (req, res) => {
     }
 });
 
-// Connect to DB and start server
 async function startServer() {
     try {
-        // Validate environment variables
         validateEnv();
 
-        // Connect to database
         await connectDB();
         console.log('Connected to MongoDB');
 
-        // Verify email configuration
         const emailConfigured = await verifyTransporter();
         console.log(`Email configurated`);
 
-        // Start the server
         app.listen(PORT, () => {
             console.log(`Server running on port ${PORT}`);
         });
