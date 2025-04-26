@@ -1,10 +1,13 @@
+<!-- This page is made with the help of CLAUD 😁 -->
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cosmic Harvest</title>
+    <title>LOKRISE-DEADEND</title>
+    <link rel="shortcut icon" href="./deadend.ico" type="image/x-icon">
     <style>
         body {
             font-family: 'Georgia', serif;
@@ -19,6 +22,22 @@
             overflow: hidden;
             position: relative;
             background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23dcc59e' fill-opacity='0.4' fill-rule='evenodd'/%3E%3C/svg%3E");
+            transition: background-color 8s;
+        }
+
+        .sky {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 60%;
+            background: linear-gradient(to bottom, #87CEEB, #E0F7FF);
+            z-index: -2;
+            transition: all 8s;
+        }
+
+        .night .sky {
+            background: linear-gradient(to bottom, #0a1a2a, #2a3a4a);
         }
 
         .container {
@@ -31,6 +50,26 @@
             border-radius: 12px;
             border: 3px solid #8b5a2b;
             box-shadow: 0 4px 12px rgba(139, 90, 43, 0.3);
+            animation: floatContainer 6s infinite ease-in-out;
+            transition: background-color 4s, border-color 4s, box-shadow 4s;
+        }
+
+        .night .container {
+            background-color: rgba(42, 35, 45, 0.8);
+            border-color: #3a2a20;
+            box-shadow: 0 4px 12px rgba(20, 15, 10, 0.5);
+        }
+
+        @keyframes floatContainer {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
         }
 
         h1 {
@@ -41,6 +80,12 @@
             letter-spacing: 2px;
             text-transform: uppercase;
             text-shadow: 2px 2px 0px #e3c496;
+            transition: color 4s, text-shadow 4s;
+        }
+
+        .night h1 {
+            color: #e3c496;
+            text-shadow: 2px 2px 0px #5a3921, 0 0 10px rgba(227, 196, 150, 0.5);
         }
 
         h2 {
@@ -48,6 +93,24 @@
             margin-top: 10px;
             font-family: 'Georgia', serif;
             color: #734222;
+            animation: pulse 3s infinite;
+            transition: color 4s;
+        }
+
+        .night h2 {
+            color: #a08570;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
         }
 
         p {
@@ -55,6 +118,11 @@
             line-height: 1.6;
             margin: 20px 0;
             font-family: 'Georgia', serif;
+            transition: color 4s;
+        }
+
+        .night p {
+            color: #c0b0a0;
         }
 
         .explore-button {
@@ -66,15 +134,53 @@
             font-size: 1.1rem;
             cursor: pointer;
             border: 2px solid #734222;
-            transition: all 0.3s ease;
+            transition: all 0.3s ease, background-color 4s, color 4s, border-color 4s;
             font-family: 'Courier New', Courier, monospace;
             box-shadow: 0 4px 0 #5a3921;
+            animation: buttonGlow 2s infinite alternate;
+        }
+
+        .night .explore-button {
+            background-color: #3a2a20;
+            color: #e3c496;
+            border-color: #5a3921;
+            box-shadow: 0 4px 0 #2a1a10;
+        }
+
+        @keyframes buttonGlow {
+            0% {
+                box-shadow: 0 4px 0 #5a3921;
+            }
+
+            100% {
+                box-shadow: 0 4px 10px rgba(139, 90, 43, 0.7);
+            }
+        }
+
+        .night .explore-button {
+            animation: buttonGlowNight 2s infinite alternate;
+        }
+
+        @keyframes buttonGlowNight {
+            0% {
+                box-shadow: 0 4px 0 #2a1a10;
+            }
+
+            100% {
+                box-shadow: 0 4px 10px rgba(80, 60, 40, 0.7), 0 0 20px rgba(227, 196, 150, 0.3);
+            }
         }
 
         .explore-button:hover {
             background-color: #734222;
-            transform: translateY(2px);
+            transform: translateY(2px) scale(1.05);
             box-shadow: 0 2px 0 #5a3921;
+            animation: none;
+        }
+
+        .night .explore-button:hover {
+            background-color: #2a1a10;
+            box-shadow: 0 2px 0 #1a0a05;
         }
 
         .farmer {
@@ -82,6 +188,24 @@
             height: 150px;
             margin: 30px auto;
             position: relative;
+            animation: farmerBounce 3s infinite ease-in-out;
+            transition: filter 8s;
+        }
+
+        .night .farmer {
+            filter: brightness(0.7) contrast(1.2);
+        }
+
+        @keyframes farmerBounce {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
         }
 
         .farmer-body {
@@ -102,6 +226,19 @@
             position: absolute;
             top: -20px;
             left: 40px;
+            animation: headNod 3s infinite;
+        }
+
+        @keyframes headNod {
+
+            0%,
+            100% {
+                transform: rotate(0deg);
+            }
+
+            50% {
+                transform: rotate(5deg);
+            }
         }
 
         .farmer-hat {
@@ -113,6 +250,19 @@
             top: -15px;
             left: 30px;
             transform: rotate(-5deg);
+            animation: hatTip 4s infinite ease-in-out;
+        }
+
+        @keyframes hatTip {
+
+            0%,
+            100% {
+                transform: rotate(-5deg);
+            }
+
+            50% {
+                transform: rotate(-10deg);
+            }
         }
 
         .farmer-hat-top {
@@ -147,12 +297,36 @@
             transform: rotate(20deg);
             left: 25px;
             top: 40px;
+            animation: armWave 2s infinite alternate;
+            transform-origin: top center;
+        }
+
+        @keyframes armWave {
+            0% {
+                transform: rotate(20deg);
+            }
+
+            100% {
+                transform: rotate(35deg);
+            }
         }
 
         .farmer-arm-right {
             transform: rotate(-20deg);
             right: 25px;
             top: 40px;
+            animation: armWave2 2.5s infinite alternate;
+            transform-origin: top center;
+        }
+
+        @keyframes armWave2 {
+            0% {
+                transform: rotate(-20deg);
+            }
+
+            100% {
+                transform: rotate(-40deg);
+            }
         }
 
         .farmer-leg-left,
@@ -167,10 +341,38 @@
 
         .farmer-leg-left {
             left: 50px;
+            animation: legKick 1.5s infinite alternate;
+            transform-origin: top center;
+        }
+
+        @keyframes legKick {
+
+            0%,
+            100% {
+                transform: rotate(0);
+            }
+
+            50% {
+                transform: rotate(5deg);
+            }
         }
 
         .farmer-leg-right {
             right: 50px;
+            animation: legKick2 1.5s infinite alternate-reverse;
+            transform-origin: top center;
+        }
+
+        @keyframes legKick2 {
+
+            0%,
+            100% {
+                transform: rotate(0);
+            }
+
+            50% {
+                transform: rotate(-5deg);
+            }
         }
 
         .field {
@@ -182,6 +384,29 @@
             left: 0;
             z-index: 1;
             border-top: 15px solid #5a3921;
+            animation: fieldWave 15s infinite linear;
+            transition: background-color 8s, border-top-color 8s;
+        }
+
+        .night .field {
+            background-color: #5b4633;
+            border-top-color: #2a1a10;
+        }
+
+        @keyframes fieldWave {
+
+            0%,
+            100% {
+                transform: skewX(0);
+            }
+
+            25% {
+                transform: skewX(1deg);
+            }
+
+            75% {
+                transform: skewX(-1deg);
+            }
         }
 
         .crop {
@@ -191,6 +416,29 @@
             background-color: #44733d;
             bottom: 0;
             z-index: 2;
+            animation: cropSway 3s infinite ease-in-out;
+            transform-origin: bottom center;
+            transition: background-color 8s;
+        }
+
+        .night .crop {
+            background-color: #243320;
+        }
+
+        @keyframes cropSway {
+
+            0%,
+            100% {
+                transform: rotate(0);
+            }
+
+            25% {
+                transform: rotate(5deg);
+            }
+
+            75% {
+                transform: rotate(-5deg);
+            }
         }
 
         .crop:before {
@@ -202,6 +450,11 @@
             border-radius: 50%;
             top: -5px;
             left: -10px;
+            transition: background-color 8s;
+        }
+
+        .night .crop:before {
+            background-color: #243320;
         }
 
         .tractor {
@@ -210,10 +463,42 @@
             height: 60px;
             background-color: #d62828;
             border-radius: 8px;
-            bottom: 100px;
-            left: 10%;
+            bottom: 70px;
+            left: -150px;
             z-index: 2;
-            animation: tractorMove 30s linear infinite;
+            animation: tractorDrive 20s linear infinite;
+            transition: filter 8s;
+        }
+
+        .night .tractor {
+            filter: brightness(0.6);
+        }
+
+        @keyframes tractorDrive {
+            0% {
+                left: -150px;
+                transform: scaleX(1);
+            }
+
+            45% {
+                left: 100%;
+                transform: scaleX(1);
+            }
+
+            50% {
+                left: 100%;
+                transform: scaleX(-1);
+            }
+
+            95% {
+                left: -150px;
+                transform: scaleX(-1);
+            }
+
+            100% {
+                left: -150px;
+                transform: scaleX(1);
+            }
         }
 
         .tractor-cab {
@@ -226,12 +511,40 @@
             left: 10px;
         }
 
+        .tractor-light {
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            background-color: #ffdb58;
+            border-radius: 50%;
+            top: 10px;
+            left: 5px;
+            box-shadow: 0 0 10px #ffdb58;
+            opacity: 0;
+            transition: opacity 2s;
+        }
+
+        .night .tractor-light {
+            opacity: 1;
+        }
+
         .tractor-wheel-front,
         .tractor-wheel-back {
             position: absolute;
             background-color: #333;
             border-radius: 50%;
             bottom: -20px;
+            animation: wheelSpin 2s linear infinite;
+        }
+
+        @keyframes wheelSpin {
+            0% {
+                transform: rotate(0);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         .tractor-wheel-front {
@@ -261,55 +574,239 @@
             background-color: white;
             border-radius: 50%;
             opacity: 0.8;
+            animation: cloudFloat 60s linear infinite;
+            transition: opacity 8s, filter 8s;
         }
 
-        .video-container {
-            position: fixed;
+        .night .cloud {
+            opacity: 0.3;
+            filter: brightness(0.2) contrast(0.8);
+        }
+
+        @keyframes cloudFloat {
+            0% {
+                transform: translateX(-100%);
+            }
+
+            100% {
+                transform: translateX(100vw);
+            }
+        }
+
+        /* Stars in sky */
+        .stars {
+            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
-            height: 100%;
-            z-index: 100;
-            background-color: rgba(90, 57, 33, 0.9);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
+            height: 60%;
+            z-index: -1;
+            overflow: hidden;
         }
 
-        .rick-text {
-            font-size: 2.5rem;
-            color: #f5e7c1;
-            margin-bottom: 20px;
-            font-family: 'Courier New', Courier, monospace;
-            text-transform: uppercase;
-            letter-spacing: 2px;
+        .star {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+            animation: twinkle 3s infinite alternate;
+            opacity: 0;
+            transition: opacity 4s;
         }
 
-        @keyframes tractorMove {
-            0% {
-                left: -15%;
-                transform: scaleX(1);
+        .night .star {
+            opacity: 1;
+        }
+
+        @keyframes twinkle {
+
+            0%,
+            100% {
+                opacity: 0.2;
+                transform: scale(0.8);
             }
 
-            45% {
-                left: 100%;
-                transform: scaleX(1);
+            50% {
+                opacity: 1;
+                transform: scale(1.2);
+            }
+        }
+
+        /* Birds */
+        .bird {
+            position: absolute;
+            font-size: 20px;
+            z-index: 3;
+            color: #444;
+            animation: flyBird 40s linear infinite;
+            transition: opacity 8s;
+        }
+
+        .night .bird {
+            opacity: 0;
+        }
+
+        @keyframes flyBird {
+            0% {
+                left: -5%;
+                top: 10%;
+                transform: scale(1);
+            }
+
+            50% {
+                left: 110%;
+                top: 20%;
+                transform: scale(1);
+            }
+
+            51% {
+                left: 110%;
+                transform: scale(-1, 1);
+            }
+
+            100% {
+                left: -5%;
+                top: 15%;
+                transform: scale(-1, 1);
+            }
+        }
+
+        .butterfly {
+            position: absolute;
+            font-size: 16px;
+            z-index: 3;
+            color: #a83282;
+            animation: butterflyFly 25s linear infinite alternate;
+            transition: opacity 8s;
+        }
+
+        .night .butterfly {
+            opacity: 0;
+        }
+
+        @keyframes butterflyFly {
+            0% {
+                left: 10%;
+                top: 30%;
+            }
+
+            25% {
+                left: 20%;
+                top: 20%;
+            }
+
+            50% {
+                left: 50%;
+                top: 25%;
+            }
+
+            75% {
+                left: 70%;
+                top: 15%;
+            }
+
+            100% {
+                left: 90%;
+                top: 30%;
+            }
+        }
+
+        /* Sun and Moon */
+        .sun-moon-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 40%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .sun {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            background: radial-gradient(circle, #ffdb58 30%, #ff9d00 70%);
+            border-radius: 50%;
+            left: -100px;
+            top: 40px;
+            box-shadow: 0 0 40px #ffdb58;
+            animation: sunMove 30s linear infinite;
+        }
+
+        @keyframes sunMove {
+
+            0%,
+            100% {
+                left: -100px;
+                top: 40px;
+                transform: scale(1);
+            }
+
+            25% {
+                left: 25%;
+                top: 20px;
+                transform: scale(1.2);
             }
 
             50% {
                 left: 100%;
-                transform: scaleX(-1);
+                top: 40px;
+                transform: scale(1);
             }
 
-            95% {
-                left: -15%;
-                transform: scaleX(-1);
+            50.001%,
+            99.999% {
+                left: -900px;
+            }
+        }
+
+        .moon {
+            position: absolute;
+            width: 70px;
+            height: 70px;
+            background: radial-gradient(circle, #e8e8e8 30%, #b0b0b0 70%);
+            border-radius: 50%;
+            left: -900px;
+            top: 40px;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.6);
+            animation: moonMove 30s linear infinite;
+        }
+
+        .moon:before {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: rgba(190, 190, 190, 0.6);
+            border-radius: 50%;
+            top: 15px;
+            left: 15px;
+        }
+
+        @keyframes moonMove {
+
+            0%,
+            49.999% {
+                left: -900px;
             }
 
+            50%,
             100% {
-                left: -15%;
-                transform: scaleX(1);
+                left: -100px;
+                top: 40px;
+                transform: scale(1);
+            }
+
+            75% {
+                left: 25%;
+                top: 20px;
+                transform: scale(1.2);
+            }
+
+            99.999% {
+                left: 100%;
+                top: 40px;
+                transform: scale(1);
             }
         }
 
@@ -334,14 +831,23 @@
                 transform: scale(0.8);
             }
 
-            .rick-text {
-                font-size: 1.5rem;
+            .sun,
+            .moon {
+                width: 60px;
+                height: 60px;
             }
         }
     </style>
 </head>
 
 <body>
+    <div class="sky"></div>
+
+    <div class="sun-moon-container">
+        <div class="sun"></div>
+        <div class="moon"></div>
+    </div>
+
     <div class="container" id="farmContent">
         <h1>COSMIC HARVEST</h1>
         <div class="farmer">
@@ -364,20 +870,16 @@
 
     <div class="tractor">
         <div class="tractor-cab"></div>
+        <div class="tractor-light"></div>
         <div class="tractor-wheel-front"></div>
         <div class="tractor-wheel-back"></div>
     </div>
 
     <div class="field" id="field"></div>
     <div class="clouds" id="clouds"></div>
-
-    <div class="video-container" id="rickRollContainer">
-        <div class="rick-text">YOU JUST GOT BARN ROLLED!</div>
-        <video id="spaceVideo" width="720" controls autoplay>
-            <source src="video.mp4" type="video/mp4">
-            Your browser does not support the video tag.
-        </video>
-    </div>
+    <div class="stars" id="stars"></div>
+    <div class="bird">✈</div>
+    <div class="butterfly">&#x1F98B;</div>
 
     <script>
         // Create clouds
@@ -391,10 +893,28 @@
             cloud.style.height = `${size / 2}px`;
             cloud.style.top = `${Math.random() * 30}%`;
             cloud.style.left = `${Math.random() * 100}%`;
+            cloud.style.animationDuration = `${60 + Math.random() * 40}s`;
+            cloud.style.animationDelay = `${Math.random() * -30}s`;
             cloudsContainer.appendChild(cloud);
         }
 
-        // Create crops in the field
+        // Create stars
+        const starsContainer = document.getElementById('stars');
+        const starCount = 50;
+        for (let i = 0; i < starCount; i++) {
+            const star = document.createElement('div');
+            star.classList.add('star');
+            const size = Math.random() * 3 + 1;
+            star.style.width = `${size}px`;
+            star.style.height = `${size}px`;
+            star.style.top = `${Math.random() * 40}%`;
+            star.style.left = `${Math.random() * 100}%`;
+            star.style.animationDuration = `${1 + Math.random() * 5}s`;
+            star.style.animationDelay = `${Math.random() * -5}s`;
+            starsContainer.appendChild(star);
+        }
+
+        // Create crops in the field with varied properties
         const field = document.getElementById('field');
         const cropCount = 20;
         for (let i = 0; i < cropCount; i++) {
@@ -402,13 +922,80 @@
             crop.classList.add('crop');
             crop.style.left = `${5 + (i * 5)}%`;
             crop.style.height = `${30 + Math.random() * 30}px`;
+
+            // Varied animation timing for each crop
+            crop.style.animationDuration = `${2 + Math.random() * 3}s`;
+            crop.style.animationDelay = `${Math.random() * -2}s`;
+
             field.appendChild(crop);
         }
 
-        // Show video on button click
+        // Create multiple birds
+        for (let i = 0; i < 3; i++) {
+            const bird = document.createElement('div');
+            bird.classList.add('bird');
+            bird.innerHTML = '✈';
+            bird.style.fontSize = `${15 + Math.random() * 10}px`;
+            bird.style.top = `${10 + Math.random() * 20}%`;
+            bird.style.animationDuration = `${30 + Math.random() * 20}s`;
+            bird.style.animationDelay = `${Math.random() * -15}s`;
+            document.body.appendChild(bird);
+        }
+
+        // Create multiple butterflies
+        for (let i = 0; i < 5; i++) {
+            const butterfly = document.createElement('div');
+            butterfly.classList.add('butterfly');
+            butterfly.innerHTML = '&#x1F98B;';
+            butterfly.style.fontSize = `${10 + Math.random() * 8}px`;
+            butterfly.style.color = `hsl(${Math.random() * 360}, 80%, 60%)`;
+            butterfly.style.animationDuration = `${15 + Math.random() * 15}s`;
+            butterfly.style.animationDelay = `${Math.random() * -10}s`;
+            document.body.appendChild(butterfly);
+        }
+
+        // Day/night cycle
+        let isDayTime = true;
+        setInterval(() => {
+            document.body.classList.toggle('night');
+            isDayTime = !isDayTime;
+        }, 15000); // Toggle every 15 seconds
+
+        // Redirect to Rick Roll on YouTube when button is clicked
         document.getElementById("exploreBtn").addEventListener("click", () => {
-            document.getElementById("rickRollContainer").style.display = "flex";
-            document.getElementById("spaceVideo").play();
+            // Rick Roll video URL on YouTube
+            window.location.href = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+        });
+
+        // Make button bounce slightly on hover to attract attention
+        const exploreBtn = document.getElementById("exploreBtn");
+        exploreBtn.addEventListener("mouseover", () => {
+            exploreBtn.style.animation = "buttonPulse 0.5s infinite alternate";
+        });
+        exploreBtn.addEventListener("mouseout", () => {
+            exploreBtn.style.animation = isDayTime ? "buttonGlow 2s infinite alternate" : "buttonGlowNight 2s infinite alternate";
+        });
+
+        // Add some visual feedback when exploring the page
+        window.addEventListener("mousemove", (e) => {
+            // Create sparkles where the mouse moves (subtle effect)
+            if (Math.random() > 0.98) {
+                const sparkle = document.createElement('div');
+                sparkle.style.position = 'absolute';
+                sparkle.style.width = '3px';
+                sparkle.style.height = '3px';
+                sparkle.style.backgroundColor = isDayTime ?
+                    `hsl(${Math.random() * 60 + 40}, 100%, 75%)` :
+                    `hsl(${Math.random() * 60 + 210}, 100%, 75%)`;
+                sparkle.style.borderRadius = '50%';
+                sparkle.style.top = `${e.clientY}px`;
+                sparkle.style.left = `${e.clientX}px`;
+                sparkle.style.zIndex = '9999';
+                document.body.appendChild(sparkle);
+                setTimeout(() => {
+                    sparkle.remove();
+                }, 500);
+            }
         });
     </script>
 </body>
