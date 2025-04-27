@@ -8,11 +8,11 @@ import {
     FiAlertCircle,
     FiRefreshCw
 } from 'react-icons/fi';
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, ArcElement } from 'chart.js';
-import { Line, Bar, Doughnut } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend } from 'chart.js';
+import { Line } from 'react-chartjs-2';
 
 // Register ChartJS components
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, ArcElement);
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend);
 
 const Dashboard = () => {
     const [stats, setStats] = useState(null);
@@ -113,26 +113,6 @@ const Dashboard = () => {
         ]
     };
 
-    // Generate category chart data from real data
-    const categoryChartData = {
-        labels: stats.categoryData?.labels || [],
-        datasets: [
-            {
-                data: stats.categoryData?.data || [],
-                backgroundColor: [
-                    'rgba(54, 162, 235, 0.6)',
-                    'rgba(255, 99, 132, 0.6)',
-                    'rgba(75, 192, 192, 0.6)',
-                    'rgba(255, 206, 86, 0.6)',
-                    'rgba(153, 102, 255, 0.6)',
-                    'rgba(255, 159, 64, 0.6)',
-                    'rgba(201, 203, 207, 0.6)'
-                ],
-                borderWidth: 1
-            }
-        ]
-    };
-
     return (
         <div className="space-y-6">
             {/* Stats Cards */}
@@ -191,9 +171,9 @@ const Dashboard = () => {
             </div>
 
             {/* Charts */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 gap-6">
                 {/* Sales Trend */}
-                <div className="admin-card lg:col-span-2">
+                <div className="admin-card">
                     <h3 className="text-xl font-semibold mb-4">Revenue Trends</h3>
                     <div className="h-80">
                         <Line
@@ -214,25 +194,6 @@ const Dashboard = () => {
                                         callbacks: {
                                             label: context => `$${context.parsed.y}`
                                         }
-                                    }
-                                }
-                            }}
-                        />
-                    </div>
-                </div>
-
-                {/* Category Distribution */}
-                <div className="admin-card">
-                    <h3 className="text-xl font-semibold mb-4">Category Distribution</h3>
-                    <div className="h-80 flex items-center justify-center">
-                        <Doughnut
-                            data={categoryChartData}
-                            options={{
-                                responsive: true,
-                                maintainAspectRatio: false,
-                                plugins: {
-                                    legend: {
-                                        position: 'bottom'
                                     }
                                 }
                             }}
