@@ -92,10 +92,11 @@ export const requireApprovedSeller = async (req, res, next) => {
             return res.status(403).json({ message: 'Access denied, seller role required' });
         }
 
-        if (user.sellerStatus !== 'approved') {
+        // Check if sellerApplication exists and is approved
+        if (!user.sellerApplication || user.sellerApplication.status !== 'approved') {
             return res.status(403).json({
                 message: 'Your seller account is pending approval or has been rejected',
-                status: user.sellerStatus
+                status: user.sellerApplication?.status || 'pending'
             });
         }
 

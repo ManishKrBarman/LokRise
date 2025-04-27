@@ -2,7 +2,7 @@ import React from 'react';
 import { FiShoppingCart } from 'react-icons/fi';
 
 const CartSummary = ({ totals, onCheckout }) => {
-    const { subtotal, tax, shipping, total, itemCount } = totals;
+    const { subtotal, shipping, total, itemCount } = totals;
 
     return (
         <div className="bg-white rounded-lg shadow-md p-6">
@@ -12,10 +12,6 @@ const CartSummary = ({ totals, onCheckout }) => {
                 <div className="flex justify-between">
                     <span>Subtotal ({itemCount} items)</span>
                     <span className="font-medium">₹{subtotal.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between">
-                    <span>Tax (18% GST)</span>
-                    <span className="font-medium">₹{tax.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                     <span>Shipping</span>

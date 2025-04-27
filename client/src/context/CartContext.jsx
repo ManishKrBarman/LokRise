@@ -214,9 +214,9 @@ export const CartProvider = ({ children }) => {
         return {
             itemCount,
             subtotal,
-            tax: subtotal * 0.18, // Assuming 18% tax
+            tax: 0, // Remove tax calculation
             shipping: subtotal > 0 ? (subtotal > 1000 ? 0 : 100) : 0, // Free shipping over ₹1000
-            total: subtotal + (subtotal * 0.18) + (subtotal > 0 ? (subtotal > 1000 ? 0 : 100) : 0)
+            total: subtotal + (subtotal > 0 ? (subtotal > 1000 ? 0 : 100) : 0) // Remove tax from total
         };
     };
 

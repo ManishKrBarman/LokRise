@@ -13,7 +13,7 @@ const productSchema = new mongoose.Schema({
     price: { type: Number, required: true },
     originalPrice: { type: Number }, // For showing discounts
     quantityAvailable: { type: Number, required: true },
-    category: { type: String, required: true },
+    category: { type: String, required: true }, // Changed from ObjectId reference to String
     subCategory: { type: String },
     images: [{ type: String }],
     seller: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },

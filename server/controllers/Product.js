@@ -23,14 +23,6 @@ export const createProduct = async (req, res) => {
             shippingDetails
         } = req.body;
 
-        // Validate category exists
-        if (category) {
-            const categoryExists = await CategoryModel.findById(category);
-            if (!categoryExists) {
-                return res.status(404).json({ message: "Category not found" });
-            }
-        }
-
         // Create product with seller ID from authenticated user
         const product = new Product({
             seller: req.user.id,
@@ -463,6 +455,20 @@ export const getFeaturedProducts = async (req, res) => {
         res.status(200).json(featuredProducts);
     } catch (err) {
         console.error('Get featured products error:', err);
+        res.status(500).json({ message: err.message });
+    }
+};
+
+// Get all product categories
+export const getAllCategories = async (req, res) => {
+    try {
+        const categories = await CategoryModel.find({ isActive: true })
+            .select('_id name slug description icon image')
+            .sort({ displayOrder: 1, name: 1 });
+
+        res.status(200).json(categories);
+    } catch (err) {
+        console.error('Get categories error:', err);
         res.status(500).json({ message: err.message });
     }
 };

@@ -35,7 +35,9 @@ const getBaseUrl = () => {
     if (import.meta.env.VITE_API_URL) {
         return import.meta.env.VITE_API_URL;
     }
-    throw new Error('VITE_API_URL environment variable is not defined');
+    // Fallback to localhost if environment variable is not set
+    console.log('VITE_API_URL not defined, falling back to default URL');
+    return 'http://localhost:3000';
 };
 
 export const BASE_URL = getBaseUrl();

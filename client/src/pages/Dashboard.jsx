@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { authAPI, sellerAPI } from '../services/api';
+import { authAPI, sellerAPI, productAPI } from '../services/api';
 import { FiPackage, FiHeart, FiShoppingCart, FiDollarSign, FiCreditCard, FiStar, FiPlus, FiTrendingUp, FiUsers, FiBarChart2, FiAlertCircle, FiLock, FiUserX } from 'react-icons/fi';
 import NavBar from '../components/NavBar';
 import Footer from '../components/Footer';
@@ -100,8 +100,15 @@ const Dashboard = () => {
 
                                 // Only fetch products if seller is approved
                                 if (statusResponse.data.status === 'approved') {
-                                    // This would be an API call in a real app
-                                    setSellerProducts([]); // Would be populated from API
+                                    // Fetch seller products from API
+                                    const productsResponse = await productAPI.getSellerProducts({
+                                        page: 1,
+                                        limit: 5 // Limit to 5 most recent products
+                                    });
+                                    
+                                    if (productsResponse.data && productsResponse.data.products) {
+                                        setSellerProducts(productsResponse.data.products);
+                                    }
                                 }
                             } else if (!sellerStatus && user.sellerApplication) {
                                 // Fallback to user object if API doesn't return status
@@ -136,6 +143,42 @@ const Dashboard = () => {
         }
     }, [user, isSeller, sellerStatus]);
 
+    // Add a refresh function to reload seller products
+    const loadSellerProducts = async () => {
+        if (isSeller && sellerStatus === 'approved') {
+            try {
+                console.log("Fetching seller products");
+                const productsResponse = await productAPI.getSellerProducts({
+                    page: 1,
+                    limit: 10 // Fetch more products to display
+                });
+                
+                if (productsResponse.data && productsResponse.data.products) {
+                    console.log("Successfully fetched products:", productsResponse.data.products.length);
+                    setSellerProducts(productsResponse.data.products);
+                    // Update product count in metrics
+                    setMetrics(prev => ({
+                        ...prev,
+                        productCount: productsResponse.data.totalProducts || productsResponse.data.products.length
+                    }));
+                } else {
+                    console.log("No products returned or invalid response structure");
+                    setSellerProducts([]);
+                }
+            } catch (error) {
+                console.error("Error fetching seller products:", error);
+                setSellerProducts([]);
+            }
+        }
+    };
+
+    // Separate useEffect for loading seller products to avoid dependency issues
+    useEffect(() => {
+        if (user && isSeller && sellerStatus === 'approved' && !loading) {
+            loadSellerProducts();
+        }
+    }, [user, isSeller, sellerStatus, loading]);
+
     // Display actual status in console for debugging
     useEffect(() => {
         if (user) {
@@ -148,14 +191,21 @@ const Dashboard = () => {
         }
     }, [sellerStatus, user, isSeller]);
 
-    const handleProductCreationSuccess = (newProduct) => {
-        setSellerProducts([newProduct, ...sellerProducts]);
+    const handleProductCreationSuccess = async (newProduct) => {
+        // Add the new product to the beginning of the list
+        setSellerProducts(prevProducts => [newProduct, ...prevProducts]);
+        
+        // Close the product form modal
         setShowProductForm(false);
-        // Update metrics
+        
+        // Update product count in metrics
         setMetrics(prev => ({
             ...prev,
             productCount: prev.productCount + 1
         }));
+
+        // Show a notification or toast message that could be implemented later
+        console.log('Product created successfully:', newProduct);
     };
 
     const renderSellerApprovalMessage = () => {
@@ -460,7 +510,7 @@ const Dashboard = () => {
                             <div className="divide-y divide-gray-200">
                                 {sellerProducts.length > 0 ? (
                                     sellerProducts.map((product) => (
-                                        <div key={product.id} className="p-6 flex items-center justify-between">
+                                        <div key={product._id} className="p-6 flex items-center justify-between">
                                             <div className="flex items-center">
                                                 <div className="w-12 h-12 bg-gray-200 rounded-md mr-4">
                                                     {product.images && product.images.length > 0 && (
@@ -478,7 +528,12 @@ const Dashboard = () => {
                                             </div>
                                             <div className="flex space-x-2">
                                                 <button className="px-3 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded">Edit</button>
-                                                <button className="px-3 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded">View</button>
+                                                <button 
+                                                    className="px-3 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded"
+                                                    onClick={() => navigate(`/product/${product._id}`)}
+                                                >
+                                                    View
+                                                </button>
                                             </div>
                                         </div>
                                     ))

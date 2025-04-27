@@ -115,10 +115,6 @@ const OrderSuccess = () => {
                                     <span>{orderDetails.shippingFee > 0 ? 
                                         `₹${orderDetails.shippingFee.toFixed(2)}` : 'Free'}</span>
                                 </div>
-                                <div className="flex justify-between text-sm">
-                                    <span>Tax</span>
-                                    <span>₹{orderDetails.tax?.toFixed(2)}</span>
-                                </div>
                                 <div className="flex justify-between font-medium pt-3 border-t">
                                     <span>Total</span>
                                     <span>₹{orderDetails.totalAmount?.toFixed(2)}</span>

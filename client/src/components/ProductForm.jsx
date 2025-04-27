@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import FormInput from './FormInput';
 import { productAPI, uploadAPI, authAPI } from '../services/api';
+import api from '../services/api';
 
 const ProductForm = ({ onSuccess, onCancel, initialSellerStatus }) => {
     const { user } = useAuth();
@@ -68,11 +69,24 @@ const ProductForm = ({ onSuccess, onCancel, initialSellerStatus }) => {
         // Fetch categories from API
         const fetchCategories = async () => {
             try {
-                // In a real app, you'd fetch from your API
-                // For now, using mock data
-                setCategories(['Electronics', 'Fashion', 'Home & Garden', 'Books', 'Courses']);
+                // Use hardcoded categories since the API endpoint might not be working properly
+                setCategories([
+                    { _id: "electronics", name: "Electronics" },
+                    { _id: "fashion", name: "Fashion" },
+                    { _id: "home-garden", name: "Home & Garden" },
+                    { _id: "books", name: "Books" },
+                    { _id: "courses", name: "Courses" }
+                ]);
             } catch (error) {
                 console.error('Error fetching categories:', error);
+                // Fallback to static categories
+                setCategories([
+                    { _id: "electronics", name: "Electronics" },
+                    { _id: "fashion", name: "Fashion" },
+                    { _id: "home-garden", name: "Home & Garden" },
+                    { _id: "books", name: "Books" },
+                    { _id: "courses", name: "Courses" }
+                ]);
             }
         };
 
@@ -173,13 +187,20 @@ const ProductForm = ({ onSuccess, onCancel, initialSellerStatus }) => {
         }
 
         try {
+            // Format the data according to the server's expected schema
             const productData = {
-                ...formData,
+                name: formData.name,
+                description: formData.description,
                 price: parseFloat(formData.price || 0),
                 originalPrice: formData.originalPrice ? parseFloat(formData.originalPrice) : undefined,
                 quantityAvailable: parseInt(formData.quantityAvailable || 0),
-                seller: user._id,
+                category: formData.category,
+                subCategory: formData.subCategory,
+                location: formData.location,
                 tags: formData.tags ? formData.tags.split(',').map(tag => tag.trim()) : [],
+                productType: formData.productType,
+                status: 'active', // Set default status
+                images: formData.images || [],
                 ...(formData.productType === 'course' && {
                     courseDetails: {
                         ...courseDetails,
@@ -188,36 +209,31 @@ const ProductForm = ({ onSuccess, onCancel, initialSellerStatus }) => {
                 })
             };
 
-            // For development/testing - mock API call
-            console.log('Would send product data to API:', productData);
-
-            // Simulate successful product creation
-            const mockResponse = {
-                data: {
-                    ...productData,
-                    _id: 'temp_' + Date.now(),
-                    createdAt: new Date().toISOString(),
-                    rating: 0,
-                    reviewCount: 0,
-                    purchaseCount: 0,
-                    viewCount: 0,
-                    inStock: true,
-                    featured: false,
-                    isNewProduct: true
-                }
-            };
-
-            // In production, uncomment this to use the real API
-            // const response = await productAPI.createProduct(productData);
-
-            onSuccess(mockResponse.data);
+            console.log('Submitting product data:', productData);
+            
+            // Use the real API to create a product
+            const response = await productAPI.createProduct(productData);
+            console.log('Product created successfully:', response.data);
+            
+            // Pass the created product data to the success handler
+            onSuccess(response.data.product);
         } catch (error) {
             console.error('Error creating product:', error);
-            if (error.response?.status === 403) {
-                setError('Your seller account is pending approval or has been rejected.');
+            
+            // More detailed error handling
+            if (error.response) {
+                // The server responded with a status code outside of 2xx range
+                const errorMessage = error.response.data?.message || 'Server error occurred';
+                setError(`Error: ${errorMessage} (${error.response.status})`);
+            } else if (error.request) {
+                // The request was made but no response was received
+                setError('No response from server. Please check your connection and try again.');
             } else {
-                setError(error.response?.data?.message || 'Failed to create product. Please try again.');
+                // Something happened in setting up the request
+                setError('Failed to create product: ' + error.message);
             }
+            
+            setIsSubmitting(false);
         } finally {
             setIsSubmitting(false);
         }
@@ -380,9 +396,9 @@ const ProductForm = ({ onSuccess, onCancel, initialSellerStatus }) => {
                         required
                     >
                         <option value="">Select Category</option>
-                        {categories.map((cat, index) => (
-                            <option key={index} value={cat}>
-                                {cat}
+                        {categories.map((cat) => (
+                            <option key={cat._id} value={cat._id}>
+                                {cat.name}
                             </option>
                         ))}
                     </select>

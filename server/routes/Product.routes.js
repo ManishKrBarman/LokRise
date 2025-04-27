@@ -11,6 +11,7 @@ import {
     getRelatedProducts,
     getFeaturedProducts,
     getCoursesBySearch,
+    getAllCategories,
 } from '../controllers/Product.js';
 
 import {
@@ -23,6 +24,7 @@ const router = express.Router();
 
 // ----------- PUBLIC ROUTES -----------
 router.get('/', getProducts); // All products
+router.get('/categories', getAllCategories); // Get all product categories
 router.get('/search/courses', getCoursesBySearch); // Search courses
 router.get('/featured', getFeaturedProducts); // Featured products
 router.get('/:id/related', getRelatedProducts); // Related products by product ID

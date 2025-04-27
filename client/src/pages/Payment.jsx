@@ -922,10 +922,6 @@ const Payment = () => {
                             <span className="text-gray-700">Subtotal</span>
                             <span>₹{cartTotal?.toFixed(2) || '0.00'}</span>
                         </div>
-                        <div className="flex justify-between mb-1">
-                            <span className="text-gray-700">Shipping</span>
-                            <span>₹0.00</span>
-                        </div>
                         <div className="flex justify-between font-medium">
                             <span>Total</span>
                             <span>₹{cartTotal?.toFixed(2) || '0.00'}</span>
