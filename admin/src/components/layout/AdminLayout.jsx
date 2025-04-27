@@ -24,10 +24,17 @@ const AdminLayout = () => {
 
     // Function to safely get the user initial
     const getUserInitial = () => {
-        if (user && user.name && typeof user.name === 'string' && user.name.length > 0) {
-            return user.name.charAt(0);
+        try {
+            if (user && user.name) {
+                // Convert to string in case name is not a string type
+                const nameStr = String(user.name);
+                return nameStr.length > 0 ? nameStr.charAt(0).toUpperCase() : 'A';
+            }
+            return 'A'; // Default fallback
+        } catch (error) {
+            console.error('Error getting user initial:', error);
+            return 'A'; // Default fallback on error
         }
-        return 'A'; // Default fallback
     };
 
     const menuItems = [
