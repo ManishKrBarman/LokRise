@@ -22,6 +22,14 @@ const AdminLayout = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
+    // Function to safely get the user initial
+    const getUserInitial = () => {
+        if (user && user.name && typeof user.name === 'string' && user.name.length > 0) {
+            return user.name.charAt(0);
+        }
+        return 'A'; // Default fallback
+    };
+
     const menuItems = [
         { path: '/', icon: <FiHome size={20} />, label: 'Dashboard' },
         { path: '/users', icon: <FiUsers size={20} />, label: 'Users' },
@@ -88,7 +96,7 @@ const AdminLayout = () => {
                                 onClick={() => setDropdownOpen(!dropdownOpen)}
                             >
                                 <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center">
-                                    {user?.name?.charAt(0) || 'A'}
+                                    {getUserInitial()}
                                 </div>
                                 {!sidebarCollapsed && (
                                     <>

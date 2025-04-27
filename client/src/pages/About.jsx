@@ -158,7 +158,7 @@ const AboutPage = () => {
             role: "UI/UX Designer",
             specialty: "Visual Design",
             quote: "Simplicity is the ultimate sophistication.",
-            github: "https://github.com/notCreatedYetAcct"
+            github: "https://github.com/kashyaphimansh3/kashyaphimansh3"
         }
     ];
 
