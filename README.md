@@ -1,159 +1,139 @@
-# LokRise
+![github-submission-banner](https://github.com/user-attachments/assets/a1493b84-e4e2-456e-a791-ce35ee2bcf2f)
 
-![LokRise Logo](client/src/assets/logo.svg)
+# 🚀 LokRise
 
-## Project Overview
+> Empowering rural artisans by connecting them to global markets through an integrated e-commerce and education platform.
 
-LokRise is a comprehensive platform designed to connect rural artisans, farmers, and micro-entrepreneurs directly with a global market, while preserving and promoting India's cultural heritage and craftsmanship. The platform combines e-commerce, education, and community features to create a holistic ecosystem that empowers rural creators.
+---
 
-## Tech Stack
+## 📌 Problem Statement
 
-### Frontend
-- **Client Application**: React 18 with Vite
-- **Admin Dashboard**: React 18 with Vite
-- **Styling**: Tailwind CSS
-- **Icons**: React-Icons (FI - Feather Icons set)
-- **State Management**: React Context API
-- **Routing**: React Router v6
-- **Animation**: Framer Motion
+**Problem Statement 7 – Transform the Future of Rural Commerce**
 
-### Backend
-- **Server**: Node.js with Express
-- **Database**: MongoDB with Mongoose ODM
-- **Authentication**: JWT (JSON Web Tokens)
-- **Email Service**: Configurable SMTP service
-- **API Architecture**: RESTful API
+---
 
-### Payment Processing (DEMONSTRATION)
+## 🎯 Objective
+
+LokRise bridges the gap between rural artisans, farmers, and micro-entrepreneurs and the global marketplace, while preserving India's rich cultural heritage and craftsmanship. The platform addresses challenges like limited market reach, technological barriers, and lack of educational resources faced by rural creators.
+
+Our solution creates a sustainable ecosystem that empowers rural communities through:
+- Direct market access without intermediaries
+- Digital literacy and business skill development
+- Community building and cultural preservation
+- Fair pricing and economic opportunity
+
+---
+
+## 🧠 Team & Approach
+
+### Team Name:  
+`Creon Team`
+
+### Team Members:  
+- Manish Kr Barman (Full Stack Developer) - [GitHub](https://github.com/ManishKrBarman)
+- Devesh - Full Stack Developer
+- Raghav - UI/UX Designer (UX)
+- Himanshi - UI/UX Designer (UI)
+
+### Our Approach:  
+- We chose this problem to address the significant digital divide and market access gap faced by rural artisans
+- Key challenges we addressed include low digital literacy, limited connectivity in rural areas, and the need for culturally sensitive UX design
+- We pivoted from a purely e-commerce platform to a holistic ecosystem that combines marketplace, education, and community features based on our research into rural artisans' needs
+
+---
+
+## 🛠️ Tech Stack
+
+### Core Technologies Used:
+- **Frontend:**
+  - React 18 with Vite
+  - Tailwind CSS
+  - React Router v6
+  - React Context API
+  - Framer Motion
+  - React-Icons (FI - Feather Icons set)
+
+- **Backend:**
+  - Node.js with Express
+  - JWT Authentication
+  - RESTful API Architecture
+  - Configurable SMTP email service
+
+- **Database:**
+  - MongoDB with Mongoose ODM
+
+- **Hosting:**
+  - Netlify (Frontend deployments)
+
+### Payment Processing (DEMONSTRATION):
 - UPI
 - Cards
 - Cash on Delivery
 - Barter System
 
-## Project Structure
+### Sponsor Technologies Used:
+- [ ] **Groq**
+- [ ] **Monad**
+- [ ] **Fluvio**
+- [ ] **Base**
+- [ ] **Screenpipe**
+- [ ] **Stellar**
 
-```
-/
-├── admin/                  # Admin dashboard application
-├── client/                 # Main client application
-├── mock-data/              # Sample CSV data for database seeding
-├── server/                 # Backend server application
-└── netlify.toml            # Netlify deployment configuration
-```
+---
 
-### Client Application Structure
-```
-client/
-├── public/                 # Static assets
-│   └── team/               # Team member images
-├── src/
-│   ├── assets/             # Application assets
-│   ├── components/         # Reusable UI components
-│   ├── context/            # React Context providers
-│   ├── pages/              # Application pages/routes
-│   ├── services/           # API service wrappers
-│   └── styles/             # Global styles
-├── index.html              # HTML entry point
-├── tailwind.config.js      # Tailwind CSS configuration
-└── vite.config.js          # Vite bundler configuration
-```
-
-### Admin Dashboard Structure
-```
-admin/
-├── public/                 # Static assets
-├── src/
-│   ├── assets/             # Admin-specific assets
-│   ├── components/         # Admin UI components
-│   │   └── layout/         # Layout components
-│   ├── context/            # Admin-specific contexts
-│   ├── pages/              # Admin pages
-│   └── services/           # Admin API services
-├── index.html              # Admin HTML entry point
-├── tailwind.config.js      # Admin Tailwind configuration
-└── vite.config.js          # Admin Vite configuration
-```
-
-### Server Structure
-```
-server/
-├── controllers/            # API controllers
-├── data/                   # Static data and reference files
-├── libs/                   # Utility libraries
-├── middlewares/            # Express middlewares
-├── models/                 # Mongoose data models
-├── public/                 # Public static files
-├── routes/                 # API route definitions
-├── temp/                   # Temporary files and scripts
-├── app.js                  # Express application setup
-├── importData.js           # Database seeding script
-└── package.json            # Server dependencies
-```
-
-## Key Features
+## ✨ Key Features
 
 ### For Buyers
-- Authenticated shopping experience
-- Cultural product discovery with storytelling elements
-- Secure checkout and payment processing
-- Order tracking and history
-- User profiles with saved addresses
-- Wishlist functionality
-- Cart management
-- Community forum participation
+- ✅ Authenticated shopping experience with personalized recommendations
+- ✅ Cultural product discovery with artisan storytelling elements
+- ✅ Secure checkout with multiple payment options
+- ✅ Order tracking and history
+- ✅ Community forum participation
 
 ### For Sellers (Rural Artisans)
-- Seller onboarding and verification process
-- Product listing and management
-- Order fulfillment
-- Sales analytics
-- Mobile-friendly design for low-connectivity areas
-- Local language support (in development)
-- OTP-based authentication for low digital literacy
+- ✅ Mobile-friendly seller onboarding with low-tech options
+- ✅ Product listing and inventory management
+- ✅ Order fulfillment tracking
+- ✅ Sales analytics and insights
+- ✅ OTP-based authentication for low digital literacy
 
 ### For Education
-- Course catalog with various learning paths
-- Instructor profiles and ratings
-- Student enrollment and progress tracking
-- Interactive course content
-- Rural empowerment focused curriculum
-- Skill development opportunities
+- ✅ Course catalog with rural empowerment curriculum
+- ✅ Skill development pathways
+- ✅ Student progress tracking
+- ✅ Interactive course content
 
 ### Administrative
-- Comprehensive dashboard
-- User management
-- Seller approval workflow
-- Order management
-- Analytics and reporting
-- System settings configuration
+- ✅ Comprehensive dashboard for platform management
+- ✅ User and seller verification workflows
+- ✅ Order management system
+- ✅ Analytics and reporting tools
 
-## Database Models
+---
 
-- **User**: Authentication, profiles, and roles
-- **Product**: Physical and digital products (courses)
-- **Order**: Purchase transactions
-- **Category**: Product categorization
-- **Cart**: Shopping cart items
-- **Wishlist**: Saved items
-- **Review**: Product and seller reviews
-- **Coupon**: Promotional discounts
-- **LearningPath**: Educational paths
-- **Forum**: Community discussion
+## 📽️ Demo & Deliverables
 
-## Setup and Installation
+- **Demo Video Link:** [Add your demo video link here]
+- **Pitch Deck / PPT Link:** [Add your presentation link here]
 
-### Prerequisites
+---
+
+## ✅ Tasks & Bonus Checklist
+
+- [ ] **All members of the team completed the mandatory task - Followed at least 2 of our social channels and filled the form**
+- [ ] **All members of the team completed Bonus Task 1 - Sharing of Badges and filled the form (2 points)**
+- [ ] **All members of the team completed Bonus Task 2 - Signing up for Sprint.dev and filled the form (3 points)**
+
+---
+
+## 🧪 How to Run the Project
+
+### Requirements:
 - Node.js (v16+)
 - MongoDB (v5+)
 - npm or yarn
 
-### Environment Variables
-The project requires various environment variables for configuration. Example files:
-- `/server/.env.example`
-- `/client/.env.example`
-- `/admin/.env.example`
-
-### Installation Steps
+### Local Setup:
 
 1. **Clone the repository**
 ```bash
@@ -195,41 +175,40 @@ node dropDatabase.js
 node importData.js
 ```
 
-## Development
+### Environment Variables
+The project requires various environment variables for configuration. Example files:
+- `/server/.env.example`
+- `/client/.env.example`
+- `/admin/.env.example`
 
-### Running in Development Mode
-- Server: `npm run dev` in the server directory
-- Client: `npm run dev` in the client directory
-- Admin: `npm run dev` in the admin directory
+---
 
-## Authentication Flow
+## 🧬 Future Scope
 
-The application uses JWT for authentication with the following flow:
-1. User login/register via email
-2. Server validates credentials and issues JWT
-3. JWT stored in localStorage/cookies
-4. Token sent with subsequent requests via Authorization header
-5. Server validates token middleware for protected routes
+- 📈 AI-driven market insights for artisans
+- 🛡️ Blockchain-based product verification for authenticity
+- 🌐 Expanded language support for greater accessibility
+- 📱 Native mobile application for areas with limited connectivity
+- 🤝 Artisan cooperative formation and support tools
+- 🌍 Carbon footprint tracking for sustainable commerce
 
-## Performance Optimizations
+---
 
-- React lazy loading for route-based code splitting
-- Image optimization and lazy loading
-- Mongoose query optimization with proper indexing
-- API response caching where appropriate
-- Efficient Tailwind CSS purging for production
+## 📎 Resources / Credits
 
-## Project Contributors
+- This project was created as part of Hackazards 2025
+- Project structure follows modern React best practices
+- Authentication system built on JWT with secure storage
+- Database models designed for scalability and performance optimization
+- Special thanks to all contributors and supporters of rural Indian artisans
 
-- Manish - Full Stack Developer
-- Devesh - Full Stack Developer
-- Raghav - UI/UX Designer (UX)
-- Himanshi - UI/UX Designer (UI)
+---
 
-## Acknowledgments
+## 🏁 Final Words
 
-- This project was created as part of Hackazards 2025.
-- Special thanks to all contributors and supporters of rural Indian artisans.
+The LokRise journey has been about more than building a platform—it's about creating a bridge between traditional craftsmanship and modern markets. Our team faced challenges in designing UX that works across digital literacy levels and connectivity constraints, but these obstacles led to creative solutions like OTP-based authentication and offline-first features.
+
+We believe that technology should serve community needs, and we've aimed to build a solution that respects cultural heritage while opening new economic opportunities for rural creators.
 
 ---
 
