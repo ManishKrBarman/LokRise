@@ -587,14 +587,11 @@ const Dashboard = () => {
                                                 </p>
                                             </div>
                                             <div className="text-right">
-                                                <p className="text-sm font-medium text-gray-900">
-                                                    ₹{order.totalAmount.toFixed(2)}
-                                                </p>
                                                 <p className={`text-sm ${order.status === 'delivered' ? 'text-green-600' :
                                                     order.status === 'cancelled' ? 'text-red-600' :
                                                         'text-yellow-600'
                                                     }`}>
-                                                    {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                                                    {(order.status && typeof order.status === 'string') ? (order.status.charAt(0).toUpperCase() + order.status.slice(1)) : 'Unknown'}
                                                 </p>
                                             </div>
                                         </div>
