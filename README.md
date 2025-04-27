@@ -33,7 +33,7 @@ Our solution creates a sustainable ecosystem that empowers rural communities thr
 - Manish Kr Barman (Full Stack Developer) - [GitHub](https://github.com/ManishKrBarman)
 - Devesh - Full Stack Developer - [GitHub](https://github.com/DilicalFlame)
 - Raghav - UI/UX Designer (UX) - [GitHub](https://github.com/Raghavo2)
-- Himanshi - UI/UX Designer (UI) 
+- Himanshi - UI/UX Designer (UI) - [GitHub](https://github.com/kashyaphimansh3)
 
 ### Our Approach:  
 - We chose this problem to address the significant digital divide and market access gap faced by rural artisans
