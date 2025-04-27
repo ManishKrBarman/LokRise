@@ -44,11 +44,13 @@ export const authMiddleware = async (req, res, next) => {
 
             // Set user on request object
             req.user = {
-                id: user._id,
+                id: user._id.toString(), // Convert to string to ensure consistent comparison
                 email: user.email,
                 role: user.role,
                 isVerified: user.isVerified
             };
+
+            console.log('User authenticated:', { id: req.user.id, role: req.user.role });
 
             next();
         } catch (tokenError) {

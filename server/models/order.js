@@ -21,16 +21,16 @@ const orderSchema = new mongoose.Schema({
     totalAmount: { type: Number, required: true },
     couponCode: { type: String },
 
-    // Order Status
+    // Order Status - updated to include awaiting_barter_approval
     status: {
         type: String,
-        enum: ['pending', 'processing', 'confirmed', 'shipped', 'delivered', 'cancelled', 'refunded'],
+        enum: ['pending', 'processing', 'confirmed', 'shipped', 'delivered', 'cancelled', 'refunded', 'awaiting_barter_approval'],
         default: 'pending'
     },
     statusHistory: [{
         status: {
             type: String,
-            enum: ['pending', 'processing', 'confirmed', 'shipped', 'delivered', 'cancelled', 'refunded']
+            enum: ['pending', 'processing', 'confirmed', 'shipped', 'delivered', 'cancelled', 'refunded', 'awaiting_barter_approval']
         },
         date: { type: Date, default: Date.now },
         note: { type: String }
@@ -45,6 +45,48 @@ const orderSchema = new mongoose.Schema({
     paymentMethod: { type: String },
     transactionId: { type: String },
     paymentDate: { type: Date },
+
+    // Payment Details - Add detailed structure for different payment methods including barter
+    paymentDetails: {
+        paymentMethod: { type: String },
+        paymentStatus: { type: String },
+        // For online payments
+        transactionId: { type: String },
+        transactionRef: { type: String },
+        paymentGateway: { type: String },
+        paymentInitiated: { type: Date },
+        paymentCompletedAt: { type: Date },
+        // For cards
+        lastFourDigits: { type: String },
+        // For UPI
+        upiId: { type: String },
+        upiTransactionRef: { type: String },
+        // For Barter
+        barterProposal: {
+            orderId: { type: mongoose.Schema.Types.ObjectId, ref: 'Order' },
+            buyer: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+            seller: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+            item: {
+                title: { type: String },
+                category: { type: String },
+                description: { type: String },
+                estimatedValue: { type: Number },
+                topUpAmount: { type: Number, default: 0 },
+                photos: [{ type: String }]
+            },
+            status: { type: String, default: 'pending' },
+            createdAt: { type: Date },
+            barterAcceptedAt: { type: Date },
+            barterRejectedAt: { type: Date }
+        },
+        // For COD
+        CODRequested: { type: Date },
+        // For refunds
+        refundAmount: { type: Number },
+        refundDate: { type: Date },
+        refundRef: { type: String },
+        refundReason: { type: String }
+    },
 
     // Shipping Information
     shippingAddress: {

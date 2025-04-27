@@ -261,7 +261,7 @@ export const getOrderById = async (req, res) => {
         const order = await Order.findById(id)
             .populate('buyer', 'name email phone')
             .populate('seller', 'name email')
-            .populate('products.product', 'name price images description');
+            .populate('items.product', 'name price images description');  // Changed from 'products.product' to 'items.product'
 
         if (!order) {
             return res.status(404).json({ message: 'Order not found' });
@@ -306,7 +306,7 @@ export const getBuyerOrders = async (req, res) => {
             .skip(skip)
             .limit(limitNum)
             .populate('seller', 'name')
-            .populate('products.product', 'name price images');
+            .populate('items.product', 'name price images');  // Changed from 'products.product' to 'items.product'
 
         // Get total count
         const totalOrders = await Order.countDocuments(query);
@@ -346,7 +346,7 @@ export const getSellerOrders = async (req, res) => {
             .skip(skip)
             .limit(limitNum)
             .populate('buyer', 'name')
-            .populate('products.product', 'name price images');
+            .populate('items.product', 'name price images');
 
         // Get total count
         const totalOrders = await Order.countDocuments(query);
@@ -370,7 +370,7 @@ export const updateOrderStatus = async (req, res) => {
         const { status, description } = req.body;
 
         // Validate status
-        const validStatuses = ['pending', 'processing', 'shipped', 'delivered', 'cancelled', 'refunded'];
+        const validStatuses = ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled', 'refunded'];
         if (!validStatuses.includes(status)) {
             return res.status(400).json({ message: 'Invalid status value' });
         }
@@ -382,12 +382,20 @@ export const updateOrderStatus = async (req, res) => {
             return res.status(404).json({ message: 'Order not found' });
         }
 
-        // Validate permissions
-        if (req.user.role === 'buyer' && req.user.id !== order.buyer.toString()) {
+        // Log information for debugging
+        console.log('Update order attempt:');
+        console.log('- User ID:', req.user.id);
+        console.log('- User role:', req.user.role);
+        console.log('- Order seller ID:', order.seller);
+        console.log('- Order buyer ID:', order.buyer);
+        console.log('- Requested status:', status);
+
+        // Validate permissions - convert IDs to strings to ensure proper comparison
+        if (req.user.role === 'buyer' && req.user.id !== String(order.buyer)) {
             return res.status(403).json({ message: 'You do not have permission to update this order' });
         }
 
-        if (req.user.role === 'seller' && req.user.id !== order.seller.toString()) {
+        if (req.user.role === 'seller' && req.user.id !== String(order.seller)) {
             return res.status(403).json({ message: 'You do not have permission to update this order' });
         }
 
@@ -459,7 +467,7 @@ export const generateOrderReceipt = async (req, res) => {
         const order = await Order.findById(id)
             .populate('buyer', 'name email phone address')
             .populate('seller', 'name email businessDetails')
-            .populate('products.product', 'name price');
+            .populate('items.product', 'name price');  // Changed from 'products.product' to 'items.product'
 
         if (!order) {
             return res.status(404).json({ message: 'Order not found' });
@@ -491,7 +499,7 @@ export const generateOrderReceipt = async (req, res) => {
                 businessName: order.seller.businessDetails?.businessName,
                 gstin: order.seller.businessDetails?.gstin
             },
-            products: order.products.map(item => ({
+            items: order.items.map(item => ({  // Changed from 'products' to 'items'
                 name: item.name || item.product.name,
                 price: item.price || item.product.price,
                 quantity: item.quantity,
@@ -499,7 +507,7 @@ export const generateOrderReceipt = async (req, res) => {
             })),
             paymentMethod: order.paymentMethod,
             paymentDetails: order.paymentDetails,
-            subtotal: order.products.reduce((total, item) => {
+            subtotal: order.items.reduce((total, item) => {  // Changed from 'products' to 'items'
                 return total + ((item.price || item.product.price) * item.quantity);
             }, 0),
             discount: order.couponApplied ? order.discount || 0 : 0,
@@ -560,7 +568,7 @@ export const cancelOrder = async (req, res) => {
 
         // Restore product inventory
         const productUpdates = [];
-        for (const item of order.products) {
+        for (const item of order.items) {  // Changed from 'products' to 'items'
             productUpdates.push({
                 updateOne: {
                     filter: { _id: item.product },
@@ -606,5 +614,203 @@ export const cancelOrder = async (req, res) => {
     } catch (err) {
         console.error('Cancel order error:', err);
         res.status(500).json({ message: err.message });
+    }
+};
+
+// Accept barter proposal
+export const acceptBarterProposal = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { description } = req.body;
+
+        // Find order
+        const order = await Order.findById(id);
+
+        if (!order) {
+            return res.status(404).json({ message: 'Order not found' });
+        }
+
+        // Verify this is a barter order with pending status
+        if (order.paymentMethod !== 'BARTER' || !order.paymentDetails?.barterProposal) {
+            return res.status(400).json({
+                success: false,
+                message: 'This order does not have a pending barter proposal'
+            });
+        }
+
+        // Verify the seller is authorized for this order
+        if (req.user.id !== order.seller.toString()) {
+            return res.status(403).json({
+                success: false,
+                message: 'You do not have permission to accept this barter proposal'
+            });
+        }
+
+        // Verify the order is in awaiting approval state
+        if (order.status !== 'awaiting_barter_approval') {
+            return res.status(400).json({
+                success: false,
+                message: 'This barter proposal is not in awaiting approval status'
+            });
+        }
+
+        // Update order status
+        order.status = 'confirmed';
+        order.updatedAt = new Date();
+
+        // Update payment status
+        order.paymentDetails.paymentStatus = 'completed';
+        order.paymentDetails.barterAcceptedAt = new Date();
+
+        // Add to status history
+        order.statusHistory.push({
+            status: 'confirmed',
+            date: new Date(),
+            note: description || 'Barter proposal accepted by seller'
+        });
+
+        await order.save();
+
+        // Notify the buyer
+        await UserModel.findByIdAndUpdate(
+            order.buyer,
+            {
+                $push: {
+                    notifications: {
+                        message: `Your barter proposal for order #${order.orderNumber} has been accepted`,
+                        type: 'order',
+                        read: false,
+                        link: `/orders/${order._id}`,
+                        createdAt: new Date()
+                    }
+                }
+            }
+        );
+
+        res.status(200).json({
+            success: true,
+            message: 'Barter proposal accepted successfully',
+            order: {
+                id: order._id,
+                orderNumber: order.orderNumber,
+                status: order.status,
+                statusHistory: order.statusHistory
+            }
+        });
+    } catch (err) {
+        console.error('Accept barter error:', err);
+        res.status(500).json({
+            success: false,
+            message: err.message
+        });
+    }
+};
+
+// Reject barter proposal
+export const rejectBarterProposal = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { description } = req.body;
+
+        // Find order
+        const order = await Order.findById(id);
+
+        if (!order) {
+            return res.status(404).json({
+                success: false,
+                message: 'Order not found'
+            });
+        }
+
+        // Verify this is a barter order with pending status
+        if (order.paymentMethod !== 'BARTER' || !order.paymentDetails?.barterProposal) {
+            return res.status(400).json({
+                success: false,
+                message: 'This order does not have a pending barter proposal'
+            });
+        }
+
+        // Verify the seller is authorized for this order
+        if (req.user.id !== order.seller.toString()) {
+            return res.status(403).json({
+                success: false,
+                message: 'You do not have permission to reject this barter proposal'
+            });
+        }
+
+        // Verify the order is in awaiting approval state
+        if (order.status !== 'awaiting_barter_approval') {
+            return res.status(400).json({
+                success: false,
+                message: 'This barter proposal is not in awaiting approval status'
+            });
+        }
+
+        // Update order status
+        order.status = 'cancelled';
+        order.updatedAt = new Date();
+
+        // Update payment status
+        order.paymentDetails.paymentStatus = 'failed';
+        order.paymentDetails.barterRejectedAt = new Date();
+
+        // Add to status history
+        order.statusHistory.push({
+            status: 'cancelled',
+            date: new Date(),
+            note: description || 'Barter proposal rejected by seller'
+        });
+
+        // Restore inventory
+        const productUpdates = [];
+        for (const item of order.items) {
+            productUpdates.push({
+                updateOne: {
+                    filter: { _id: item.product },
+                    update: {
+                        $inc: { quantityAvailable: item.quantity }
+                    }
+                }
+            });
+        }
+
+        if (productUpdates.length > 0) {
+            await Product.bulkWrite(productUpdates);
+        }
+
+        await order.save();
+
+        // Notify the buyer
+        await UserModel.findByIdAndUpdate(
+            order.buyer,
+            {
+                $push: {
+                    notifications: {
+                        message: `Your barter proposal for order #${order.orderNumber} has been rejected`,
+                        type: 'order',
+                        read: false,
+                        link: `/orders/${order._id}`,
+                        createdAt: new Date()
+                    }
+                }
+            }
+        );
+
+        res.status(200).json({
+            success: true,
+            message: 'Barter proposal rejected successfully',
+            order: {
+                id: order._id,
+                orderNumber: order.orderNumber,
+                status: order.status,
+                statusHistory: order.statusHistory
+            }
+        });
+    } catch (err) {
+        console.error('Reject barter error:', err);
+        res.status(500).json({
+            success: false,
+            message: err.message
+        });
     }
 };

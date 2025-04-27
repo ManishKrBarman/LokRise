@@ -18,6 +18,7 @@ import QandA from './pages/QandA';
 import BecomeSeller from './pages/BecomeSeller';
 import SellerPending from './pages/SellerPending';
 import ApplicationStatus from './pages/seller/ApplicationStatus';
+import SellerOrders from './pages/seller/SellerOrders';
 import Profile from './pages/Profile';
 import Dashboard from './pages/Dashboard';
 import Search from './pages/Search';
@@ -39,6 +40,7 @@ function App() {
                 <Route path="/become-seller" element={<BecomeSeller />} />
                 <Route path="/seller/pending" element={<SellerPending />} />
                 <Route path="/seller/application-status" element={<ApplicationStatus />} />
+                <Route path="/seller/orders" element={<SellerOrders />} />
                 <Route path="/courses" element={<Edu />} />
                 <Route path="/customer-service" element={<CustomerService />} />
                 <Route path="/login" element={<Login />} />

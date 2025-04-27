@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { FiShoppingCart, FiBell, FiSearch, FiHeart, FiPackage, FiUser, FiMenu, FiX } from 'react-icons/fi';
+import { FiShoppingCart, FiBell, FiSearch, FiHeart, FiPackage, FiUser, FiMenu, FiX, FiGrid } from 'react-icons/fi';
 import { useNavigate, Link } from 'react-router-dom';
 import logo from '../assets/logo.svg';
 import { useAuth } from '../context/AuthContext';
@@ -324,8 +324,23 @@ const Navbar = (props) => {
                                                     Wishlist {wishlistItems.length > 0 && `(${wishlistItems.length})`}
                                                 </Link>
                                                 {user?.role === 'seller' && (
-                                                    <Link to="/dashboard" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                    <Link to="/dashboard" className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                        <FiGrid size={16} className="mr-2" />
                                                         Dashboard
+                                                    </Link>
+                                                )}
+                                                {user?.role === 'seller' && (
+                                                    <Link to="/seller/orders" className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                        <div className="relative mr-2">
+                                                            <FiPackage size={16} />
+                                                            {/* Show notification badge for new orders */}
+                                                            {user.notifications?.filter(n => n.type === 'order' && !n.read).length > 0 && (
+                                                                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
+                                                                    {user.notifications.filter(n => n.type === 'order' && !n.read).length}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                        Manage Orders
                                                     </Link>
                                                 )}
                                                 {/* Add option to view seller application if pending or rejected */}
@@ -445,8 +460,27 @@ const Navbar = (props) => {
                                                     className="flex items-center px-4 py-3 hover:bg-gray-100"
                                                     onClick={() => setShowMobileMenu(false)}
                                                 >
-                                                    <FiShoppingCart size={18} className="mr-3" />
+                                                    <FiGrid size={18} className="mr-3" />
                                                     <span>Dashboard</span>
+                                                </Link>
+                                            )}
+
+                                            {user?.role === 'seller' && (
+                                                <Link
+                                                    to="/seller/orders"
+                                                    className="flex items-center px-4 py-3 hover:bg-gray-100"
+                                                    onClick={() => setShowMobileMenu(false)}
+                                                >
+                                                    <div className="relative mr-3">
+                                                        <FiPackage size={18} />
+                                                        {/* Show notification badge for new orders */}
+                                                        {user.notifications?.filter(n => n.type === 'order' && !n.read).length > 0 && (
+                                                            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
+                                                                {user.notifications.filter(n => n.type === 'order' && !n.read).length}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                    <span>Manage Orders</span>
                                                 </Link>
                                             )}
 

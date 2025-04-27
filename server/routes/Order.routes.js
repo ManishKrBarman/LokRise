@@ -7,7 +7,9 @@ import {
     getSellerOrders,
     updateOrderStatus,
     generateOrderReceipt,
-    cancelOrder
+    cancelOrder,
+    acceptBarterProposal,
+    rejectBarterProposal
 } from '../controllers/Order.js';
 import { authMiddleware, authorizeRoles } from '../middlewares/auth.js';
 
@@ -21,6 +23,8 @@ OrderRoutes.get('/:id', authMiddleware, getOrderById);
 OrderRoutes.post('/:id/update-status', authMiddleware, updateOrderStatus);
 OrderRoutes.get('/:id/receipt', authMiddleware, generateOrderReceipt);
 OrderRoutes.post('/:id/cancel', authMiddleware, cancelOrder);
+OrderRoutes.post('/:id/accept-barter', authMiddleware, authorizeRoles('seller'), acceptBarterProposal);
+OrderRoutes.post('/:id/reject-barter', authMiddleware, authorizeRoles('seller'), rejectBarterProposal);
 
 // Admin only routes
 OrderRoutes.get('/', authMiddleware, authorizeRoles('admin'), getOrders);

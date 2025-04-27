@@ -459,6 +459,26 @@ const Dashboard = () => {
                                     <FiPackage className="text-[var(--primary-color)]" size={24} />
                                     <span className="ml-3 font-medium text-gray-900">View Orders</span>
                                 </Link>
+                                
+                                {/* Seller Orders link - only shown to approved sellers */}
+                                {isSeller && sellerStatus === 'approved' && (
+                                    <Link
+                                        to="/seller/orders"
+                                        className="flex items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 relative"
+                                    >
+                                        <div className="relative">
+                                            <FiPackage className="text-[var(--primary-color)]" size={24} />
+                                            {/* New order badge */}
+                                            {user.notifications?.filter(n => n.type === 'order' && !n.read).length > 0 && (
+                                                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                                                    {user.notifications.filter(n => n.type === 'order' && !n.read).length}
+                                                </span>
+                                            )}
+                                        </div>
+                                        <span className="ml-3 font-medium text-gray-900">Manage Orders</span>
+                                    </Link>
+                                )}
+                                
                                 <Link
                                     to="/wishlist"
                                     className="flex items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100"
