@@ -31,9 +31,9 @@ Our solution creates a sustainable ecosystem that empowers rural communities thr
 
 ### Team Members:  
 - Manish Kr Barman (Full Stack Developer) - [GitHub](https://github.com/ManishKrBarman)
-- Devesh - Full Stack Developer
-- Raghav - UI/UX Designer (UX)
-- Himanshi - UI/UX Designer (UI)
+- Devesh - Full Stack Developer - [GitHub](https://github.com/DilicalFlame)
+- Raghav - UI/UX Designer (UX) - [GitHub](https://github.com/Raghavo2)
+- Himanshi - UI/UX Designer (UI) 
 
 ### Our Approach:  
 - We chose this problem to address the significant digital divide and market access gap faced by rural artisans
@@ -72,12 +72,7 @@ Our solution creates a sustainable ecosystem that empowers rural communities thr
 - Barter System
 
 ### Sponsor Technologies Used:
-- [ ] **Groq**
-- [ ] **Monad**
-- [ ] **Fluvio**
-- [ ] **Base**
-- [ ] **Screenpipe**
-- [ ] **Stellar**
+- [.] **Groq**
 
 ---
 
@@ -113,14 +108,14 @@ Our solution creates a sustainable ecosystem that empowers rural communities thr
 
 ## 📽️ Demo & Deliverables
 
-- **Demo Video Link:** [Add your demo video link here]
-- **Pitch Deck / PPT Link:** [Add your presentation link here]
+- **Demo Video Link:** https://youtu.be/gCPdyKiOLc4?si=uj1CLGRBi3dYaG4Z
+- **Pitch Deck / PPT Link:** 
 
 ---
 
 ## ✅ Tasks & Bonus Checklist
 
-- [ ] **All members of the team completed the mandatory task - Followed at least 2 of our social channels and filled the form**
+- [.] **All members of the team completed the mandatory task - Followed at least 2 of our social channels and filled the form**
 - [ ] **All members of the team completed Bonus Task 1 - Sharing of Badges and filled the form (2 points)**
 - [ ] **All members of the team completed Bonus Task 2 - Signing up for Sprint.dev and filled the form (3 points)**
 
