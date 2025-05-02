@@ -103,6 +103,9 @@ Our solution creates a sustainable ecosystem that empowers rural communities thr
 - ✅ User and seller verification workflows
 - ✅ Order management system
 - ✅ Analytics and reporting tools
+- **DEMO LOGIN**
+- ID = ***temp@admin.com***
+- PASSWORD = ***temp@admin***
 
 ---
 
